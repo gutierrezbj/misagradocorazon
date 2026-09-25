@@ -194,7 +194,7 @@ const useStyles = makeStyles((c) => ({
     paddingVertical: 6,
   },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FFFFFF" },
-  liveText: { fontFamily: fonts.bodyBold, fontSize: 12, color: c.onBrandPrimary, letterSpacing: 1 },
+  liveText: { fontFamily: fonts.bodyBold, fontSize: 14, color: c.onBrandPrimary, letterSpacing: 1 },
   candleBanner: {
     flexDirection: "row",
     alignItems: "center",

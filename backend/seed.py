@@ -152,6 +152,17 @@ STAFF_ENV = [
     ("SEED_MODERATOR_EMAIL", "SEED_MODERATOR_PASSWORD", "moderator", "Moderación"),
 ]
 
+# Default moderation word filter — this is operational configuration, not
+# sample content. Admins manage the list from the panel afterwards.
+MODERATION_WORDS = [
+    "milagro garantizado",
+    "cadena de oracion",
+    "reenvia esto",
+    "brujeria",
+    "amuleto",
+    "maldicion",
+]
+
 
 async def run_seed(db, pwd_ctx):
     # Saints catalog (+ keep media/text fresh on existing docs)
@@ -189,6 +200,10 @@ async def run_seed(db, pwd_ctx):
             },
         }
         await db.daily_content.update_one({"date": d}, {"$setOnInsert": doc}, upsert=True)
+
+    # Moderation word filter (operational configuration)
+    for w in MODERATION_WORDS:
+        await db.moderation_words.update_one({"word": w}, {"$setOnInsert": {"word": w}}, upsert=True)
 
     # Staff accounts — only from environment variables, only if both set
     for ekey, pkey, role, name in STAFF_ENV:

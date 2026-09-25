@@ -93,8 +93,8 @@ export default function AdminCauses() {
 const useStyles = makeStyles((c) => ({
   section: { fontFamily: fonts.displayBold, fontSize: 20, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   causeName: { fontFamily: fonts.displaySemibold, fontSize: 17, color: c.onSurface },
-  meta: { fontFamily: fonts.body, fontSize: 13, color: c.muted, marginTop: 2, marginBottom: spacing.sm },
+  meta: { fontFamily: fonts.body, fontSize: 14, color: c.muted, marginTop: 2, marginBottom: spacing.sm },
   statusRow: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   statusChip: { backgroundColor: c.surfaceTertiary, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6 },
-  statusText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: c.onSurfaceSecondary },
+  statusText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary },
 }));

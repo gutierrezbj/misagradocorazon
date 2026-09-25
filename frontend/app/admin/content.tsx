@@ -127,5 +127,5 @@ const useStyles = makeStyles((c) => ({
   saintGrid: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm, marginBottom: spacing.sm },
   saintTile: { width: 88, borderRadius: radius.md, overflow: "hidden", borderWidth: 2, borderColor: "transparent", backgroundColor: c.surfaceSecondary },
   saintImg: { width: "100%", height: 70 },
-  saintName: { fontFamily: fonts.body, fontSize: 11, color: c.onSurface, padding: 4, textAlign: "center" },
+  saintName: { fontFamily: fonts.body, fontSize: 14, color: c.onSurface, padding: 4, textAlign: "center" },
 }));

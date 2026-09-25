@@ -72,6 +72,6 @@ export default function AdminTransparency() {
 const useStyles = makeStyles((c) => ({
   section: { fontFamily: fonts.displayBold, fontSize: 20, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   month: { fontFamily: fonts.displaySemibold, fontSize: 16, color: c.onSurface },
-  amount: { fontFamily: fonts.body, fontSize: 13, color: c.onSurfaceSecondary, marginTop: 4 },
-  note: { fontFamily: fonts.body, fontSize: 13, color: c.muted, marginTop: 4, fontStyle: "italic" },
+  amount: { fontFamily: fonts.body, fontSize: 14, color: c.onSurfaceSecondary, marginTop: 4 },
+  note: { fontFamily: fonts.body, fontSize: 14, color: c.muted, marginTop: 4, fontStyle: "italic" },
 }));

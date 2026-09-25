@@ -132,7 +132,7 @@ const useStyles = makeStyles((c) => ({
   name: { fontFamily: fonts.displayBold, fontSize: 26, color: c.onAltar, marginTop: spacing.sm },
   email: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted },
   roleBadge: { backgroundColor: c.brandSecondary, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 4, marginTop: spacing.sm },
-  roleText: { fontFamily: fonts.bodySemibold, fontSize: 12, color: c.onBrandSecondary, textTransform: "uppercase" },
+  roleText: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.onBrandSecondary, textTransform: "uppercase" },
   statsRow: { flexDirection: "row", justifyContent: "space-around", backgroundColor: c.surfaceSecondary, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.md },
   stat: { alignItems: "center" },
   statValue: { fontFamily: fonts.displayBold, fontSize: 28, color: c.brand },

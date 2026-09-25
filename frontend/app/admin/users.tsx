@@ -73,9 +73,9 @@ const useStyles = makeStyles((c) => ({
   search: { borderWidth: 1, borderColor: c.border, borderRadius: radius.md, padding: spacing.sm + 2, fontFamily: fonts.body, fontSize: 15, color: c.onSurface, backgroundColor: c.surfaceSecondary, marginBottom: spacing.md },
   userTop: { flexDirection: "row", alignItems: "center" },
   userName: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
-  userEmail: { fontFamily: fonts.body, fontSize: 13, color: c.muted },
+  userEmail: { fontFamily: fonts.body, fontSize: 14, color: c.muted },
   blockBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.surfaceTertiary, alignItems: "center", justifyContent: "center" },
   roleRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: spacing.sm },
   roleChip: { backgroundColor: c.surfaceTertiary, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 6 },
-  roleText: { fontFamily: fonts.bodyMedium, fontSize: 12, color: c.onSurfaceSecondary },
+  roleText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary },
 }));

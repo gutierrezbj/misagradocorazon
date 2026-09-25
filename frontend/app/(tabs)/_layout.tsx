@@ -50,7 +50,7 @@ export default function TabsLayout() {
           ...(Platform.OS === "web" ? { height: 64 } : {}),
         },
         tabBarItemStyle: { alignSelf: "center" },
-        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 12 },
+        tabBarLabelStyle: { fontFamily: fonts.bodyMedium, fontSize: 14 },
       }}
     >
       <Tabs.Screen name="index" options={{ title: t("tabAltar"), tabBarIcon: icon("home") }} />

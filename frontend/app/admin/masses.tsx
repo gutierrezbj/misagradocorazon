@@ -69,6 +69,6 @@ export default function AdminMasses() {
 const useStyles = makeStyles((c) => ({
   section: { fontFamily: fonts.displayBold, fontSize: 20, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   title: { fontFamily: fonts.displaySemibold, fontSize: 17, color: c.onSurface },
-  meta: { fontFamily: fonts.body, fontSize: 13, color: c.muted, marginTop: 2 },
-  url: { fontFamily: fonts.body, fontSize: 12, color: c.brand, marginTop: 4 },
+  meta: { fontFamily: fonts.body, fontSize: 14, color: c.muted, marginTop: 2 },
+  url: { fontFamily: fonts.body, fontSize: 14, color: c.brand, marginTop: 4 },
 }));

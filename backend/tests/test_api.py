@@ -345,6 +345,47 @@ def test_moderation_flow_end_to_end(s, superadmin_token, user_token):
     s.delete(f"{API}/admin/moderation/words/{w}", headers=auth(superadmin_token), timeout=15)
 
 
+# ---------------- Iteration 4: Seeded default moderation words ----------------
+def test_iter4_default_moderation_words_seeded(s, superadmin_token):
+    r = s.get(f"{API}/admin/moderation/words", headers=auth(superadmin_token), timeout=15)
+    assert r.status_code == 200
+    body = r.json()
+    # Endpoint may return {"words": [...]} of dicts or strings; normalize
+    raw = body.get("words", body if isinstance(body, list) else [])
+    words = set()
+    for w in raw:
+        if isinstance(w, str):
+            words.add(w.lower())
+        elif isinstance(w, dict) and "word" in w:
+            words.add(str(w["word"]).lower())
+    defaults = {"brujeria", "amuleto", "maldicion", "milagro garantizado", "cadena de oracion", "reenvia esto"}
+    missing = defaults - words
+    assert not missing, f"Missing default moderation words: {missing}. Got: {sorted(words)}"
+
+
+def test_iter4_default_filter_flags_brujeria(s):
+    # Fresh user so nothing from previous flow can interfere
+    unique = uuid.uuid4().hex[:8]
+    creds = {"email": f"TEST_mod_{unique}@example.com", "password": "TestPass2026!", "name": f"TEST Mod {unique}"}
+    rr = s.post(f"{API}/auth/register", json=creds, timeout=20)
+    assert rr.status_code == 200, rr.text
+    tok = rr.json()["session_token"]
+    r = s.post(
+        f"{API}/intentions",
+        json={"text": "TEST oracion sobre brujeria en el pueblo", "category": "general"},
+        headers=auth(tok),
+        timeout=15,
+    )
+    assert r.status_code == 200, r.text
+    j = r.json()
+    assert j.get("flagged") is True, f"Expected flagged=true, got: {j}"
+    assert j["intention"]["status"] == "pending", f"Expected pending, got: {j['intention']['status']}"
+    iid = j["intention"]["id"]
+    # And it must NOT be visible in the public list
+    pub = s.get(f"{API}/intentions", timeout=15).json()["intentions"]
+    assert not any(i["id"] == iid for i in pub), "Flagged intention leaked to public /intentions"
+
+
 def test_logout(s, user_creds):
     # separate login just for logout test
     r = s.post(f"{API}/auth/login", json={"email": user_creds["email"], "password": user_creds["password"]}, timeout=15)

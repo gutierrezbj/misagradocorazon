@@ -58,13 +58,13 @@ export default function AdminPush() {
 }
 
 const useStyles = makeStyles((c) => ({
-  note: { fontFamily: fonts.body, fontSize: 13, color: c.muted, fontStyle: "italic", marginBottom: spacing.md },
-  label: { fontFamily: fonts.bodyMedium, fontSize: 13, color: c.onSurfaceSecondary, marginBottom: 4 },
+  note: { fontFamily: fonts.body, fontSize: 14, color: c.muted, fontStyle: "italic", marginBottom: spacing.md },
+  label: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginBottom: 4 },
   langRow: { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.md },
   langChip: { backgroundColor: c.surfaceTertiary, borderRadius: radius.pill, paddingHorizontal: 16, paddingVertical: 8 },
   langText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary },
   section: { fontFamily: fonts.displayBold, fontSize: 20, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   pushTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
   pushBody: { fontFamily: fonts.body, fontSize: 14, color: c.onSurfaceSecondary, marginTop: 2 },
-  pushMeta: { fontFamily: fonts.body, fontSize: 12, color: c.muted, marginTop: 4 },
+  pushMeta: { fontFamily: fonts.body, fontSize: 14, color: c.muted, marginTop: 4 },
 }));

@@ -231,7 +231,7 @@ const useStyles = makeStyles((c) => ({
   impactCard: { borderRadius: radius.lg, padding: spacing.lg, alignItems: "center" },
   impactLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.goldSoft, textTransform: "uppercase", letterSpacing: 1 },
   impactValue: { fontFamily: fonts.displayBold, fontSize: 48, color: "#FDFBF7", marginVertical: 4 },
-  impactNote: { fontFamily: fonts.body, fontSize: 13, color: c.goldSoft },
+  impactNote: { fontFamily: fonts.body, fontSize: 14, color: c.goldSoft },
   fundedTitle: { fontFamily: fonts.displaySemibold, fontSize: 19, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   fundedRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
   fundedIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.brandTertiary, alignItems: "center", justifyContent: "center" },

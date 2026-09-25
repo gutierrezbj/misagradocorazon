@@ -101,7 +101,7 @@ const useStyles = makeStyles((colors) => ({
   },
   devMessage: {
     color: colors.error,
-    fontSize: 13,
+    fontSize: 14,
     textAlign: "center",
   },
   button: {
@@ -123,7 +123,7 @@ const useStyles = makeStyles((colors) => ({
   },
   detailsToggle: {
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 14,
     textDecorationLine: "underline",
     paddingVertical: 8,
   },
@@ -140,8 +140,8 @@ const useStyles = makeStyles((colors) => ({
   },
   detailsText: {
     color: colors.onSurfaceSecondary,
-    fontSize: 12,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
     fontFamily: Platform.select({ ios: "Menlo", default: "monospace" }),
   },
 }));
