@@ -1,7 +1,7 @@
 # Auditoría de entrega — Mi Sagrado Corazón
 
 Fecha: 2026-09-25 (revisión 2, sustituye a la versión sin código)
-Objeto: rama `conflict_250926_1728`, commit `8202ef5`.
+Objeto: rama `conflict_250926_1728`, commit `8202ef5` (secciones 0–10) y hasta `55ecc8f` (sección 11).
 Método: lectura completa del código y del historial git. **No se ha ejecutado nada**: ni backend, ni app, ni tests, ni `tsc`, porque hace falta MongoDB e instalar las dependencias. Lo que depende de ejecutarlo va marcado como *no verificado*.
 
 ## 0. Resumen
@@ -287,7 +287,31 @@ Roles implementados: `user`, `moderator`, `editor` y `superadmin`, con superadmi
 
 En esta sesión no se ha hecho: es un cambio de ramas remotas y queda a tu decisión.
 
-## 11. Incoherencias de documentación (pendientes para los SDD)
+## 11. Revisión de las correcciones (iteraciones 2 y 3)
+
+- Rama: `conflict_250926_1728`, commits `24efb70`, `ba4d72c`, `3c0cc6c` y `55ecc8f`.
+- Se guardaron en la misma rama y no en `feature/entrega-constructor-v2`, como se pidió.
+- Revisión por lectura del diff. Sin ejecutar.
+
+| Petición | Estado | Evidencia |
+|----------|--------|-----------|
+| 1. Staff solo desde variables de entorno | **Hecho** | `seed.py` lee `SEED_*_EMAIL` / `SEED_*_PASSWORD` y, si la cuenta existe, sobrescribe su contraseña. Los tests leen las mismas variables. **Pendiente:** la contraseña antigua `Sagrado2026` sigue en el historial git (commits `825a786` y `ba4d72c`) y en `test_reports/iteration_2.json`. Según `iteration_3.json` ya no funciona en la preview (401), pero hay que tratarla como quemada. |
+| 2. Seed sin datos inventados | **Hecho, con un efecto colateral** | Eliminadas las causas, votos, transparencia, intenciones y misa de ejemplo. **Regresión:** también eliminó la lista de palabras de moderación (`WORDS`). En una instalación nueva el filtro automático del muro y del chat arranca vacío y no filtra nada. |
+| 3. Voto único | **Hecho** | Índice único `votes(user_id, month)` y `DuplicateKeyError` → 400. El `$inc` del contador va aparte y no es atómico con la inserción: si falla entre ambas operaciones, el voto queda sin contar. Riesgo bajo. |
+| 4. Privacidad en endpoints públicos | **Hecho** | Quitados `user_id`, `prayed_by` y `user_name` de intenciones, velas comunitarias y chat. Se añade `already_prayed`. |
+| 5. Tipografía ≥16 px lectura / ≥14 px secundarias | **Parcial** | De 10–13 px se baja de 44 a 28 casos, pero sigue habiendo 64 de 162 tamaños ≤14 px. Los que quedan por debajo de 14 están sobre todo en el panel admin, `light-candle.tsx` (4) y la barra de pestañas. |
+| 6. Textos "público y auditado" / "20 % de cada vela" | **Hecho** | Ahora dice "20 % de la facturación mensual". |
+| 7. `.env.example` | **No hecho** | No existe en la rama. |
+| 8. Rama `feature/entrega-constructor-v2` | **No hecho** | Guardado en `conflict_250926_1728`. |
+
+Cambios de diseño en estas iteraciones:
+
+- `CandleFlame` rehecho en SVG (`react-native-svg`, dependencia nueva) con variantes `pillar` (login), `basic`, `solemn` y `permanent`, más un modo `mourning` para difuntos (ámbar).
+- Logo oficial de Google.
+- Títulos en **Playfair Display** en lugar de Cormorant Garamond: pendiente de tu aprobación.
+- Las velas guardan ahora `category` (`general` / `difuntos`).
+
+## 12. Incoherencias de documentación (pendientes para los SDD)
 
 1. **Pagos:** la especificación dice Stripe (§5.2, §7) y a la vez IAP para consumibles (§9.1). El prototipo no resuelve nada: simula sin modelo de pago.
 2. **Apple Sign-In:** entra en el MVP según la especificación. `CLAUDE.md` lo exige antes de la App Store.
