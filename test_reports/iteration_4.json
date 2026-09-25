@@ -1,0 +1,37 @@
+{
+  "summary": "Iteration 4 — 3 corrections + regression smoke. ALL PASS. Backend pytest 34/34 (7.92s) via /app/backend/tests/test_api.py including 2 new iter-4 tests: test_iter4_default_moderation_words_seeded (asserts the 6 defaults 'brujeria', 'amuleto', 'maldicion', 'milagro garantizado', 'cadena de oracion', 'reenvia esto' are all present in GET /api/admin/moderation/words as superadmin) and test_iter4_default_filter_flags_brujeria (fresh user posts 'TEST oracion sobre brujeria en el pueblo' → response has flagged=true and intention.status='pending'; the intention id is NOT visible in public GET /api/intentions). CORRECTION 1 also visually confirmed in admin UI: /admin/moderation lists exactly the 6 default 'Palabras filtradas' chips (amuleto, brujeria, cadena de oracion, maldicion, milagro garantizado, reenvia esto) and the flagged intention shows in 'Cola de intenciones (1)'. CORRECTION 2 — font >=14px: full mobile 390x844 regression sweep — Altar renders (title 'Sagrado Corazón de Jesús', 'Encender una vela' CTA, 'Evangelio de hoy', 'Santo del día', bottom tab labels Altar/Muro/Misa/Causas), /light-candle renders (saint chips, intention textarea, candle-type buttons, 'Encender vela'), Muro/Misa/Causas tabs render (Misa: 'Próxima Misa', countdown, chat; Causas: 'Causa del mes' with vote button), /admin dashboard renders (metric cards Usuarios/Velas/Ingresos/Votos/Intenciones/Por revisar + Gestión grid), /admin/moderation renders, /admin/causes renders form + list. NO text clipping, NO layout breakage, NO React Native red screen anywhere. CORRECTION 3 — /app/.env.example verified: file exists and lists MONGO_URL, DB_NAME, SEED_ADMIN_EMAIL/PASSWORD, SEED_EDITOR_EMAIL/PASSWORD, SEED_MODERATOR_EMAIL/PASSWORD, EXPO_PUBLIC_BACKEND_URL, EXPO_TUNNEL_SUBDOMAIN, EXPO_PACKAGER_HOSTNAME, EXPO_PACKAGER_PROXY_URL, EXPO_USE_FAST_RESOLVER, METRO_CACHE_ROOT — all keys empty (no real secret values). REGRESSION smoke: register (TEST_iter4_<uuid>@example.com) → onboarding (saint_corazon) → Altar rendered with 'Buenas tardes, TEST' greeting and lit candle SVG; /light-candle deceased-toggle flips rim ellipse fill from #4A0000 (red) → #8A6A2E (amber/mourning) — captured programmatically via SVG ellipse fill inspection; admin login works and Panel de gestión loads for superadmin (Hola, Juan (Superadmin)); all core backend endpoints (auth/login, /candles, /intentions, /causes/current, /masses/next, /transparency, /saints, /daily) return 200 via pytest. Only console noise is the pre-existing RN Web shadow*/Image.resizeMode deprecation warnings from iterations 1-3 — non-blocking, already reported.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "RN Web shadow* style props", "issue": "Pre-existing (iter1/2/3) warning still present: '\"shadow*\" style props are deprecated. Use \"boxShadow\".' Non-blocking. Sweep app-level styles for shadowColor/shadowOffset/shadowOpacity/shadowRadius when convenient."},
+      {"component": "RN Web Image.style.resizeMode", "issue": "Pre-existing warning: 'Image: style.resizeMode is deprecated. Please use props.resizeMode.' Non-blocking. Move resizeMode out of StyleSheet into the <Image resizeMode=... /> prop."}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional, non-blocking) Migrate remaining RN shadow* style props to boxShadow and move Image resizeMode from StyleSheet to <Image resizeMode=... /> prop to silence the two RN Web deprecation warnings."
+  ],
+  "critical_code_review_comments": [
+    "seed.py DEFAULT_MODERATION_WORDS (lines 158-163) correctly includes the 6 required defaults and _seed_moderation_words upserts them idempotently on startup — safe to re-run.",
+    "/app/.env.example is well-documented, groups backend vs frontend vars, calls out that staff accounts are only created when BOTH email+password are set, and contains no real secret values (all keys blank).",
+    "The two new iter-4 pytest cases are additive and normalize the /admin/moderation/words response shape (accepts list of str OR list of dicts with 'word' key) so they remain robust if the endpoint contract is later tightened."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_api.py (added test_iter4_default_moderation_words_seeded and test_iter4_default_filter_flags_brujeria)"
+  ],
+  "success_rate": {"backend": "34/34 (100%)", "frontend": "100% of iteration-4 criteria (all 6 default moderation words shown in admin UI, brujeria flags an intention, no font/layout regressions on Altar/Muro/Misa/Causas/light-candle/admin dashboard/admin subscreens, .env.example present)"},
+  "seed_data_creation": "Two fresh users via /api/auth/register: TEST_user_<uuid>@example.com (pytest session fixture) and TEST_mod_<uuid>@example.com (moderation test). One frontend register TEST_iter4_<uuid>@example.com for the UI regression. All TEST_-prefixed.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend + frontend share https://app-concept-review.preview.emergentagent.com (same-origin). Staff creds live only in backend/.env; pytest conftest reads them via python-dotenv (SEED_ADMIN_EMAIL/PASSWORD etc). Pytest suite is 34 tests, ~8s, run with `pytest /app/backend/tests/test_api.py -v --tb=short`. Iter-4 tests (test_iter4_default_moderation_words_seeded, test_iter4_default_filter_flags_brujeria) are stable and can be reused as regression for the seeded moderation word list. Frontend testIDs unchanged from iter3: toggle-auth-mode, name/email/password-input, submit-auth-button, saint-saint_corazon, finish-onboarding-button, light-candle-button, candle-saint-*, candle-intention-input, deceased-toggle, candle-type-*, light-now-button, candle-done-button. To programmatically verify the mourning candle, inspect SVG ellipse fills: red rim = #4A0000, mourning rim = #8A6A2E. Admin routes reachable at /admin, /admin/moderation, /admin/causes, /admin/masses, /admin/content, /admin/transparency, /admin/users, /admin/push (all render fine for superadmin at 390x844). Direct navigation to /altar returns 'Unmatched Route' because tabs live in the (tabs) group — this is expected, use '/' instead.",
+  "rca_of_issue": "N/A — all iteration-4 acceptance criteria met on first pass."
+}

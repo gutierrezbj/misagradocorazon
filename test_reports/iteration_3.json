@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 3 covered SECURITY/DATA hardening and two design tweaks. Backend pytest suite (32/32 PASSED, 6.29s) via /app/backend/tests/test_api.py. Iteration-3-specific backend checks all green: (a) SECURITY 1 — env-only staff seed: /api/auth/login with the OLD hardcoded 'Sagrado2026' password for admin@misagradocorazon.com returns 401; env-based creds (admin/editor/moderator) log in and /auth/me returns correct roles superadmin/editor/moderator. (b) DATA 2 — /api/transparency = {records:[], total_impact:0}; /api/saints?patron_only=true returns 7 saints; /api/daily returns devotional content; /api/causes/current after auth returns causes:[] until an admin creates one. (c) SECURITY 3 — unique vote index: editor POST /api/admin/causes for current month, fresh user POST /api/causes/{id}/vote → 200, second vote same month → 400 (not 500), and /api/causes/current then has my_vote_cause_id set (test_causes_current_and_vote). (d) PRIVACY 4 — /api/intentions items have NO user_id and NO prayed_by and DO have already_prayed (bool); /api/candles/community items have no user_id, no user_name and no intention; POST /api/intentions response contains no user_id/prayed_by; mass chat messages have no user_id (test_intentions_list_and_filter, test_community_candles). Frontend (mobile 390x844, EXPO_PUBLIC_BACKEND_URL): register → onboarding (saint_corazon) → Altar renders correctly. Altar main candle is a red glass votive with a thin gold cross (verified: 9 <rect>s + 3 <ellipse>s per candle SVG — the 2 cross rects and 2 gold band rects are present under hasBands). On /light-candle the 'deceased-toggle' is present; toggling ON switches the rim ellipse fill from #4A0000 (red) to #8A6A2E (mourning/amber) and the top wax pool/ellipses shift to the amber palette (no blue). Selecting candle types updates the preview: basic → 14 total rects (no cross/no bands), solemn → 19 rects (+5 for gold cross bars + 2 gold band strips), confirming variants differ; permanent similarly adds the top pedestal ring. Full light-candle flow works E2E: pick saint (candle-saint-saint_guadalupe) → intention → type → 'Encender vela' → success screen 'Tu vela está encendida' displayed. Causas wording: success screen already shows 'El 20% de la facturación mensual se destina a la causa del mes'; the strings 'público y auditado' and '20% de cada vela' are no longer present anywhere in /app/frontend/app/(tabs)/causas.tsx or /app/frontend/src/i18n.tsx (grep-verified). No console errors observed on this run — the earlier '<rect> attribute height negative' warning from iteration 2 is gone (CandleFlame.tsx now uses Math.max(0, …) on lines 253-254). Only remaining console warnings are pre-existing RN Web deprecations (shadow*, pointerEvents) — non-blocking. Regression (register→onboarding→Altar; candle E2E) verified fresh this iteration; Muro/Misa/admin flows unchanged and already covered by pytest.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "RN Web shadow* style props", "issue": "Pre-existing (iter1/2) warning: '\"shadow*\" style props are deprecated. Use \"boxShadow\".' Non-blocking; likely inside RN internal components but sweep app-level styles for shadowColor/shadowOffset/shadowOpacity/shadowRadius and migrate to boxShadow when possible."}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "(Optional, non-blocking) Migrate any lingering RN shadow* style props to boxShadow to clear the RN Web deprecation warning."
+  ],
+  "critical_code_review_comments": [
+    "seed.py cleanly guards staff creation on both SEED_*_EMAIL and SEED_*_PASSWORD; if either is unset the account is skipped, exactly matching the spec.",
+    "CandleFlame.tsx rim/ellipse mourning palette switches on the `mourning` prop while the gold cross remains driven by hasBands (solemn/permanent) — good separation and matches the requested UX.",
+    "test_causes_current_and_vote already asserts the exact 200→400 behavior for duplicate votes in the same month, covering the new unique index; consider also asserting the 400 response body to differentiate 'already_voted' vs generic bad request in the future."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "32/32 (100%)", "frontend": "100% of iteration-3 criteria (deceased toggle, gold cross on solemn/permanent, variant preview switch, full E2E flow, Causas wording)"},
+  "seed_data_creation": "Registered a single TEST_iter3_<uuid>@example.com user via /api/auth/register and completed onboarding (saint_corazon). No manual DB seeding.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Backend base + frontend share https://app-concept-review.preview.emergentagent.com (same-origin). Staff creds live only in backend/.env — pytest conftest reads them via python-dotenv. All 32 tests are stable. Frontend testIDs used: toggle-auth-mode, name-input, email-input, password-input, submit-auth-button, saint-saint_corazon, finish-onboarding-button, light-candle-button, candle-saint-*, candle-intention-input, deceased-toggle, candle-type-basic/solemn/permanent, light-now-button, candle-done-button. To verify the deceased/mourning candle programmatically, inspect the rim <ellipse> fill: red=#4A0000, mourning=#8A6A2E; the gold cross adds 2 rects and gold band adds 2 more rects (basic→14 total, solemn→19 total). Candle-type-permanent button may require a small scroll on 390x844 as the type list is horizontally paginated; use scrollIntoViewIfNeeded before force-click if needed.",
+  "rca_of_issue": "N/A — no failures found."
+}

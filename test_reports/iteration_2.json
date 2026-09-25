@@ -1,0 +1,37 @@
+{
+  "summary": "Iteration 2 focused on visual/UX fixes (login band, Google logo, Playfair font) and the new glass-votive candle with 3 variants. Backend smoke check: /api/saints and /api/auth/login (admin@misagradocorazon.com/Sagrado2026) both 200. Frontend (mobile 390x844): (1) Login screen — dark hero (candle + brand + tagline) transitions directly into the ivory card, no white/grey band or gap visible; card background rgb(253,251,247). (2) 'Continuar con Google' button now renders the official multicolor Google 'G' SVG with brand palette (#EA4335 red, #4285F4 blue, #FBBC05 yellow, #34A853 green detected in DOM); no envelope icon. (3) Playfair Display font active: 'Iniciar sesión' computed fontFamily = 'PlayfairDisplay-Bold' 28px; accented characters ('ó' in 'Corazón', 'ó' in 'sesión') render correctly with no missing-glyph fallback or crash. Brand title screenshot visually shows Playfair serif with proper accents. (4) Glass votive candles: Altar main candle renders as red glass votive (variant='solemn') with inner light, gold band, and lit flame — no errors. On /light-candle the top preview updates when selecting candle type cards — SVG bounding box changes from basic (~175x175) → solemn (~198x198, larger with gold band) → permanent (~179x179, taller with pedestal + top gold ring), confirming variant swap. Full flow works: pick saint (candle-saint-saint_guadalupe) → type intention 'Por la salud de mi familia' → pick 'permanent' → press Encender vela → success screen 'Tu vela está encendida' appears (verified in DOM). After tapping Continuar the Altar shows the lit candle under 'Mis velas encendidas' as a mini glass votive (mini-sized SVGs visible). Regression flows (register → onboarding with saint_corazon → Altar) also worked end-to-end in this run; deeper regression (Muro/Causas/Misa/Admin) was already validated 100% in iteration_1 and backend endpoints are unchanged. One console error observed: '<rect> attribute height: A negative value is not valid. (\"-10.520000000000003\")' — coming from GlassVotive's right specular-highlight rect at small candle sizes (mini candle size≈54). Non-blocking (candles still render) but should be clamped to avoid noisy console errors on the Altar mini list.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {"component": "GlassVotive (mini candle in Altar 'Mis velas encendidas')", "issue": "SVG console error: '<rect> attribute height: A negative value is not valid. (\"-10.520...\")'. Right specular-highlight Rect at CandleFlame.tsx:239 uses height = glassBottom - rimY - 34, which is negative for small candle sizes (size≈54 → bodyH≈33 → height≈-10.5). Clamp with Math.max(0, …) or skip that Rect when bodyH is below a threshold. Reference: /app/frontend/src/components/CandleFlame.tsx:239", "testID": "n/a (rendered inside mini candle card)", "priority": "LOW"}
+    ],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "shadow* style props (RN Web)", "issue": "Existing warning from iter1: '\"shadow*\" style props are deprecated. Use \"boxShadow\".' Non-blocking."},
+      {"component": "pointerEvents prop (RN Web)", "issue": "New non-blocking warning: 'props.pointerEvents is deprecated. Use style.pointerEvents' — likely from an internal RN/Reanimated component; verify no app-level usage of pointerEvents prop remains."}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_api.py (reused from iter1, unchanged)",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "In /app/frontend/src/components/CandleFlame.tsx GlassVotive, clamp specular-highlight rect heights to >=0 (Math.max) or skip highlights when bodyH is too small, to eliminate the '<rect> height negative' console error on mini candles. Repro: light any candle then look at Altar 'Mis velas encendidas' or shrink CandleFlame size below ~60."
+  ],
+  "critical_code_review_comments": [
+    "GlassVotive (CandleFlame.tsx) hard-codes several rect y/height offsets (e.g. rimY+10, height = glassBottom - rimY - 34) that break at small sizes; parameterize by size or clamp.",
+    "Light-candle preview container styles.preview has height 250; CandleFlame(size=150) computes wrapH ≈ 262.5, so ~12px of the top of the wrap overlaps the section label above. Consider raising preview height to 270 or lowering candle size to ~140 for a cleaner layout.",
+    "AltarStage flameArea height 300 works, but the LinearGradient bgOverlay is only 400px tall — on taller devices the transition may look abrupt. Non-blocking."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "smoke 2/2 (login + saints); full 32/32 unchanged from iter1", "frontend": "100% of iteration-specific criteria (login band, Google logo, Playfair font, glass votive variants, preview change, full light-candle flow, mini candle on altar)"},
+  "seed_data_creation": "None; used existing seeded content and created a fresh TEST_ prefixed user via register.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Frontend base = https://app-concept-review.preview.emergentagent.com (same-origin, EXPO_PUBLIC_BACKEND_URL). Staff creds in /app/memory/test_credentials.md. Regular user register still works. testIDs used this iteration: google-login-button, email-input, password-input, name-input, submit-auth-button, toggle-auth-mode, saint-saint_corazon, finish-onboarding-button, light-candle-button, candle-saint-*, candle-intention-input, candle-type-basic/solemn/permanent, light-now-button, candle-done-button. When testing candle-preview change, capture SVG bounding-box width/height because the CandleFlame wraps a canvas-sized <svg>; expected sizes differ by variant (basic ~150 base, solemn wider due to size delta and gold band, permanent taller with pedestal). Watch for the '<rect> height negative' SVG error until fixed.",
+  "rca_of_issue": "GlassVotive negative-rect: CandleFlame.tsx:239 defines the right highlight Rect with height = glassBottom - rimY - 34. For any candle where bodyH < ~44 (typical for the mini candle at size=54 → bodyH=33.48), this expression is negative and react-native-svg logs the error. Mitigation: replace with `Math.max(0, glassBottom - rimY - 34)` or gate the highlight rects on a minimum size (e.g. only render when size >= 80)."
+}
