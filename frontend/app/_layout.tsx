@@ -63,9 +63,9 @@ function Gate() {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    CormorantGaramond: require("../assets/fonts/CormorantGaramond.ttf"),
-    "CormorantGaramond-SemiBold": require("../assets/fonts/CormorantGaramond.ttf"),
-    "CormorantGaramond-Bold": require("../assets/fonts/CormorantGaramond.ttf"),
+    PlayfairDisplay: require("../assets/fonts/PlayfairDisplay.ttf"),
+    "PlayfairDisplay-SemiBold": require("../assets/fonts/PlayfairDisplay.ttf"),
+    "PlayfairDisplay-Bold": require("../assets/fonts/PlayfairDisplay.ttf"),
     LibreFranklin: require("../assets/fonts/LibreFranklin.ttf"),
     "LibreFranklin-Medium": require("../assets/fonts/LibreFranklin.ttf"),
     "LibreFranklin-SemiBold": require("../assets/fonts/LibreFranklin.ttf"),

@@ -2,14 +2,14 @@ import { useState } from "react";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
-import { AppButton, Icon, useToast } from "@/src/components/ui";
+import { AppButton, useToast } from "@/src/components/ui";
 import { CandleFlame } from "@/src/components/CandleFlame";
+import { GoogleLogo } from "@/src/components/GoogleLogo";
 import { ApiError } from "@/src/api";
 
 export default function LoginScreen() {
@@ -70,8 +70,6 @@ export default function LoginScreen() {
           <Text style={styles.tagline}>{t("tagline")}</Text>
         </View>
 
-        <LinearGradient colors={["transparent", colors.surface]} style={styles.fade} />
-
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{mode === "login" ? t("signIn") : t("signUp")}</Text>
 
@@ -131,7 +129,7 @@ export default function LoginScreen() {
           </View>
 
           <Pressable testID="google-login-button" onPress={google} style={styles.googleBtn}>
-            <Icon name="mail" size={18} color={colors.onSurface} />
+            <GoogleLogo size={20} />
             <Text style={styles.googleText}>{t("continueGoogle")}</Text>
           </Pressable>
 
@@ -162,7 +160,7 @@ const useStyles = makeStyles((c) => ({
     paddingHorizontal: spacing.xl,
     fontStyle: "italic",
   },
-  fade: { height: 40, marginTop: -20 },
+  fade: { height: 0 },
   card: {
     backgroundColor: c.surface,
     marginHorizontal: spacing.md,

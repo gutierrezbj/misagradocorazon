@@ -64,9 +64,9 @@ const light = {
 export type ThemeColors = typeof light;
 
 export const fonts = {
-  display: "CormorantGaramond",
-  displaySemibold: "CormorantGaramond-SemiBold",
-  displayBold: "CormorantGaramond-Bold",
+  display: "PlayfairDisplay",
+  displaySemibold: "PlayfairDisplay-SemiBold",
+  displayBold: "PlayfairDisplay-Bold",
   body: "LibreFranklin",
   bodyMedium: "LibreFranklin-Medium",
   bodySemibold: "LibreFranklin-SemiBold",

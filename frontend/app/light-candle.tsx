@@ -65,7 +65,7 @@ export default function LightCandle() {
       <View style={[styles.root, styles.doneWrap, { paddingTop: insets.top }]}>
         <StatusBar style="light" />
         <View style={{ height: 220, justifyContent: "flex-end" }}>
-          <CandleFlame size={170} lit />
+          <CandleFlame size={170} lit variant={type} />
         </View>
         <Text style={styles.doneTitle}>{t("candleLit")}</Text>
         <Text style={styles.doneSub}>{t("candleLitSub")}</Text>
@@ -88,6 +88,10 @@ export default function LightCandle() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: spacing.md, paddingBottom: insets.bottom + 120 }} showsVerticalScrollIndicator={false}>
+        <View style={styles.preview}>
+          <CandleFlame size={150} lit variant={type} />
+        </View>
+
         <Text style={styles.sectionLabel}>{t("forWhichSaint")}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.sm }}>
           {saints.map((s: any) => (
@@ -153,6 +157,7 @@ const useStyles = makeStyles((c) => ({
   title: { fontFamily: fonts.displayBold, fontSize: 26, color: c.gold },
   close: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.altarCard, alignItems: "center", justifyContent: "center" },
   sectionLabel: { fontFamily: fonts.bodySemibold, fontSize: 15, color: c.onAltarMuted, textTransform: "uppercase", letterSpacing: 1, marginTop: spacing.md },
+  preview: { height: 250, alignItems: "center", justifyContent: "flex-end", marginBottom: spacing.sm },
   saintChip: { width: 92, borderRadius: radius.md, overflow: "hidden", borderWidth: 2, borderColor: "transparent", backgroundColor: c.altarCard },
   saintChipActive: { borderColor: c.gold },
   saintChipImg: { width: "100%", height: 80, backgroundColor: c.altarCardSoft },

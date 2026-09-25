@@ -87,7 +87,7 @@ export default function Altar() {
             </Pressable>
           )}
           <View style={styles.flameArea}>
-            <CandleFlame size={190} lit />
+            <CandleFlame size={190} lit variant="solemn" />
           </View>
         </View>
 
@@ -135,7 +135,7 @@ export default function Altar() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingRight: spacing.md }}>
               {candles.map((c: any) => (
                 <View key={c.id} style={styles.miniCandle}>
-                  <CandleFlame size={54} lit />
+                  <CandleFlame size={54} lit variant={c.type} />
                   <Text style={styles.miniSaint} numberOfLines={1}>
                     {c.saint_name}
                   </Text>
