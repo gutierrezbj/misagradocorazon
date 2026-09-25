@@ -1,7 +1,7 @@
 # Auditoría de entrega — Mi Sagrado Corazón
 
 Fecha: 2026-09-25 (revisión 2, sustituye a la versión sin código)
-Objeto: rama `conflict_250926_1728`, commit `8202ef5` (secciones 0–10) y hasta `55ecc8f` (sección 11).
+Objeto: rama `conflict_250926_1728`, commit `8202ef5` (secciones 0–10) y hasta `67b47ed` (sección 11).
 Método: lectura completa del código y del historial git. **No se ha ejecutado nada**: ni backend, ni app, ni tests, ni `tsc`, porque hace falta MongoDB e instalar las dependencias. Lo que depende de ejecutarlo va marcado como *no verificado*.
 
 ## 0. Resumen
@@ -287,7 +287,7 @@ Roles implementados: `user`, `moderator`, `editor` y `superadmin`, con superadmi
 
 En esta sesión no se ha hecho: es un cambio de ramas remotas y queda a tu decisión.
 
-## 11. Revisión de las correcciones (iteraciones 2 y 3)
+## 11. Revisión de las correcciones (iteraciones 2 a 4)
 
 - Rama: `conflict_250926_1728`, commits `24efb70`, `ba4d72c`, `3c0cc6c` y `55ecc8f`.
 - Se guardaron en la misma rama y no en `feature/entrega-constructor-v2`, como se pidió.
@@ -296,13 +296,14 @@ En esta sesión no se ha hecho: es un cambio de ramas remotas y queda a tu decis
 | Petición | Estado | Evidencia |
 |----------|--------|-----------|
 | 1. Staff solo desde variables de entorno | **Hecho** | `seed.py` lee `SEED_*_EMAIL` / `SEED_*_PASSWORD` y, si la cuenta existe, sobrescribe su contraseña. Los tests leen las mismas variables. **Pendiente:** la contraseña antigua `Sagrado2026` sigue en el historial git (commits `825a786` y `ba4d72c`) y en `test_reports/iteration_2.json`. Según `iteration_3.json` ya no funciona en la preview (401), pero hay que tratarla como quemada. |
-| 2. Seed sin datos inventados | **Hecho, con un efecto colateral** | Eliminadas las causas, votos, transparencia, intenciones y misa de ejemplo. **Regresión:** también eliminó la lista de palabras de moderación (`WORDS`). En una instalación nueva el filtro automático del muro y del chat arranca vacío y no filtra nada. |
+| 2. Seed sin datos inventados | **Hecho** | Eliminadas las causas, votos, transparencia, intenciones y misa de ejemplo. La lista de palabras de moderación, que se había perdido en la iteración 3, se restaura en la 4 (`MODERATION_WORDS`, `seed.py:157`), con 2 tests nuevos. |
 | 3. Voto único | **Hecho** | Índice único `votes(user_id, month)` y `DuplicateKeyError` → 400. El `$inc` del contador va aparte y no es atómico con la inserción: si falla entre ambas operaciones, el voto queda sin contar. Riesgo bajo. |
 | 4. Privacidad en endpoints públicos | **Hecho** | Quitados `user_id`, `prayed_by` y `user_name` de intenciones, velas comunitarias y chat. Se añade `already_prayed`. |
-| 5. Tipografía ≥16 px lectura / ≥14 px secundarias | **Parcial** | De 10–13 px se baja de 44 a 28 casos, pero sigue habiendo 64 de 162 tamaños ≤14 px. Los que quedan por debajo de 14 están sobre todo en el panel admin, `light-candle.tsx` (4) y la barra de pestañas. |
+| 5. Tipografía ≥16 px lectura / ≥14 px secundarias | **Hecho** (iteración 4) | 0 de 162 `fontSize` por debajo de 14. Los textos de lectura revisados (evangelio, meditación, santo, intenciones, causas, chat) están en 16–17 px. Etiquetas y metadatos en 14–15 px. |
 | 6. Textos "público y auditado" / "20 % de cada vela" | **Hecho** | Ahora dice "20 % de la facturación mensual". |
-| 7. `.env.example` | **No hecho** | No existe en la rama. |
-| 8. Rama `feature/entrega-constructor-v2` | **No hecho** | Guardado en `conflict_250926_1728`. |
+| 7. `.env.example` | **No llega al repo** | Según `test_reports/iteration_4.json` existe en el entorno de Emergent, pero el `.gitignore` tiene el patrón `.env.*`, que también excluye `.env.example`. Solución: añadir `!.env.example` al `.gitignore`. |
+| 8. Rama `feature/entrega-constructor-v2` | **No hecho** | Las iteraciones 4 (`caebefe`, `67b47ed`) se guardaron otra vez en `conflict_250926_1728`. |
+| — Pagos reales | Correcto | No se ha integrado RevenueCat, Stripe ni ningún SDK de pagos. |
 
 Cambios de diseño en estas iteraciones:
 
