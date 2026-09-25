@@ -1,0 +1,165 @@
+{
+  "app_name": "Mi Sagrado Corazón",
+  "personality": "3 Editorial Mobile LIGHT combined with 6 Glass / Luxe DARK for the Altar screen",
+  "personality_one_liner": "A warm, sacred, and deeply emotional digital chapel that balances the solemnity of classical Catholic devotions with premium editorial typography and cinematic depth.",
+  "color": {
+    "surface": "#FDFBF7",
+    "onSurface": "#2D2422",
+    "surfaceSecondary": "#F3EFE6",
+    "onSurfaceSecondary": "#3A312E",
+    "surfaceTertiary": "#EAE4D9",
+    "onSurfaceTertiary": "#4A413D",
+    "surfaceInverse": "#1C0F0E",
+    "onSurfaceInverse": "#FDFBF7",
+    "brand": "#8B0000",
+    "brandPrimary": "#7A0000",
+    "onBrandPrimary": "#FDFBF7",
+    "brandSecondary": "#C5A059",
+    "onBrandSecondary": "#1C0F0E",
+    "brandTertiary": "#E8D9B9",
+    "onBrandTertiary": "#5C4316",
+    "success": "#2E523A",
+    "onSuccess": "#FFFFFF",
+    "warning": "#C5A059",
+    "onWarning": "#FFFFFF",
+    "error": "#8B0000",
+    "onError": "#FFFFFF",
+    "info": "#4A6984",
+    "onInfo": "#FFFFFF",
+    "border": "#E1D8C9",
+    "borderStrong": "#C5A059",
+    "divider": "#E1D8C9",
+    "muted": "#82776E",
+    "onBrand": "#FDFBF7"
+  },
+  "typography": {
+    "displayFontFamily": "CormorantGaramond",
+    "textFontFamily": "LibreFranklin",
+    "scale": {
+      "sm": 14,
+      "base": 16,
+      "lg": 18,
+      "xl": 24,
+      "2xl": 32
+    }
+  },
+  "spacing": {
+    "rule": "Generous, breathable editorial margins. Do not cramp content. Use spacing to create moments of reflection.",
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32,
+    "2xl": 48,
+    "3xl": 64
+  },
+  "radius_tokens": {
+    "sm": 4,
+    "md": 8,
+    "lg": 16,
+    "pill": 999
+  },
+  "shadow_tier": "1",
+  "navigation": "bottom_tabs",
+  "icon_set": "Feather",
+  "glassmorphism": {
+    "enabled": "true",
+    "do's": [
+      "Use dark frosted glass panels over the Altar background to hold daily readings or prayers without blocking the candle's glow.",
+      "Use subtle blur on the bottom tab bar to allow scrolling content to gently ghost underneath."
+    ],
+    "dont's": [
+      "Do not apply glass to readable body text blocks or dense form fields.",
+      "Do not use highly reflective white glass on the Altar screen; keep it muted, dark, and warm."
+    ]
+  },
+  "platform_libraries": {
+    "glass": {
+      "ios": "expo-glass-effect",
+      "android": "expo-blur",
+      "low_end_android_fallback": "solid surfaceSecondary"
+    },
+    "image": "expo-image",
+    "blur": "expo-blur",
+    "bottom_sheet": "@gorhom/bottom-sheet",
+    "animation": "react-native-reanimated",
+    "gesture": "react-native-gesture-handler"
+  },
+  "screens": [
+    {
+      "name": "Altar (Home)",
+      "purpose": "A deeply personal and spiritual home screen functioning as a virtual altar centered around lighting a virtual candle for an intention.",
+      "states": {
+        "loading": "Centered minimalist gold cross or fading candle outline on a dark warm background.",
+        "empty": "Prompt to 'Select your Patron Saint' to construct your personal altar.",
+        "error": "Message: 'Unable to prepare your altar at this time.' with a soft gold Retry button."
+      },
+      "layout": "CRITICAL: This entire screen MUST use the dark theme ('surfaceInverse' #1C0F0E background) to emulate a dimly lit chapel. Top: Greeting and streak counter. Center: Large, immersive animated candle (fluid Lottie/Skia flame) that acts as the emotional core. Below the candle: Floating glass or 'brandPrimary' tinted cards for Daily Gospel + Audio Meditation, and Morning/Night Prayers."
+    },
+    {
+      "name": "Muro (Community Intentions)",
+      "purpose": "A public wall of prayer requests where users can pray for each other.",
+      "states": {
+        "loading": "Skeleton rows resembling parchment prayer cards.",
+        "empty": "Illustration of folded hands with text: 'Be the first to share an intention today.'",
+        "error": "Message: 'Could not load community intentions.' with a Retry button."
+      },
+      "layout": "Uses the light Ivory ('surface') theme. Top: Segmented filter pills (Recent, Health, Family, Thanksgiving). Body: Feed of intention cards. Each card uses 'surfaceSecondary', features elegant serif typography for the name, and a prominent 'Rezo por ti' (I pray for you) button in 'brandSecondary' (Gold). Avoid rigid dashboards; arrange cards with generous 'lg' padding."
+    },
+    {
+      "name": "Misa (Live Sunday Mass)",
+      "purpose": "A virtual gathering space to watch the weekly Sunday Mass with community chat.",
+      "states": {
+        "loading": "Loading spinner over a blurred chapel image.",
+        "empty": "Countdown timer to the next Sunday Mass prominently displayed over a beautiful church interior photo.",
+        "error": "Message: 'Could not connect to the live stream.' with Retry button."
+      },
+      "layout": "Light or Dark theme based on live status. Top half: 16:9 YouTube embed container with gradient scrim. Bottom half: Split between an active community chat feed and a beautifully formatted schedule. Use classical alignment and generous spacing. Add a sticky primary CTA 'Donate to Collection' at the bottom."
+    },
+    {
+      "name": "Causas (Social Impact)",
+      "purpose": "A transparent voting and reporting system for the community's monthly charitable donations.",
+      "states": {
+        "loading": "Skeleton of candidate cards with progress bars.",
+        "empty": "Message: 'New causes are being prepared for next month.'",
+        "error": "Message: 'Unable to load causes.' with Retry button."
+      },
+      "layout": "Light Ivory ('surface') theme. Top: Editorial-style header 'Cause of the Month' and current revenue percentage tracker. Middle: Candidate cards showing high-quality photos (with top-to-bottom dark gradient scrims for readable text), descriptions, and a prominent 'Votar' (Vote) button. Bottom: Transparency panel showing past funded causes with before/after photo galleries."
+    }
+  ],
+  "images": {
+    "altar_background": {
+      "url": "https://images.pexels.com/photos/30252655/pexels-photo-30252655.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "dark": "https://images.pexels.com/photos/29917672/pexels-photo-29917672.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Warm glow of candles inside a church in Vienna, creating a serene atmosphere."
+    },
+    "saint_card_jesus": {
+      "url": "https://images.pexels.com/photos/7219104/pexels-photo-7219104.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "A detailed painting of the Sacred Heart of Jesus displayed indoors with ornate decor."
+    },
+    "sunday_mass_hero": {
+      "url": "https://images.unsplash.com/photo-1465848059293-208e11dfea17?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2MjJ8MHwxfHNlYXJjaHwxfHxjYXRob2xpYyUyMGNodXJjaCUyMHN1bmRheSUyMG1hc3N8ZW58MHx8fHwxNzkwMzQ1MzA4fDA&ixlib=rb-4.1.0&q=85",
+      "alt": "Beautiful catholic church interior."
+    },
+    "charity_impact_card": {
+      "url": "https://images.pexels.com/photos/7156163/pexels-photo-7156163.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "alt": "Volunteers organizing donation boxes with clothes and food items in a community center."
+    }
+  },
+  "haptics": {
+    "candle_light_press": "heavy",
+    "candle_flame_hold": "success",
+    "rezo_por_ti_tap": "light",
+    "cause_vote_submit": "medium",
+    "tab_change": "selection"
+  },
+  "instructions_to_main_agent": [
+    "CRITICAL: The 'Altar' screen must strictly use the dark theme (surfaceInverse: #1C0F0E) to simulate a dimly lit, sacred chapel environment. The rest of the app should use the light Ivory theme (surface: #FDFBF7) to ensure high readability for older demographics.",
+    "Do not use generic blue/purple default palettes or UI toolkits (Tailwind/Shadcn). Stick explicitly to the Sacred Heart Red (#8B0000), Gold (#C5A059), and Ivory palette provided in the colors block.",
+    "The primary feature is the virtual candle. You MUST use an animated Lottie or Skia component for the candle flame to make it feel alive and emotional. A static image is not acceptable.",
+    "Typography MUST load 'CormorantGaramond' for Display/Serif and 'LibreFranklin' for Body/Sans via expo-font. Ensure font sizes are heavily weighted toward the 'lg' and 'xl' tokens for older audience accessibility.",
+    "Any text overlaid on imagery (like the Saint cards or Charity candidate cards) MUST have a vertical gradient scrim (transparent to 70%+ surfaceInverse) underneath it to guarantee WCAG contrast.",
+    "The 'Rezo por ti' button on the Muro screen should be a prominent, easily tappable target with haptic feedback wired to it.",
+    "When building the layout, lean into editorial spacing. Give the content room to breathe to convey dignity and reflection rather than overwhelming the user with a dense dashboard."
+  ]
+}

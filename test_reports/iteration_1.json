@@ -1,0 +1,42 @@
+{
+  "summary": "Full end-to-end test of Mi Sagrado Corazón (bilingual Catholic devotional Expo app + FastAPI backend). Backend: 32/32 pytest cases green covering auth (register/login for seeded admin/editor/moderator + bad password + /me + onboarding + profile + logout), saints (list, patron_only filter, by-id + 404), daily content + streak increment (idempotent per date+kind), candles (light, mine, community-projection hides intention, invalid type 400), intentions (create, category filter, pray-idempotent per user, banned-word flags to pending), masses (next, list, chat post+list), causes/voting (current, one-vote-per-month enforcement returns 400 on second vote, my_vote_cause_id reflects vote, history, transparency, votes/me), and complete Admin RBAC matrix (metrics=any-staff, moderation=moderator, content/causes/masses/daily/transparency=editor, /admin/users=superadmin only, /admin/push=any-staff; regular user gets 403 everywhere; moderator gets 403 on editor-only routes and on superadmin-only users; editor gets 403 on moderation). Frontend (mobile viewport 390x844): register → onboarding (patron Sagrado Corazón) → Altar renders with animated candle, patron name, streak, gospel + saint-of-day cards and 4 tabs. Light-candle flow: pick saint + intention + type solemn + Encender → success screen 'Tu vela está encendida' shown. Muro: chip filters render, publish intention succeeds, 'Rezo por ti' increments. Misa: countdown displays (02d 01h ...), chat sends & appears. Causas: vote registers, progress bar updates to 34% and button switches to 'Votado'. Admin panel reachable at /admin as superadmin, dashboard shows metrics + 7 tiles + back button; all sub-pages load correctly: /admin/moderation, /admin/causes, /admin/masses, /admin/content (Santoral y contenido), /admin/transparency, /admin/users, /admin/push. No React Native red screens, no console errors, no deprecated packages (expo-av/barcode-scanner/background-fetch not used). One deprecation warning only: 'shadow* style props are deprecated. Use boxShadow.' (informational, from RN Web). No blocking issues found.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [],
+    "react_native_issues": [
+      {"component": "shadow* style props (RN Web)", "issue": "Console warning: '\"shadow*\" style props are deprecated. Use \"boxShadow\".' Non-blocking, informational. Consider migrating shadowColor/shadowOffset/shadowOpacity/shadowRadius to boxShadow for React Native Web compatibility."}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/conftest.py",
+    "/app/backend/tests/test_api.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Optional: migrate shadow* style props to boxShadow to silence the RN Web deprecation console warning.",
+    "Optional: expose a 'Cerrar sesión' path in Profile tests so QA can log out cleanly between staff/user sessions (worked via manual localStorage/incognito during testing)."
+  ],
+  "critical_code_review_comments": [
+    "server.py at 904 lines is approaching the 700-line guideline; consider splitting into routers (auth, saints, daily, candles, intentions, masses, causes, admin) for maintainability.",
+    "In /api/candles/community, the projection {\"_id\":0, \"intention\":0} correctly hides intentions—good. Consider also removing user_id to avoid leaking IDs of unknown users.",
+    "moderation contains_banned() loads all banned words on every request; fine at small scale but could be cached in-memory for hot paths (intentions/chat).",
+    "All handlers correctly exclude MongoDB _id with projections; no ObjectId serialization issues seen.",
+    "RBAC helper require_roles correctly short-circuits superadmin, and 401 vs 403 distinction is correct."
+  ],
+  "updated_files": [
+    "/app/backend/tests/conftest.py (new)",
+    "/app/backend/tests/test_api.py (new)",
+    "/app/backend/tests/__init__.py (new)"
+  ],
+  "success_rate": {"backend": "100% (32/32)", "frontend": "100% of core flows (auth, onboarding, altar, light-candle, muro, misa, causas, admin dashboard + 7 sub-pages)"},
+  "seed_data_creation": "No seed data created manually; startup seeder populated saints, daily content, masses, causes, transparency and staff users. Test users were created via /api/auth/register with TEST_ prefixed emails (kept for regression, harmless).",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend base + frontend base = https://app-concept-review.preview.emergentagent.com (same-origin). Seeded staff creds in /app/memory/test_credentials.md. Regular user auth uses /api/auth/register or /login (JSON: email/password/name). Frontend uses testIDs: email-input, password-input, name-input, submit-auth-button, toggle-auth-mode, saint-<id>, finish-onboarding-button, light-candle-button, candle-saint-<id>, candle-intention-input, candle-type-<basic|solemn|permanent>, light-now-button, candle-done-button, new-intention-fab, intention-input, publish-intention-button, cat-<key>, pray-<intId>, chat-input, chat-send-button, vote-<causeId>, admin-back, tile-<icon>. Admin URLs: /admin, /admin/moderation, /admin/causes, /admin/masses, /admin/content, /admin/transparency, /admin/users, /admin/push. Google login button exists (google-login-button) but is not fully testable end-to-end (interactive OAuth). Pytest suite is at /app/backend/tests/test_api.py and is safe to re-run (uses uuid-prefixed emails).",
+  "rca_of_issue": "N/A — no bugs found in this iteration."
+}
