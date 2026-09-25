@@ -86,6 +86,6 @@ const useStyles = makeStyles((c) => ({
   langText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurfaceSecondary },
   row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
   rowLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: c.onSurface },
-  rowValue: { fontFamily: fonts.body, fontSize: 15, color: c.muted },
-  note: { fontFamily: fonts.body, fontSize: 13, color: c.muted, fontStyle: "italic", marginTop: 4 },
+  rowValue: { fontFamily: fonts.body, fontSize: 16, color: c.muted },
+  note: { fontFamily: fonts.body, fontSize: 14, color: c.muted, fontStyle: "italic", marginTop: 4 },
 }));

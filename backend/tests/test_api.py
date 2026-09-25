@@ -12,21 +12,18 @@ def test_health(s):
     assert r.json().get("status") == "ok"
 
 
-def test_login_seeded_accounts(s):
-    for email, pwd, role in [
-        ("admin@misagradocorazon.com", "Sagrado2026", "superadmin"),
-        ("editor@misagradocorazon.com", "Editor2026", "editor"),
-        ("moderador@misagradocorazon.com", "Moderador2026", "moderator"),
+def test_login_seeded_accounts(s, superadmin_token, editor_token, moderator_token):
+    for tok, role in [
+        (superadmin_token, "superadmin"),
+        (editor_token, "editor"),
+        (moderator_token, "moderator"),
     ]:
-        r = s.post(f"{API}/auth/login", json={"email": email, "password": pwd}, timeout=15)
-        assert r.status_code == 200, f"{email}: {r.text}"
-        j = r.json()
-        assert j["user"]["role"] == role
-        assert j["session_token"]
+        me = s.get(f"{API}/auth/me", headers=auth(tok), timeout=15).json()["user"]
+        assert me["role"] == role
 
 
 def test_login_bad_password(s):
-    r = s.post(f"{API}/auth/login", json={"email": "admin@misagradocorazon.com", "password": "wrong"}, timeout=15)
+    r = s.post(f"{API}/auth/login", json={"email": "nobody_missing@example.com", "password": "wrong"}, timeout=15)
     assert r.status_code == 401
 
 
@@ -139,6 +136,8 @@ def test_community_candles(s):
     assert "total" in j and "candles" in j
     for c in j["candles"]:
         assert "intention" not in c  # projection hides intention
+        assert "user_id" not in c  # no internal id leaked
+        assert "user_name" not in c  # no author name leaked
 
 
 # ---------------- Intentions ----------------
@@ -162,6 +161,10 @@ def test_intentions_create(s, user_token):
 def test_intentions_list_and_filter(s):
     r = s.get(f"{API}/intentions", timeout=15)
     assert r.status_code == 200
+    for i in r.json()["intentions"]:
+        assert "user_id" not in i  # no internal id leaked
+        assert "prayed_by" not in i  # voter list hidden
+        assert "already_prayed" in i  # only whether current user prayed
     r2 = s.get(f"{API}/intentions?category=general", timeout=15)
     assert r2.status_code == 200
     for i in r2.json()["intentions"]:
@@ -209,19 +212,26 @@ def test_mass_chat_flow(s, user_token):
 
 
 # ---------------- Causes / Votes / Transparency ----------------
-def test_causes_current_and_vote(s, user_token):
+def test_causes_current_and_vote(s, user_token, editor_token):
+    from datetime import datetime, timezone
+
+    month = datetime.now(timezone.utc).strftime("%Y-%m")
+    # editor creates a voting cause for the current month (no seeded causes exist)
+    c = s.post(
+        f"{API}/admin/causes",
+        json={"month": month, "name": {"es": "TEST causa", "en": "TEST cause"}, "status": "voting"},
+        headers=auth(editor_token),
+        timeout=15,
+    )
+    assert c.status_code == 200, c.text
+    cid = c.json()["cause"]["id"]
+
     r = s.get(f"{API}/causes/current", headers=auth(user_token), timeout=15)
     assert r.status_code == 200
-    j = r.json()
-    causes = j["causes"]
-    assert len(causes) >= 1
-    voting = [c for c in causes if c.get("status") == "voting"]
-    if not voting:
-        return
-    cid = voting[0]["id"]
+
     v = s.post(f"{API}/causes/{cid}/vote", headers=auth(user_token), timeout=15)
     assert v.status_code == 200
-    # second vote should 400
+    # second vote same month must be rejected (unique index + guard)
     v2 = s.post(f"{API}/causes/{cid}/vote", headers=auth(user_token), timeout=15)
     assert v2.status_code == 400
 

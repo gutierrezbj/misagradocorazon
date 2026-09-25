@@ -133,7 +133,7 @@ export default function Causas() {
           <LinearGradient colors={[colors.brand, colors.brandPrimary]} style={styles.impactCard}>
             <Text style={styles.impactLabel}>{t("totalImpact")}</Text>
             <Text style={styles.impactValue}>${totalImpact.toLocaleString()}</Text>
-            <Text style={styles.impactNote}>20% de cada vela · público y auditado</Text>
+            <Text style={styles.impactNote}>20% de la facturación mensual</Text>
           </LinearGradient>
 
           <Text style={styles.fundedTitle}>{t("fundedCauses")}</Text>
@@ -175,7 +175,7 @@ const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
   header: { paddingHorizontal: spacing.md, marginBottom: spacing.md },
   title: { fontFamily: fonts.displayBold, fontSize: 30, color: c.onSurface },
-  sub: { fontFamily: fonts.body, fontSize: 15, color: c.muted, marginTop: 2 },
+  sub: { fontFamily: fonts.body, fontSize: 16, color: c.muted, marginTop: 2 },
   votesPill: {
     flexDirection: "row",
     alignItems: "center",
@@ -187,7 +187,7 @@ const useStyles = makeStyles((c) => ({
     paddingVertical: 6,
     marginTop: spacing.sm,
   },
-  votesPillText: { fontFamily: fonts.bodyMedium, fontSize: 13, color: c.onBrandTertiary },
+  votesPillText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onBrandTertiary },
   card: {
     marginHorizontal: spacing.md,
     marginBottom: spacing.lg,
@@ -205,14 +205,14 @@ const useStyles = makeStyles((c) => ({
   locationRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 },
   location: { fontFamily: fonts.body, fontSize: 14, color: "#E8D9B9" },
   cardBody: { padding: spacing.md },
-  desc: { fontFamily: fonts.body, fontSize: 15, color: c.onSurfaceSecondary, lineHeight: 23 },
+  desc: { fontFamily: fonts.body, fontSize: 16, color: c.onSurfaceSecondary, lineHeight: 24 },
   metaRow: { flexDirection: "row", gap: spacing.md, marginTop: spacing.md },
   metaLabelRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  metaLabel: { fontFamily: fonts.bodyMedium, fontSize: 12, color: c.muted, textTransform: "uppercase" },
+  metaLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.muted, textTransform: "uppercase" },
   metaValue: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.onSurface, marginTop: 2 },
   progressTrack: { height: 10, borderRadius: 5, backgroundColor: c.surfaceTertiary, marginTop: spacing.md, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 5, backgroundColor: c.brandSecondary },
-  percentage: { fontFamily: fonts.bodyMedium, fontSize: 13, color: c.onSurfaceSecondary, marginTop: 6 },
+  percentage: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginTop: 6 },
   voteBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -236,6 +236,6 @@ const useStyles = makeStyles((c) => ({
   fundedRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
   fundedIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.brandTertiary, alignItems: "center", justifyContent: "center" },
   fundedName: { fontFamily: fonts.bodySemibold, fontSize: 15, color: c.onSurface },
-  fundedMonth: { fontFamily: fonts.body, fontSize: 13, color: c.muted },
+  fundedMonth: { fontFamily: fonts.body, fontSize: 14, color: c.muted },
   fundedAmount: { fontFamily: fonts.displayBold, fontSize: 18, color: c.success },
 }));

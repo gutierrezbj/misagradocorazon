@@ -180,7 +180,7 @@ const useStyles = makeStyles((c) => ({
   countRow: { flexDirection: "row", gap: spacing.md, marginTop: spacing.sm },
   timeCell: { alignItems: "center", minWidth: 52 },
   timeNum: { fontFamily: fonts.displayBold, fontSize: 34, color: c.gold },
-  timeLbl: { fontFamily: fonts.body, fontSize: 12, color: c.onAltarMuted, textTransform: "uppercase" },
+  timeLbl: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, textTransform: "uppercase" },
   liveBadge: {
     position: "absolute",
     top: 50,
@@ -209,8 +209,8 @@ const useStyles = makeStyles((c) => ({
   chatHeader: { paddingHorizontal: spacing.md, paddingTop: spacing.md },
   chatTitle: { fontFamily: fonts.displayBold, fontSize: 20, color: c.onSurface },
   msgRow: { backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.sm + 2 },
-  msgName: { fontFamily: fonts.bodySemibold, fontSize: 13, color: c.brand },
-  msgText: { fontFamily: fonts.body, fontSize: 15, color: c.onSurface, marginTop: 2 },
+  msgName: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.brand },
+  msgText: { fontFamily: fonts.body, fontSize: 16, color: c.onSurface, marginTop: 2 },
   chatEmpty: { fontFamily: fonts.body, fontStyle: "italic", color: c.muted, textAlign: "center", marginTop: spacing.lg },
   inputBar: {
     flexDirection: "row",

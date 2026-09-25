@@ -13,6 +13,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel, Field, EmailStr
 from passlib.context import CryptContext
+from pymongo.errors import DuplicateKeyError
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
@@ -124,6 +125,19 @@ async def get_current_user(authorization: Optional[str] = Header(None)) -> Dict[
         raise HTTPException(status_code=401, detail="User not found")
     if user.get("blocked"):
         raise HTTPException(status_code=403, detail="Account blocked")
+    return user
+
+
+async def get_optional_user(authorization: Optional[str] = Header(None)) -> Optional[Dict[str, Any]]:
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    token = authorization.split(" ", 1)[1].strip()
+    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
+    if not session or ensure_aware(session["expires_at"]) < now_utc():
+        return None
+    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
+    if not user or user.get("blocked"):
+        return None
     return user
 
 
@@ -325,6 +339,7 @@ class CandleIn(BaseModel):
     saint_id: str
     intention: str
     type: str = "basic"
+    category: str = "general"
 
 
 @api.post("/candles")
@@ -334,6 +349,7 @@ async def light_candle(body: CandleIn, user=Depends(get_current_user)):
     saint = await db.saints.find_one({"id": body.saint_id}, {"_id": 0})
     if not saint:
         raise HTTPException(status_code=404, detail="Saint not found")
+    category = "difuntos" if body.category == "difuntos" else "general"
     doc = {
         "id": new_id("candle"),
         "user_id": user["user_id"],
@@ -342,6 +358,7 @@ async def light_candle(body: CandleIn, user=Depends(get_current_user)):
         "saint_name": saint.get("name"),
         "intention": body.intention,
         "type": body.type,
+        "category": category,
         "price": CANDLE_PRICES[body.type],
         "active": True,
         "created_at": now_utc(),
@@ -359,7 +376,9 @@ async def my_candles(user=Depends(get_current_user)):
 
 @api.get("/candles/community")
 async def community_candles():
-    candles = await db.candles.find({}, {"_id": 0, "intention": 0}).sort("created_at", -1).to_list(60)
+    candles = await db.candles.find(
+        {}, {"_id": 0, "intention": 0, "user_id": 0, "user_name": 0}
+    ).sort("created_at", -1).to_list(60)
     total = await db.candles.count_documents({})
     return {"candles": candles, "total": total}
 
@@ -379,12 +398,20 @@ async def contains_banned(text: str) -> bool:
 
 
 @api.get("/intentions")
-async def list_intentions(category: Optional[str] = None):
+async def list_intentions(category: Optional[str] = None, user=Depends(get_optional_user)):
     q: Dict[str, Any] = {"status": "approved"}
     if category and category != "all":
         q["category"] = category
-    items = await db.intentions.find(q, {"_id": 0}).sort("created_at", -1).to_list(200)
-    return {"intentions": items}
+    items = await db.intentions.find(
+        q, {"_id": 0, "user_id": 0}
+    ).sort("created_at", -1).to_list(200)
+    uid = user["user_id"] if user else None
+    out = []
+    for it in items:
+        prayed_by = it.pop("prayed_by", [])
+        it["already_prayed"] = bool(uid and uid in prayed_by)
+        out.append(it)
+    return {"intentions": out}
 
 
 @api.post("/intentions")
@@ -403,6 +430,9 @@ async def create_intention(body: IntentionIn, user=Depends(get_current_user)):
     }
     await db.intentions.insert_one(doc)
     doc.pop("_id", None)
+    doc.pop("user_id", None)
+    doc.pop("prayed_by", None)
+    doc["already_prayed"] = False
     return {"intention": doc, "flagged": flagged}
 
 
@@ -449,7 +479,7 @@ class ChatIn(BaseModel):
 @api.get("/masses/{mass_id}/chat")
 async def get_chat(mass_id: str):
     msgs = await db.chat_messages.find(
-        {"mass_id": mass_id, "status": "visible"}, {"_id": 0}
+        {"mass_id": mass_id, "status": "visible"}, {"_id": 0, "user_id": 0}
     ).sort("created_at", 1).to_list(200)
     return {"messages": msgs}
 
@@ -468,6 +498,7 @@ async def post_chat(mass_id: str, body: ChatIn, user=Depends(get_current_user)):
     }
     await db.chat_messages.insert_one(doc)
     doc.pop("_id", None)
+    doc.pop("user_id", None)
     return {"message": doc, "flagged": flagged}
 
 
@@ -508,9 +539,12 @@ async def vote_cause(cause_id: str, user=Depends(get_current_user)):
     existing = await db.votes.find_one({"user_id": user["user_id"], "month": month})
     if existing:
         raise HTTPException(status_code=400, detail="Already voted this month")
-    await db.votes.insert_one(
-        {"id": new_id("vote"), "user_id": user["user_id"], "cause_id": cause_id, "month": month, "created_at": now_utc()}
-    )
+    try:
+        await db.votes.insert_one(
+            {"id": new_id("vote"), "user_id": user["user_id"], "cause_id": cause_id, "month": month, "created_at": now_utc()}
+        )
+    except DuplicateKeyError:
+        raise HTTPException(status_code=400, detail="Already voted this month")
     await db.causes.update_one({"id": cause_id}, {"$inc": {"votes": 1}})
     return {"ok": True}
 
@@ -892,6 +926,7 @@ async def startup():
     await db.saints.create_index("id", unique=True)
     await db.daily_content.create_index("date", unique=True)
     await db.causes.create_index("id", unique=True)
+    await db.votes.create_index([("user_id", 1), ("month", 1)], unique=True)
     from seed import run_seed
 
     await run_seed(db, pwd_ctx)

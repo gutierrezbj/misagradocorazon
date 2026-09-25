@@ -1,8 +1,15 @@
 import os
-import time
 import uuid
 import pytest
 import requests
+from pathlib import Path
+
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+except Exception:
+    pass
 
 BASE_URL = os.environ.get("EXPO_PUBLIC_BACKEND_URL") or os.environ.get("EXPO_BACKEND_URL") or "https://app-concept-review.preview.emergentagent.com"
 BASE_URL = BASE_URL.rstrip("/")
@@ -21,6 +28,15 @@ def s():
     return session
 
 
+def _staff_creds(email_key, pwd_key):
+    """Read staff credentials from environment. Skip the test if absent."""
+    email = os.environ.get(email_key)
+    pwd = os.environ.get(pwd_key)
+    if not email or not pwd:
+        pytest.skip(f"{email_key}/{pwd_key} not configured in environment")
+    return email, pwd
+
+
 def _login(s, email, password):
     r = s.post(f"{API}/auth/login", json={"email": email, "password": password}, timeout=20)
     assert r.status_code == 200, f"Login failed for {email}: {r.status_code} {r.text}"
@@ -29,17 +45,20 @@ def _login(s, email, password):
 
 @pytest.fixture(scope="session")
 def superadmin_token(s):
-    return _login(s, "admin@misagradocorazon.com", "Sagrado2026")
+    email, pwd = _staff_creds("SEED_ADMIN_EMAIL", "SEED_ADMIN_PASSWORD")
+    return _login(s, email, pwd)
 
 
 @pytest.fixture(scope="session")
 def editor_token(s):
-    return _login(s, "editor@misagradocorazon.com", "Editor2026")
+    email, pwd = _staff_creds("SEED_EDITOR_EMAIL", "SEED_EDITOR_PASSWORD")
+    return _login(s, email, pwd)
 
 
 @pytest.fixture(scope="session")
 def moderator_token(s):
-    return _login(s, "moderador@misagradocorazon.com", "Moderador2026")
+    email, pwd = _staff_creds("SEED_MODERATOR_EMAIL", "SEED_MODERATOR_PASSWORD")
+    return _login(s, email, pwd)
 
 
 @pytest.fixture(scope="session")

@@ -12,7 +12,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 export type CandleVariant = "pillar" | "basic" | "solemn" | "permanent";
-type Props = { size?: number; lit?: boolean; variant?: CandleVariant };
+type Props = { size?: number; lit?: boolean; variant?: CandleVariant; mourning?: boolean };
 
 // Teardrop flame path pointing up, inside a `w` x `h` box.
 function flamePath(w: number, h: number): string {
@@ -21,7 +21,7 @@ function flamePath(w: number, h: number): string {
           C ${cx - w * 0.52} ${h * 0.99}, ${cx - w * 0.6} ${h * 0.34}, ${cx} 0 Z`;
 }
 
-export function CandleFlame({ size = 160, lit = true, variant = "pillar" }: Props) {
+export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourning = false }: Props) {
   const flicker = useSharedValue(0);
   const sway = useSharedValue(0);
   const glow = useSharedValue(0);
@@ -110,7 +110,7 @@ export function CandleFlame({ size = 160, lit = true, variant = "pillar" }: Prop
       {/* Vessel */}
       <View style={[styles.abs, { top: bodyTop, width: bodyW, height: bodyH + 4 }]}>
         {isGlass ? (
-          <GlassVotive w={bodyW} h={bodyH} variant={variant as "basic" | "solemn" | "permanent"} lit={lit} />
+          <GlassVotive w={bodyW} h={bodyH} variant={variant as "basic" | "solemn" | "permanent"} lit={lit} mourning={mourning} />
         ) : (
           <WaxPillar w={bodyW} h={bodyH} />
         )}
@@ -182,11 +182,13 @@ function GlassVotive({
   h,
   variant,
   lit,
+  mourning,
 }: {
   w: number;
   h: number;
   variant: "basic" | "solemn" | "permanent";
   lit: boolean;
+  mourning?: boolean;
 }) {
   const rimY = 10;
   const gold = "#C5A059";
@@ -195,25 +197,43 @@ function GlassVotive({
   const hasPedestal = variant === "permanent";
   const pedestalH = hasPedestal ? h * 0.1 : 0;
   const glassBottom = h - pedestalH;
+  const crossColor = mourning ? "#8A6A2E" : gold;
+
+  // cross geometry (thin, flat, no relief) — only on solemn & permanent
+  const crossCx = w / 2;
+  const crossCy = rimY + (glassBottom - rimY) * 0.44;
+  const crossVH = (glassBottom - rimY) * 0.26;
+  const crossHW = crossVH * 0.5;
+  const barT = Math.max(1.6, w * 0.018);
 
   return (
     <Svg width={w} height={h + 4}>
       <Defs>
-        {/* translucent red glass, lit from within */}
-        <LinearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
-          <Stop offset="0%" stopColor="#4A0000" />
-          <Stop offset="18%" stopColor="#8B0000" />
-          <Stop offset="42%" stopColor="#D32F2F" />
-          <Stop offset="52%" stopColor="#F0524B" />
-          <Stop offset="62%" stopColor="#C62828" />
-          <Stop offset="84%" stopColor="#7A0000" />
-          <Stop offset="100%" stopColor="#3F0000" />
-        </LinearGradient>
-        {/* internal flame light rising inside the glass */}
+        {mourning ? (
+          <LinearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0%" stopColor="#B58A44" />
+            <Stop offset="18%" stopColor="#E7CE94" />
+            <Stop offset="44%" stopColor="#FBEFD2" />
+            <Stop offset="54%" stopColor="#FFFAEE" />
+            <Stop offset="66%" stopColor="#F1E2B6" />
+            <Stop offset="86%" stopColor="#D9BE82" />
+            <Stop offset="100%" stopColor="#B58E44" />
+          </LinearGradient>
+        ) : (
+          <LinearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0%" stopColor="#4A0000" />
+            <Stop offset="18%" stopColor="#8B0000" />
+            <Stop offset="42%" stopColor="#D32F2F" />
+            <Stop offset="52%" stopColor="#F0524B" />
+            <Stop offset="62%" stopColor="#C62828" />
+            <Stop offset="84%" stopColor="#7A0000" />
+            <Stop offset="100%" stopColor="#3F0000" />
+          </LinearGradient>
+        )}
         <RadialGradient id="inner" cx="50%" cy="22%" r="60%">
           <Stop offset="0%" stopColor="#FFE39A" stopOpacity={lit ? 0.95 : 0.15} />
-          <Stop offset="45%" stopColor="#FF8A3D" stopOpacity={lit ? 0.55 : 0.1} />
-          <Stop offset="100%" stopColor="#8B0000" stopOpacity={0} />
+          <Stop offset="45%" stopColor="#FF8A3D" stopOpacity={lit ? 0.5 : 0.1} />
+          <Stop offset="100%" stopColor={mourning ? "#B58E44" : "#8B0000"} stopOpacity={0} />
         </RadialGradient>
         <RadialGradient id="waxpool" cx="50%" cy="50%" r="60%">
           <Stop offset="0%" stopColor="#FFEFC0" stopOpacity={lit ? 1 : 0.4} />
@@ -221,7 +241,6 @@ function GlassVotive({
         </RadialGradient>
       </Defs>
 
-      {/* pedestal (permanent) */}
       {hasPedestal && (
         <>
           <Rect x={w * 0.12} y={glassBottom} width={w * 0.76} height={pedestalH} rx={4} fill={gold} />
@@ -229,32 +248,29 @@ function GlassVotive({
         </>
       )}
 
-      {/* glass body */}
       <Rect x={0} y={rimY} width={w} height={glassBottom - rimY} rx={w * 0.12} fill="url(#glass)" />
-      {/* inner light */}
       <Rect x={2} y={rimY + 2} width={w - 4} height={glassBottom - rimY - 4} rx={w * 0.11} fill="url(#inner)" />
-      {/* left specular highlight */}
       <Rect x={w * 0.15} y={rimY + 6} width={w * 0.08} height={Math.max(0, glassBottom - rimY - 20)} rx={w * 0.04} fill="#FFFFFF" opacity={0.22} />
-      {/* right soft highlight */}
       <Rect x={w * 0.74} y={rimY + 10} width={w * 0.05} height={Math.max(0, glassBottom - rimY - 34)} rx={w * 0.03} fill="#FFFFFF" opacity={0.1} />
 
-      {/* gold bands */}
+      {/* thin flat gold cross (solemn & permanent) */}
+      {hasBands && (
+        <>
+          <Rect x={crossCx - barT / 2} y={crossCy - crossVH / 2} width={barT} height={crossVH} rx={barT / 2} fill={crossColor} opacity={0.9} />
+          <Rect x={crossCx - crossHW / 2} y={crossCy - crossVH * 0.16} width={crossHW} height={barT} rx={barT / 2} fill={crossColor} opacity={0.9} />
+        </>
+      )}
+
       {hasBands && (
         <>
           <Rect x={0} y={glassBottom - 16} width={w} height={7} fill={gold} />
           <Rect x={0} y={glassBottom - 9} width={w} height={2} fill={goldDeep} />
         </>
       )}
-      {variant === "permanent" && (
-        <>
-          <Rect x={0} y={rimY + 6} width={w} height={5} fill={gold} opacity={0.9} />
-        </>
-      )}
+      {variant === "permanent" && <Rect x={0} y={rimY + 6} width={w} height={5} fill={gold} opacity={0.9} />}
 
-      {/* rim of the glass opening */}
-      <Ellipse cx={w / 2} cy={rimY} rx={w / 2} ry={rimY} fill="#4A0000" />
-      <Ellipse cx={w / 2} cy={rimY} rx={w / 2} ry={rimY} fill="none" stroke={hasBands ? gold : "#B71C1C"} strokeWidth={hasBands ? 2.5 : 1.5} />
-      {/* molten wax pool with wick */}
+      <Ellipse cx={w / 2} cy={rimY} rx={w / 2} ry={rimY} fill={mourning ? "#8A6A2E" : "#4A0000"} />
+      <Ellipse cx={w / 2} cy={rimY} rx={w / 2} ry={rimY} fill="none" stroke={hasBands ? gold : mourning ? goldDeep : "#B71C1C"} strokeWidth={hasBands ? 2.5 : 1.5} />
       <Ellipse cx={w / 2} cy={rimY} rx={w / 2 - 6} ry={rimY - 4} fill="url(#waxpool)" />
       <Rect x={w / 2 - 1.2} y={rimY - 8} width={2.4} height={9} rx={1} fill="#3B2415" />
     </Svg>

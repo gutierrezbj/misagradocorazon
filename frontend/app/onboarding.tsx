@@ -192,7 +192,7 @@ const useStyles = makeStyles((c) => ({
     justifyContent: "center",
   },
   saintName: { fontFamily: fonts.displaySemibold, fontSize: 15, color: c.onSurface, padding: 8, textAlign: "center" },
-  hint: { fontFamily: fonts.body, fontSize: 13, color: c.muted, textAlign: "center", marginBottom: spacing.md },
+  hint: { fontFamily: fonts.body, fontSize: 14, color: c.muted, textAlign: "center", marginBottom: spacing.md },
   section: { paddingHorizontal: spacing.md, marginTop: spacing.md },
   sectionTitle: { fontFamily: fonts.displayBold, fontSize: 22, color: c.onSurface, marginBottom: spacing.sm },
   timeLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginTop: spacing.sm },

@@ -177,10 +177,10 @@ const useStyles = makeStyles((c) => ({
   cardTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   author: { fontFamily: fonts.displaySemibold, fontSize: 19, color: c.brand },
   catBadge: { backgroundColor: c.brandTertiary, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 4 },
-  catBadgeText: { fontFamily: fonts.bodyMedium, fontSize: 12, color: c.onBrandTertiary },
+  catBadgeText: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onBrandTertiary },
   intentionText: { fontFamily: fonts.body, fontSize: 17, color: c.onSurface, lineHeight: 26, marginTop: spacing.sm },
   cardBottom: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginTop: spacing.md },
-  prayCount: { fontFamily: fonts.body, fontSize: 13, color: c.muted },
+  prayCount: { fontFamily: fonts.body, fontSize: 14, color: c.muted },
   prayBtn: {
     flexDirection: "row",
     alignItems: "center",

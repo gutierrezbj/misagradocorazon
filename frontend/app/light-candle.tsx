@@ -36,10 +36,11 @@ export default function LightCandle() {
   const [saintId, setSaintId] = useState<string | null>(user?.patron_saint_id ?? null);
   const [intention, setIntention] = useState("");
   const [type, setType] = useState("basic");
+  const [forDeceased, setForDeceased] = useState(false);
   const [done, setDone] = useState(false);
 
   const lightMut = useMutation({
-    mutationFn: () => api("/candles", { method: "POST", body: { saint_id: saintId, intention, type } }),
+    mutationFn: () => api("/candles", { method: "POST", body: { saint_id: saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
@@ -65,7 +66,7 @@ export default function LightCandle() {
       <View style={[styles.root, styles.doneWrap, { paddingTop: insets.top }]}>
         <StatusBar style="light" />
         <View style={{ height: 220, justifyContent: "flex-end" }}>
-          <CandleFlame size={170} lit variant={type} />
+          <CandleFlame size={170} lit variant={type} mourning={forDeceased} />
         </View>
         <Text style={styles.doneTitle}>{t("candleLit")}</Text>
         <Text style={styles.doneSub}>{t("candleLitSub")}</Text>
@@ -89,7 +90,7 @@ export default function LightCandle() {
 
       <ScrollView contentContainerStyle={{ padding: spacing.md, paddingBottom: insets.bottom + 120 }} showsVerticalScrollIndicator={false}>
         <View style={styles.preview}>
-          <CandleFlame size={150} lit variant={type} />
+          <CandleFlame size={150} lit variant={type} mourning={forDeceased} />
         </View>
 
         <Text style={styles.sectionLabel}>{t("forWhichSaint")}</Text>
@@ -119,6 +120,13 @@ export default function LightCandle() {
           placeholderTextColor={colors.onAltarMuted}
           style={styles.input}
         />
+
+        <Pressable testID="deceased-toggle" onPress={() => setForDeceased((v) => !v)} style={styles.deceasedRow}>
+          <View style={[styles.checkbox, forDeceased && { backgroundColor: colors.brandSecondary, borderColor: colors.brandSecondary }]}>
+            {forDeceased && <Icon name="check" size={14} color={colors.onBrandSecondary} />}
+          </View>
+          <Text style={styles.deceasedText}>{t("forDeceased")}</Text>
+        </Pressable>
 
         <Text style={styles.sectionLabel}>{t("candleType")}</Text>
         {TYPES.map((ty) => (
@@ -158,6 +166,9 @@ const useStyles = makeStyles((c) => ({
   close: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.altarCard, alignItems: "center", justifyContent: "center" },
   sectionLabel: { fontFamily: fonts.bodySemibold, fontSize: 15, color: c.onAltarMuted, textTransform: "uppercase", letterSpacing: 1, marginTop: spacing.md },
   preview: { height: 250, alignItems: "center", justifyContent: "flex-end", marginBottom: spacing.sm },
+  deceasedRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
+  checkbox: { width: 26, height: 26, borderRadius: 6, borderWidth: 2, borderColor: c.altarBorder, alignItems: "center", justifyContent: "center" },
+  deceasedText: { fontFamily: fonts.body, fontSize: 16, color: c.onAltar, flex: 1 },
   saintChip: { width: 92, borderRadius: radius.md, overflow: "hidden", borderWidth: 2, borderColor: "transparent", backgroundColor: c.altarCard },
   saintChipActive: { borderColor: c.gold },
   saintChipImg: { width: "100%", height: 80, backgroundColor: c.altarCardSoft },

@@ -135,7 +135,7 @@ export default function Altar() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingRight: spacing.md }}>
               {candles.map((c: any) => (
                 <View key={c.id} style={styles.miniCandle}>
-                  <CandleFlame size={54} lit variant={c.type} />
+                  <CandleFlame size={54} lit variant={c.type} mourning={c.category === "difuntos"} />
                   <Text style={styles.miniSaint} numberOfLines={1}>
                     {c.saint_name}
                   </Text>
@@ -253,8 +253,8 @@ const useStyles = makeStyles((c) => ({
     borderColor: c.altarBorder,
     alignItems: "center",
   },
-  miniSaint: { fontFamily: fonts.bodySemibold, fontSize: 13, color: c.gold, marginTop: 4 },
-  miniIntention: { fontFamily: fonts.body, fontSize: 12, color: c.onAltarMuted, textAlign: "center", marginTop: 2 },
+  miniSaint: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.gold, marginTop: 4 },
+  miniIntention: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, textAlign: "center", marginTop: 2 },
 }));
 
 function StyleSheetAbsolute() {

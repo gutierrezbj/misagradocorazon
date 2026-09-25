@@ -93,6 +93,6 @@ const useStyles = makeStyles((c) => ({
   sectionTitle: { fontFamily: fonts.displaySemibold, fontSize: 22, color: c.brand, marginBottom: spacing.sm },
   sectionText: { fontFamily: fonts.body, fontSize: 17, lineHeight: 27, color: c.onSurfaceSecondary },
   prayerBox: { backgroundColor: c.surfaceSecondary, borderRadius: radius.lg, padding: spacing.lg, borderLeftWidth: 4, borderLeftColor: c.brandSecondary },
-  prayerLabel: { fontFamily: fonts.bodySemibold, fontSize: 13, color: c.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: spacing.sm },
+  prayerLabel: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: spacing.sm },
   prayerText: { fontFamily: fonts.display, fontSize: 22, lineHeight: 32, color: c.onSurface, fontStyle: "italic" },
 }));

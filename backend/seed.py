@@ -1,4 +1,11 @@
-"""Idempotent seed data for Mi Sagrado Corazon."""
+"""Seed data for Mi Sagrado Corazón.
+
+Loads ONLY the saints catalog and devotional daily content.
+Staff accounts are created exclusively from environment variables and only
+when both the email and password are provided. No invented people, causes,
+votes, transparency figures or sample intentions are ever seeded.
+"""
+import os
 from datetime import datetime, timezone, timedelta
 
 
@@ -15,10 +22,6 @@ IMG = {
     "antonio": FP + "Antonio_de_Pereda_y_Salgado_-_St_Anthony_of_Padua_with_Christ_Child_(detail)_-_WGA17168.jpg?width=500",
     "teresa": FP + "Teresa_de_Jes%C3%BAs_(cropped).jpg?width=500",
     "jose": FP + "William_Dyce_-_St_Joseph_-_WGA07375.jpg?width=500",
-    "cause_church": "https://images.pexels.com/photos/208315/pexels-photo-208315.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    "cause_water": "https://images.pexels.com/photos/60013/desert-drought-dehydrated-clay-soil-60013.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    "cause_food": "https://images.pexels.com/photos/7156163/pexels-photo-7156163.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
-    "cause_children": "https://images.pexels.com/photos/8422402/pexels-photo-8422402.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
 }
 
 SAINTS = [
@@ -143,20 +146,23 @@ SAINTS = [
     },
 ]
 
-WORDS = ["milagro garantizado", "cadena de oracion", "reenvia esto", "brujeria", "amuleto", "maldicion"]
+STAFF_ENV = [
+    ("SEED_ADMIN_EMAIL", "SEED_ADMIN_PASSWORD", "superadmin", "Administración"),
+    ("SEED_EDITOR_EMAIL", "SEED_EDITOR_PASSWORD", "editor", "Editor de contenido"),
+    ("SEED_MODERATOR_EMAIL", "SEED_MODERATOR_PASSWORD", "moderator", "Moderación"),
+]
 
 
 async def run_seed(db, pwd_ctx):
-    # Saints catalog
+    # Saints catalog (+ keep media/text fresh on existing docs)
     for s in SAINTS:
         await db.saints.update_one({"id": s["id"]}, {"$setOnInsert": s}, upsert=True)
-        # keep image + core text fresh even for existing docs
         await db.saints.update_one(
             {"id": s["id"]},
             {"$set": {"image_url": s["image_url"], "history": s["history"], "prayer": s["prayer"], "patronages": s["patronages"]}},
         )
 
-    # Daily content: today and yesterday
+    # Devotional daily content: today and yesterday
     today = now_utc()
     for offset, saint_id in [(0, "saint_corazon"), (-1, "saint_guadalupe")]:
         d = (today + timedelta(days=offset)).strftime("%Y-%m-%d")
@@ -184,168 +190,32 @@ async def run_seed(db, pwd_ctx):
         }
         await db.daily_content.update_one({"date": d}, {"$setOnInsert": doc}, upsert=True)
 
-    # Next Sunday mass 11:00 CT (~16:00 UTC)
-    if await db.masses.count_documents({}) == 0:
-        days_ahead = (6 - today.weekday()) % 7  # weekday: Mon=0..Sun=6
-        if days_ahead == 0:
-            days_ahead = 7
-        sunday = (today + timedelta(days=days_ahead)).replace(hour=16, minute=0, second=0, microsecond=0)
-        await db.masses.insert_one(
-            {
-                "id": "mass_seed_1",
-                "title": {"es": "Misa Dominical del Sagrado Corazón", "en": "Sacred Heart Sunday Mass"},
-                "youtube_url": "https://www.youtube.com/watch?v=DWcJFNfaw9c",
-                "scheduled_at": sunday,
-                "is_special": False,
-                "status": "scheduled",
-            }
-        )
-
-    # Causes for current month
-    month = today.strftime("%Y-%m")
-    if await db.causes.count_documents({"month": month}) == 0:
-        causes = [
-            {
-                "id": "cause_church_" + month,
-                "month": month,
-                "name": {"es": "Restaurar la ermita de San Isidro", "en": "Restore the San Isidro chapel"},
-                "location": "Oaxaca, México",
-                "responsible": "P. Manuel Ríos, párroco",
-                "description": {
-                    "es": "La ermita de San Isidro, de más de 200 años, tiene el techo dañado y el altar en ruinas. La comunidad reza allí cada semana. Con los fondos se repara el techo, se restaura el altar y se recuperan las imágenes.",
-                    "en": "The 200-year-old San Isidro chapel has a damaged roof and a ruined altar. The community prays there weekly. Funds will repair the roof, restore the altar, and recover the images.",
-                },
-                "budget": 18000,
-                "photos": [IMG["cause_church"]],
-                "timeline": "3 meses",
-                "status": "voting",
-                "votes": 128,
-                "updates": [],
-                "amount_transferred": 0,
-            },
-            {
-                "id": "cause_water_" + month,
-                "month": month,
-                "name": {"es": "Pozo de agua potable para Tzeltal", "en": "Clean water well for Tzeltal"},
-                "location": "Chiapas, México",
-                "responsible": "Misión Tzeltal (ONG)",
-                "description": {
-                    "es": "120 familias caminan 2 horas por agua. Un pozo comunitario les daría agua potable segura durante todo el año.",
-                    "en": "120 families walk 2 hours for water. A community well would give them safe drinking water year-round.",
-                },
-                "budget": 12000,
-                "photos": [IMG["cause_water"]],
-                "timeline": "2 meses",
-                "status": "voting",
-                "votes": 95,
-                "updates": [],
-                "amount_transferred": 0,
-            },
-            {
-                "id": "cause_food_" + month,
-                "month": month,
-                "name": {"es": "Comedor parroquial en el Bronx", "en": "Parish soup kitchen in the Bronx"},
-                "location": "Nueva York, EEUU",
-                "responsible": "Parroquia Santa Cruz",
-                "description": {
-                    "es": "El comedor sirve 300 comidas diarias a familias hispanas. Los fondos cubren tres meses de alimentos y una nevera industrial.",
-                    "en": "The kitchen serves 300 daily meals to Hispanic families. Funds cover three months of food and an industrial fridge.",
-                },
-                "budget": 9000,
-                "photos": [IMG["cause_food"]],
-                "timeline": "Inmediato",
-                "status": "voting",
-                "votes": 156,
-                "updates": [],
-                "amount_transferred": 0,
-            },
-        ]
-        await db.causes.insert_many(causes)
-
-    # Past funded cause + transparency
-    if await db.transparency.count_documents({}) == 0:
-        prev = (today.replace(day=1) - timedelta(days=1)).strftime("%Y-%m")
-        await db.causes.insert_one(
-            {
-                "id": "cause_children_" + prev,
-                "month": prev,
-                "name": {"es": "Útiles escolares para 200 niños", "en": "School supplies for 200 children"},
-                "location": "Puebla, México",
-                "responsible": "Hnas. de la Caridad",
-                "description": {"es": "Mochilas, cuadernos y uniformes entregados.", "en": "Backpacks, notebooks, and uniforms delivered."},
-                "budget": 6000,
-                "photos": [IMG["cause_children"]],
-                "timeline": "Completado",
-                "status": "funded",
-                "votes": 210,
-                "updates": [
-                    {"date": prev + "-25", "text": "Entrega realizada a 200 niños. ¡Gracias comunidad!", "photo": IMG["cause_children"]}
-                ],
-                "amount_transferred": 5800,
-            }
-        )
-        await db.transparency.insert_one(
-            {
-                "month": prev,
-                "total_income": 29000,
-                "impact_amount": 5800,
-                "transferred": 5800,
-                "cause_id": "cause_children_" + prev,
-                "cause_name": "Útiles escolares para 200 niños",
-                "note": "Transferencia realizada y verificada. Fotos de entrega publicadas.",
-                "published": True,
-            }
-        )
-
-    # Sample community intentions
-    if await db.intentions.count_documents({}) == 0:
-        samples = [
-            {"author_name": "María G.", "text": "Rezad por mi madre que está enferma en el hospital.", "category": "salud", "pray_count": 34},
-            {"author_name": "José L.", "text": "Doy gracias por el nuevo trabajo que encontré. Dios es fiel.", "category": "agradecimiento", "pray_count": 21},
-            {"author_name": "Carmen R.", "text": "Por la unidad de mi familia y la conversión de mi hijo.", "category": "familia", "pray_count": 48},
-            {"author_name": "Anónimo", "text": "Por el eterno descanso de mi esposo. Que en paz descanse.", "category": "difuntos", "pray_count": 62},
-        ]
-        for s in samples:
-            await db.intentions.insert_one(
-                {
-                    "id": "int_seed_" + s["author_name"].replace(" ", "").replace(".", "").lower(),
-                    "user_id": "seed",
-                    "author_name": s["author_name"],
-                    "text": s["text"],
-                    "category": s["category"],
-                    "pray_count": s["pray_count"],
-                    "prayed_by": [],
-                    "status": "approved",
-                    "created_at": now_utc(),
-                }
+    # Staff accounts — only from environment variables, only if both set
+    for ekey, pkey, role, name in STAFF_ENV:
+        email = (os.environ.get(ekey) or "").strip().lower()
+        password = os.environ.get(pkey) or ""
+        if not email or not password:
+            continue
+        existing = await db.users.find_one({"email": email})
+        if existing:
+            await db.users.update_one(
+                {"email": email},
+                {"$set": {"role": role, "password_hash": pwd_ctx.hash(password)}},
             )
-
-    # Moderation words
-    for w in WORDS:
-        await db.moderation_words.update_one({"word": w}, {"$setOnInsert": {"word": w}}, upsert=True)
-
-    # Admin + staff users
-    staff = [
-        ("admin@misagradocorazon.com", "Sagrado2026", "Juan (Superadmin)", "superadmin", "user_superadmin"),
-        ("editor@misagradocorazon.com", "Editor2026", "Editor de Contenido", "editor", "user_editor"),
-        ("moderador@misagradocorazon.com", "Moderador2026", "Moderador", "moderator", "user_moderator"),
-    ]
-    for email, pw, name, role, uid in staff:
-        exists = await db.users.find_one({"email": email})
-        if not exists:
-            await db.users.insert_one(
-                {
-                    "user_id": uid,
-                    "email": email,
-                    "name": name,
-                    "password_hash": pwd_ctx.hash(pw),
-                    "role": role,
-                    "language": "es",
-                    "onboarded": True,
-                    "patron_saint_id": "saint_corazon",
-                    "secondary_saint_ids": [],
-                    "streak": 0,
-                    "blocked": False,
-                    "created_at": now_utc(),
-                }
-            )
+            continue
+        await db.users.insert_one(
+            {
+                "user_id": f"user_{role}",
+                "email": email,
+                "name": name,
+                "password_hash": pwd_ctx.hash(password),
+                "role": role,
+                "language": "es",
+                "onboarded": True,
+                "patron_saint_id": "saint_corazon",
+                "secondary_saint_ids": [],
+                "streak": 0,
+                "blocked": False,
+                "created_at": now_utc(),
+            }
+        )
