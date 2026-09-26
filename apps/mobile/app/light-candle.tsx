@@ -13,7 +13,7 @@ import { queryClient } from "@/src/query-client";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
-import { CandleFlame } from "@/src/components/CandleFlame";
+import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
 
 const TYPES = [
   { key: "basic", price: 1, label: "candleBasic", desc: "candleBasicDesc" },
@@ -35,7 +35,7 @@ export default function LightCandle() {
 
   const [saintId, setSaintId] = useState<string | null>(user?.patron_saint_id ?? null);
   const [intention, setIntention] = useState("");
-  const [type, setType] = useState("basic");
+  const [type, setType] = useState<Exclude<CandleVariant, "pillar">>("basic");
   const [forDeceased, setForDeceased] = useState(false);
   const [done, setDone] = useState(false);
 

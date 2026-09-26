@@ -1,5 +1,5 @@
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, type ColorValue } from "react-native";
 import { Tabs } from "expo-router";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import Feather from "@react-native-vector-icons/feather";
@@ -35,8 +35,12 @@ export default function TabsLayout() {
     );
   }
 
-  const icon = (name: any) => ({ color, size }: { color: string; size: number }) =>
-    <Feather name={name} size={size} color={color} />;
+  const icon = (name: any) => {
+    const TabIcon = ({ color, size }: { color: ColorValue; size: number }) => (
+      <Feather name={name} size={size} color={color} />
+    );
+    return TabIcon;
+  };
 
   return (
     <Tabs
