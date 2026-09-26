@@ -6,7 +6,7 @@ Cumplimiento de SDD-07 (plan de testing). Todo se ejecuta con `pnpm test` y en e
 
 | SDD-07 | Dónde |
 |---|---|
-| Auth: registro, login, sesión válida o no válida | `apps/api/test/api.test.ts`, `social.test.ts`, `staff.test.ts` |
+| Auth: registro, login, sesión válida o no válida | `apps/api/test/api.test.ts`, `social.test.ts`, `staff.test.ts`, `account.test.ts` |
 | Velas: creación, cálculo del 20 % | `apps/api/test/api.test.ts`, `causas.test.ts` |
 | Santo y oraciones del día según la fecha | `apps/api/test/api.test.ts` |
 | Votación: un voto por mes, ventana de los días 1 a 7 | `apps/api/test/causas.test.ts` |
