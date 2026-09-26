@@ -44,7 +44,9 @@ function Gate() {
       if (!inOnboarding) router.replace("/onboarding");
       return;
     }
-    if (inAuth || inOnboarding) {
+    // Desde login, onboarding o el splash de la raíz ("/" sin grupo) se va al altar. Sin esto,
+    // quien vuelve a abrir la app con la sesión guardada se quedaba en el splash.
+    if (inAuth || inOnboarding || group === undefined) {
       router.replace("/(tabs)");
       return;
     }

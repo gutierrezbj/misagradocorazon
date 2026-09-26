@@ -126,3 +126,5 @@ export type Transparency = {
 };
 
 export type MyVote = { month: string; cause: { id: string; name: Localized; status: Cause["status"] }; createdAt: string };
+
+export type PrivateIntention = { id: string; text: string; createdAt: string };

@@ -10,7 +10,7 @@ import { Platform } from "react-native";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api, deviceTimeZone } from "@/src/api";
-import type { Daily, MyCandle, Saint } from "@/src/types";
+import type { CommunityCandles, Daily, MyCandle, Saint } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
@@ -31,6 +31,7 @@ export default function Altar() {
     queryFn: () => api<Daily>(`/daily?tz=${encodeURIComponent(user?.timezone ?? deviceTimeZone())}`),
   });
   const { data: myCandles, isLoading } = useQuery({ queryKey: ["candles", "me"], queryFn: () => api<MyCandle[]>("/candles/me") });
+  const { data: community } = useQuery({ queryKey: ["candles", "community"], queryFn: () => api<CommunityCandles>("/candles/community") });
   const { data: patron } = useQuery({
     queryKey: ["saint", user?.patronSaintId],
     queryFn: () => api<Saint>(`/saints/${user?.patronSaintId}`),
@@ -125,6 +126,20 @@ export default function Altar() {
             <PrayerCard label={t("morningPrayer")} icon="sunrise" onPress={() => router.push("/prayer?kind=morning")} />
             <PrayerCard label={t("nightPrayer")} icon="moon" onPress={() => router.push("/prayer?kind=night")} />
           </View>
+          <GlassCard
+            testID="candle-wall-card"
+            icon="sun"
+            title={t("candleWall")}
+            subtitle={community ? t("candlesLitToday").replace("{n}", String(community.last24h)) : ""}
+            onPress={() => router.push("/candle-wall")}
+          />
+          <GlassCard
+            testID="private-intentions-card"
+            icon="lock"
+            title={t("privateIntentions")}
+            subtitle={t("privateIntentionsShort")}
+            onPress={() => router.push("/intentions")}
+          />
         </View>
 
         {/* My candles */}
