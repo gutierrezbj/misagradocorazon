@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router";
 import { can, isStaff, useAuth } from "./auth.tsx";
 import { Layout } from "./components/Layout.tsx";
 import { useI18n } from "./i18n.tsx";
+import { Audit } from "./pages/Audit.tsx";
 import { Causes } from "./pages/Causes.tsx";
 import { Daily } from "./pages/Daily.tsx";
 import { Dashboard } from "./pages/Dashboard.tsx";
@@ -11,6 +12,7 @@ import { Masses } from "./pages/Masses.tsx";
 import { Moderation } from "./pages/Moderation.tsx";
 import { Notifications } from "./pages/Notifications.tsx";
 import { Saints } from "./pages/Saints.tsx";
+import { Transparency } from "./pages/Transparency.tsx";
 import { Users } from "./pages/Users.tsx";
 
 export function App() {
@@ -30,7 +32,9 @@ export function App() {
         {can(me, "editor") && <Route path="causas" element={<Causes />} />}
         {can(me, "editor") && <Route path="misas" element={<Masses />} />}
         {can(me, "editor") && <Route path="notificaciones" element={<Notifications />} />}
+        {can(me, "moderator", "editor") && <Route path="transparencia" element={<Transparency />} />}
         {can(me) && <Route path="usuarios" element={<Users />} />}
+        {can(me) && <Route path="registro" element={<Audit />} />}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

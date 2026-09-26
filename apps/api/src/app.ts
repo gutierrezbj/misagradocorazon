@@ -6,6 +6,7 @@ import { auth } from "./auth.ts";
 import { env } from "./env.ts";
 import { prisma } from "./db.ts";
 import { errorHandler, HttpError, ok } from "./http.ts";
+import { recordsRouter } from "./modules/admin/records.ts";
 import { adminRouter } from "./modules/admin/routes.ts";
 import { candlesRouter } from "./modules/candles/routes.ts";
 import { causasRouter } from "./modules/causas/routes.ts";
@@ -47,6 +48,7 @@ export function createApp() {
   app.use("/api", causasRouter);
   app.use("/api", pushRouter);
   app.use("/api", adminRouter);
+  app.use("/api", recordsRouter);
   app.use("/api", contentRouter);
 
   app.use(errorHandler);

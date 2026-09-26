@@ -4,7 +4,7 @@ import { prisma } from "../../db.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { optionalUser } from "../../middleware/roles.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
-import { causeDto, voteCounts, votingState } from "./service.ts";
+import { causeDto, transparencySummary, voteCounts, votingState } from "./service.ts";
 
 export const causasRouter = Router();
 
@@ -78,26 +78,9 @@ causasRouter.get("/causes/history", async (_req, res) => {
 
 // Transparencia: todo sale del libro de movimientos. Nada se teclea a mano.
 causasRouter.get("/transparency", async (_req, res) => {
-  const rows = await prisma.ledgerEntry.groupBy({ by: ["month", "type"], _sum: { amountCents: true } });
-  const winners = await prisma.cause.findMany({ where: { status: { in: ["won", "funded"] } } });
-  const byMonth = new Map<string, { revenueCents: number; impactCents: number; transferredCents: number }>();
-  for (const r of rows) {
-    const m = byMonth.get(r.month) ?? { revenueCents: 0, impactCents: 0, transferredCents: 0 };
-    const amount = r._sum.amountCents ?? 0;
-    if (r.type === "purchase") m.revenueCents += amount;
-    if (r.type === "impact_allocation") m.impactCents += amount;
-    if (r.type === "transfer") m.transferredCents += amount;
-    byMonth.set(r.month, m);
-  }
-  const months = [...byMonth.entries()]
-    .sort(([a], [b]) => b.localeCompare(a))
-    .map(([month, totals]) => {
-      const w = winners.find((c) => c.month === month);
-      return { month, ...totals, cause: w ? { id: w.id, name: { es: w.nameEs, en: w.nameEn }, status: w.status } : null };
-    });
-  const sum = (k: "revenueCents" | "impactCents" | "transferredCents") => months.reduce((a, m) => a + m[k], 0);
+  const { totals, months } = await transparencySummary();
   ok(res, {
-    totals: { revenueCents: sum("revenueCents"), impactCents: sum("impactCents"), transferredCents: sum("transferredCents") },
-    months,
+    totals,
+    months: months.map(({ pendingCents: _pendingCents, ...m }) => m),
   });
 });

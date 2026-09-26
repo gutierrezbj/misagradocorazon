@@ -115,3 +115,35 @@ export type DailyRow = {
   nightAudioUrlEs: string | null;
   nightAudioUrlEn: string | null;
 };
+
+export type Transparency = {
+  totals: { revenueCents: number; impactCents: number; transferredCents: number };
+  pendingCents: number;
+  months: {
+    month: string;
+    revenueCents: number;
+    impactCents: number;
+    transferredCents: number;
+    pendingCents: number;
+    cause: { id: string; name: Localized; status: string } | null;
+  }[];
+};
+
+export type LedgerType = "purchase" | "impact_allocation" | "transfer";
+export type LedgerPage = {
+  entries: { id: string; type: LedgerType; amountCents: number; createdAt: string; candleType: string | null; cause: Localized | null; note: string | null }[];
+  nextCursor: string | null;
+};
+
+export type AuditPage = {
+  entries: {
+    id: string;
+    action: string;
+    entity: string;
+    entityId: string;
+    data: Record<string, unknown> | null;
+    createdAt: string;
+    actor: { id: string; name: string | null; role: string | null; deleted: boolean };
+  }[];
+  nextCursor: string | null;
+};
