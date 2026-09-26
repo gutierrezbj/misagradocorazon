@@ -1,4 +1,5 @@
 // Recordatorios diarios en la hora local de cada fiel (SDD-05 US-15, US-16, US-17).
+// Abren la pantalla con el audio en marcha si existe (SDD Documentación, flujos 1 y 2: auto-play).
 // El worker lo ejecuta cada minuto. Mira los últimos minutos para no perder un aviso si la
 // tarea se retrasa; push_delivery garantiza que cada aviso sale una sola vez por fecha local.
 import { prisma } from "../../db.ts";
@@ -35,14 +36,14 @@ export async function runReminders(now = new Date()) {
       });
       sent.morning += await deliver("morning", date, morning, (r) => ({
         ...pushCopy.morning(r.language),
-        url: "/prayer?kind=morning",
+        url: "/prayer?kind=morning&autoplay=1",
       }));
 
       const night = await prisma.user.findMany({
         where: { ...reachable, timezone: tz, notifyNight: true, nightTime: { in: times } },
         select,
       });
-      sent.night += await deliver("night", date, night, (r) => ({ ...pushCopy.night(r.language), url: "/prayer?kind=night" }));
+      sent.night += await deliver("night", date, night, (r) => ({ ...pushCopy.night(r.language), url: "/prayer?kind=night&autoplay=1" }));
 
       if (times.includes(SAINT_OF_DAY_TIME)) sent.saint += await saintOfDay(tz, date);
     }
@@ -57,7 +58,7 @@ async function saintOfDay(tz: string, date: string) {
   const fans: Recipient[] = await prisma.user.findMany({ where: { ...reachable, timezone: tz, notifySaint: true }, select });
   return deliver("saint_of_day", date, fans, (r) => ({
     ...pushCopy.saintOfDay(r.language, saint.name),
-    url: `/saint/${saint.id}`,
+    url: `/saint/${saint.id}?autoplay=1`,
     image: saint.imageUrl,
   }));
 }

@@ -130,12 +130,20 @@ describe("santos y contenido diario", () => {
         morningPrayerEn: "o",
         nightPrayerEs: "n",
         nightPrayerEn: "n",
+        morningAudioUrlEs: "https://media.example/manana-es.mp3",
+        morningAudioUrlEn: "https://media.example/morning-en.mp3",
       },
     });
     const res = await request(app).get("/api/daily?date=2026-09-26");
     expect(res.status).toBe(200);
     expect(res.body.data.saintOfDay.id).toBe("saint_corazon");
     expect(res.body.data.gospel.ref).toBe("Jn 15, 9-17");
+    // Audio por idioma (US-07): cada fiel escucha el de su idioma; sin audio, null.
+    expect(res.body.data.morningPrayer.audioUrl).toEqual({
+      es: "https://media.example/manana-es.mp3",
+      en: "https://media.example/morning-en.mp3",
+    });
+    expect(res.body.data.nightPrayer.audioUrl).toEqual({ es: null, en: null });
   });
 });
 
