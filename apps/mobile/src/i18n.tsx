@@ -196,6 +196,13 @@ const dict = {
   privacy: { es: "Política de privacidad", en: "Privacy policy" },
   terms: { es: "Términos de uso", en: "Terms of use" },
   support: { es: "Soporte", en: "Support" },
+  // analítica de uso con consentimiento (ADR-011)
+  analyticsConsent: { es: "Ayúdanos a mejorar la app", en: "Help us improve the app" },
+  analyticsConsentHint: {
+    es: "Compartir estadísticas de uso: qué pantallas se abren y qué funciones se usan. Nunca tus intenciones, mensajes, nombre ni email. Puedes cambiarlo en Ajustes.",
+    en: "Share usage statistics: which screens are opened and which features are used. Never your intentions, messages, name or email. You can change this in Settings.",
+  },
+  privacySection: { es: "Privacidad", en: "Privacy" },
   // borrado de cuenta (SDD-02, transversal)
   account: { es: "Cuenta", en: "Account" },
   deleteAccount: { es: "Borrar mi cuenta", en: "Delete my account" },

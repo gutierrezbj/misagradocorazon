@@ -14,6 +14,7 @@ import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
+import { track } from "@/src/analytics";
 
 export default function Causas() {
   const styles = useStyles();
@@ -35,6 +36,7 @@ export default function Causas() {
     mutationFn: (id: string) => api(`/causes/${id}/vote`, { method: "POST" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["causes", "current"] });
+      track("vote_cast");
       toast(t("voteRegistered"), "success");
     },
     onError: (e) => toast(e instanceof ApiError && e.code === "already_voted" ? t("alreadyVoted") : t("authError"), "error"),

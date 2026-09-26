@@ -10,6 +10,7 @@ import type { CandleVariant } from "@/src/components/CandleFlame";
 import { useI18n } from "@/src/i18n";
 import { shareCard } from "@/src/share";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
+import { track } from "@/src/analytics";
 
 type Props = {
   saintName: string;
@@ -34,6 +35,7 @@ export function ShareCandlePanel({ saintName, intention, variant, mourning, onCl
     try {
       const ok = await shareCard(card, t("shareDialogTitle"));
       if (!ok) toast(t("shareUnavailable"), "error");
+      else track("candle_shared", { withIntention });
     } catch {
       toast(t("genericError"), "error");
     } finally {

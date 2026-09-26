@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View, type LayoutChangeEvent } from "react-native";
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
+import { track, type AnalyticsEvents } from "@/src/analytics";
 import { useI18n } from "@/src/i18n";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { Icon } from "@/src/components/ui";
@@ -39,10 +40,12 @@ type Props = {
   autoPlay?: boolean;
   /** "altar": fondo oscuro de las oraciones; "surface": fondo claro de las fichas. */
   tone?: "altar" | "surface";
+  /** Qué se escucha, para la analítica (solo con consentimiento). */
+  analyticsContent?: AnalyticsEvents["audio_played"]["content"];
   testID?: string;
 };
 
-export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "surface", testID = "audio-player" }: Props) {
+export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "surface", analyticsContent, testID = "audio-player" }: Props) {
   const { t } = useI18n();
   const { colors } = useTheme();
   const styles = useStyles();
@@ -53,6 +56,7 @@ export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "
   const [attempt, setAttempt] = useState(0);
   const lockScreenOn = useRef(false);
   const autoPlayed = useRef(false);
+  const tracked = useRef(false);
 
   const fg = tone === "altar" ? colors.onAltar : colors.onSurface;
   const muted = tone === "altar" ? colors.onAltarMuted : colors.muted;
@@ -71,6 +75,10 @@ export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "
     await ensureAudioMode();
     if (status.duration > 0 && status.currentTime >= status.duration - 0.5) await player.seekTo(0);
     player.play();
+    if (analyticsContent && !tracked.current) {
+      tracked.current = true;
+      track("audio_played", { content: analyticsContent });
+    }
     if (!lockScreenOn.current) {
       player.setActiveForLockScreen(
         true,

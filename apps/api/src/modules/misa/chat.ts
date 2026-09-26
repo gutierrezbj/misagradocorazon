@@ -8,6 +8,7 @@ import { prisma } from "../../db.ts";
 import { env } from "../../env.ts";
 import { publicName } from "../../lib/display-name.ts";
 import { containsBannedWord } from "../moderation/filter.ts";
+import { massStatus } from "./service.ts";
 
 type Ack = (res: { ok: boolean; error?: string; status?: string }) => void;
 type SocketUser = { id: string; name: string };
@@ -15,6 +16,13 @@ type SocketUser = { id: string; name: string };
 let io: Server | null = null;
 const lastMessageAt = new Map<string, number>();
 const MIN_INTERVAL_MS = 3_000;
+// Quien abre la misa antes de empezar cuenta como asistente si sigue dentro al comenzar.
+const MAX_WAIT_MS = 6 * 3_600_000;
+
+// Asistencia a misa (KPI de SDD-02): una fila por persona y misa, solo mientras está en directo.
+export async function recordAttendance(massId: string, userId: string) {
+  await prisma.massAttendance.createMany({ data: [{ massId, userId }], skipDuplicates: true });
+}
 
 export const roomOf = (massId: string) => `mass:${massId}`;
 
@@ -49,6 +57,20 @@ export function attachChat(httpServer: HttpServer): Server {
       const mass = payload?.massId ? await prisma.mass.findUnique({ where: { id: payload.massId } }) : null;
       if (!mass) return ack?.({ ok: false, error: "mass_not_found" });
       await socket.join(roomOf(mass.id));
+      if (user) {
+        const status = massStatus(mass);
+        if (status === "live") {
+          await recordAttendance(mass.id, user.id).catch(() => undefined);
+        } else if (status === "scheduled") {
+          const wait = mass.scheduledAt.getTime() - Date.now();
+          if (wait <= MAX_WAIT_MS) {
+            const timer = setTimeout(() => {
+              if (socket.connected && socket.rooms.has(roomOf(mass.id))) void recordAttendance(mass.id, user.id).catch(() => undefined);
+            }, wait);
+            socket.once("disconnect", () => clearTimeout(timer));
+          }
+        }
+      }
       ack?.({ ok: true });
     });
 

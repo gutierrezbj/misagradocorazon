@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -18,6 +18,7 @@ import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
 import { ShareCandlePanel } from "@/src/components/ShareCandlePanel";
+import { track } from "@/src/analytics";
 
 // Precios de @msc/shared (céntimos): 0,99 / 1,99 / 2,99 USD, los tiers de las stores.
 const TYPES = [
@@ -46,11 +47,14 @@ export default function LightCandle() {
   const [done, setDone] = useState(false);
   const [sharing, setSharing] = useState(false);
 
+  useEffect(() => track("candle_flow_started"), []);
+
   const lightMut = useMutation({
     mutationFn: () => api<{ saint: { name: string } }>("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
+      track("candle_lit", { type, forDeceased });
       setDone(true);
     },
     onError: () => toast(t("authError"), "error"),

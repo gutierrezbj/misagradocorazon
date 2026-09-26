@@ -1,20 +1,9 @@
 // KPIs del panel (SDD-02: MAU, retención D7/D30, conversión a vela, velas, ingresos, 20 %,
-// participación en votación, asistencia a misa). Consultas en vivo sobre PostgreSQL:
-// a la escala del MVP bastan. Cuando crezca, un job nocturno de pg-boss los guardará en agregados diarios.
+// participación en votación, asistencia a misa). Las cifras de la ventana se consultan en vivo;
+// la serie por día sale de los agregados diarios (kpi_daily) más el día de hoy en vivo.
 import { prisma } from "../../db.ts";
 import { monthOf } from "../../lib/dates.ts";
-
-// Actividad = cualquier gesto devocional o comunitario de un fiel (el staff no cuenta).
-const ACTIVITY_SQL = `
-  SELECT ev."userId", ev.at FROM (
-    SELECT "userId", "createdAt" AS at FROM prayer_log
-    UNION ALL SELECT "userId", "litAt" FROM candle
-    UNION ALL SELECT "userId", "createdAt" FROM intention
-    UNION ALL SELECT "userId", "createdAt" FROM intention_prayer
-    UNION ALL SELECT "userId", "createdAt" FROM chat_message
-    UNION ALL SELECT "userId", "createdAt" FROM vote
-  ) ev JOIN "user" u ON u.id = ev."userId" AND u.role = 'user'
-`;
+import { ACTIVITY_SQL, dailySeries, isoDay } from "./kpi-daily.ts";
 
 const n = (v: unknown) => Number(v ?? 0);
 const pct = (num: number, den: number) => (den > 0 ? Math.round((num / den) * 1000) / 10 : null);
@@ -71,14 +60,7 @@ export async function computeKpis(days: number, now = new Date()) {
     since,
   );
 
-  const candlesByDay = await prisma.$queryRawUnsafe<{ day: string; candles: bigint }[]>(
-    `SELECT to_char(d::date, 'YYYY-MM-DD') AS day, count(c.id) AS candles
-       FROM generate_series(date_trunc('day', $1::timestamptz), date_trunc('day', $2::timestamptz), interval '1 day') d
-       LEFT JOIN candle c ON date_trunc('day', c."litAt") = d
-      GROUP BY d ORDER BY d`,
-    since,
-    now,
-  );
+  const daily = await dailySeries(isoDay(since), now);
 
   const byType = await prisma.candle.groupBy({ by: ["type"], where: { litAt: { gte: since } }, _count: { _all: true } });
   const bySaintRaw = await prisma.candle.groupBy({
@@ -99,12 +81,15 @@ export async function computeKpis(days: number, now = new Date()) {
 
   const votesThisMonth = await prisma.vote.count({ where: { month } });
 
-  // Asistencia a misa: personas distintas que escribieron en el chat de la última misa celebrada.
-  // Es un mínimo (quien solo mira no deja rastro); la asistencia real llegará con PostHog.
+  // Asistencia a la última misa empezada: fieles que la tuvieron abierta en directo, y cuántos escribieron.
   const lastMass = await prisma.mass.findFirst({ where: { scheduledAt: { lte: now } }, orderBy: { scheduledAt: "desc" } });
-  const massParticipants = lastMass
-    ? (await prisma.chatMessage.findMany({ where: { massId: lastMass.id }, distinct: ["userId"], select: { userId: true } })).length
-    : 0;
+  const faithful = { role: "user" as const };
+  const [massAttendees, massParticipants] = lastMass
+    ? await Promise.all([
+        prisma.massAttendance.count({ where: { massId: lastMass.id, user: faithful } }),
+        prisma.chatMessage.findMany({ where: { massId: lastMass.id, user: faithful }, distinct: ["userId"], select: { userId: true } }).then((r) => r.length),
+      ])
+    : [0, 0];
 
   const pendingModeration =
     (await prisma.intention.count({ where: { status: "pending" } })) +
@@ -121,7 +106,7 @@ export async function computeKpis(days: number, now = new Date()) {
       total: n(candleTotals?.candles),
       buyers: n(candleTotals?.buyers),
       conversionRate: pct(n(candleTotals?.buyers), mau),
-      byDay: candlesByDay.map((d) => ({ day: d.day, candles: n(d.candles) })),
+      byDay: daily.map((d) => ({ day: d.day, candles: d.candles })),
       byType: ["basic", "solemn", "permanent"].map((t) => ({ type: t, candles: byType.find((b) => b.type === t)?._count._all ?? 0 })),
       bySaint: bySaintRaw.map((s) => ({
         saintId: s.saintId,
@@ -137,7 +122,10 @@ export async function computeKpis(days: number, now = new Date()) {
       transferredCents: sumOf("transfer"),
     },
     voting: { month, votes: votesThisMonth, participationRate: pct(votesThisMonth, mau) },
-    mass: lastMass ? { massId: lastMass.id, scheduledAt: lastMass.scheduledAt, chatParticipants: massParticipants } : null,
+    mass: lastMass
+      ? { massId: lastMass.id, scheduledAt: lastMass.scheduledAt, attendees: massAttendees, chatParticipants: massParticipants }
+      : null,
+    daily: daily.map((d) => ({ day: d.day, newUsers: d.newUsers, activeUsers: d.activeUsers, candles: d.candles, revenueCents: d.revenueCents })),
     moderation: { pending: pendingModeration },
   };
 }

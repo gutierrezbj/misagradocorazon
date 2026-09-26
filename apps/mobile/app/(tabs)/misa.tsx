@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "expo-router";
 import { View, Text, Pressable, FlatList, TextInput, ActivityIndicator, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
@@ -14,6 +15,7 @@ import type { CommunityCandles, Mass } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
+import { track } from "@/src/analytics";
 
 const HERO = "https://images.unsplash.com/photo-1465848059293-208e11dfea17?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080";
 
@@ -40,6 +42,12 @@ export default function Misa() {
   const { data: candlesData } = useQuery({ queryKey: ["candles", "community"], queryFn: () => api<CommunityCandles>("/candles/community") });
 
   const { messages, send } = useMassChat(mass?.id);
+  // Cada vez que se abre la pestaña con una misa cargada (embudo de asistencia).
+  useFocusEffect(
+    useCallback(() => {
+      if (mass) track("mass_opened", { status: mass.status });
+    }, [mass?.id, mass?.status]), // eslint-disable-line react-hooks/exhaustive-deps
+  );
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
   const sendMessage = async () => {
@@ -49,6 +57,7 @@ export default function Misa() {
     const res = await send(text);
     setSending(false);
     if (res.ok) {
+      track("chat_message_sent");
       setMsg("");
       if (res.status === "pending") toast(t("intentionFlagged"), "info");
     } else {

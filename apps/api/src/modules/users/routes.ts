@@ -17,6 +17,11 @@ async function assertSaintsExist(ids: string[]) {
   if (found !== new Set(ids).size) throw new HttpError(400, "invalid_saint", "Santo no válido");
 }
 
+// La fecha del consentimiento cambia solo cuando cambia el consentimiento.
+function consentStamp(user: { analyticsConsent: boolean }, consent: boolean | undefined) {
+  return consent === undefined || consent === user.analyticsConsent ? {} : { analyticsConsentAt: new Date() };
+}
+
 function assertTimeZone(tz: string | undefined) {
   if (tz !== undefined && !isValidTimeZone(tz)) throw new HttpError(400, "invalid_timezone", "Zona horaria no válida");
 }
@@ -33,7 +38,12 @@ usersRouter.put("/me/onboarding", requireUser, async (req, res) => {
   await assertSaintsExist([input.patronSaintId, ...input.secondarySaintIds]);
   const updated = await prisma.user.update({
     where: { id: user.id },
-    data: { ...input, secondarySaintIds: [...new Set(input.secondarySaintIds)], onboarded: true },
+    data: {
+      ...input,
+      ...consentStamp(user, input.analyticsConsent),
+      secondarySaintIds: [...new Set(input.secondarySaintIds)],
+      onboarded: true,
+    },
   });
   ok(res, profileDto(updated, await currentStreak(updated.id, updated.timezone)));
 });
@@ -43,7 +53,7 @@ usersRouter.patch("/me", requireUser, async (req, res) => {
   const input = profileUpdateSchema.parse(req.body);
   assertTimeZone(input.timezone);
   await assertSaintsExist([...(input.patronSaintId ? [input.patronSaintId] : []), ...(input.secondarySaintIds ?? [])]);
-  const updated = await prisma.user.update({ where: { id: user.id }, data: input });
+  const updated = await prisma.user.update({ where: { id: user.id }, data: { ...input, ...consentStamp(user, input.analyticsConsent) } });
   ok(res, profileDto(updated, await currentStreak(updated.id, updated.timezone)));
 });
 
