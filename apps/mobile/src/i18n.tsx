@@ -196,6 +196,28 @@ const dict = {
   privacy: { es: "Política de privacidad", en: "Privacy policy" },
   terms: { es: "Términos de uso", en: "Terms of use" },
   support: { es: "Soporte", en: "Support" },
+  // borrado de cuenta (SDD-02, transversal)
+  account: { es: "Cuenta", en: "Account" },
+  deleteAccount: { es: "Borrar mi cuenta", en: "Delete my account" },
+  deleteAccountLead: { es: "Esta acción no se puede deshacer.", en: "This cannot be undone." },
+  deleteAccountGone: { es: "Se borra para siempre", en: "Deleted forever" },
+  deleteAccountGoneList: {
+    es: "Tu perfil y tu email, tus intenciones privadas y públicas, tus mensajes del chat de misa, tu historial de oración y los avisos de este dispositivo.",
+    en: "Your profile and email, your private and public intentions, your Mass chat messages, your prayer history and this device's notifications.",
+  },
+  deleteAccountKept: { es: "Se conserva sin tu nombre", en: "Kept without your name" },
+  deleteAccountKeptList: {
+    es: "Las velas que encendiste, sin el texto de tu intención, y tus votos, solo como números. Nadie podrá saber que eran tuyos.",
+    en: "The candles you lit, without your intention text, and your votes, only as numbers. No one will be able to tell they were yours.",
+  },
+  deleteAccountConfirmWord: { es: "BORRAR", en: "DELETE" },
+  deleteAccountTypeToConfirm: { es: "Para confirmar, escribe {word}", en: "To confirm, type {word}" },
+  deleteAccountButton: { es: "Borrar mi cuenta para siempre", en: "Delete my account forever" },
+  deleteAccountDone: { es: "Tu cuenta se ha borrado. Que Dios te bendiga.", en: "Your account has been deleted. God bless you." },
+  deleteAccountLastAdmin: {
+    es: "Eres el último superadmin: nombra a otro antes de borrar tu cuenta.",
+    en: "You are the last superadmin: appoint another one before deleting your account.",
+  },
   // admin
 };
 

@@ -52,5 +52,6 @@ pnpm test
 - `docs/auditoria-entrega.md`: auditoría del prototipo entregado
 - `docs/propuesta-cambios-sdd.md`: cambios aprobados a los SDD
 - `docs/despliegue.md`: despliegue en Railway (API, worker, panel) y perfiles de EAS
+- `docs/borrado-cuenta.md`: borrado de cuenta desde la app (qué se borra y qué se conserva anonimizado)
 
 Propiedad: Juan Gutiérrez Blanco. Confidencial.

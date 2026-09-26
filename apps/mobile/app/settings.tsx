@@ -101,6 +101,12 @@ export default function Settings() {
         <Row label={t("privacy")} chevron />
         <Row label={t("terms")} chevron />
         <Row label={t("support")} value="soporte@misagradocorazon.com" />
+
+        <Text style={styles.sectionTitle}>{t("account")}</Text>
+        <Pressable testID="delete-account" onPress={() => router.push("/delete-account")} accessibilityRole="button" style={styles.row}>
+          <Text style={[styles.rowLabel, { color: colors.error }]}>{t("deleteAccount")}</Text>
+          <Icon name="chevron-right" size={18} color={colors.muted} />
+        </Pressable>
       </ScrollView>
     </View>
   );

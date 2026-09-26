@@ -92,6 +92,8 @@ model User {
 
   role    Role    @default(user)
   blocked Boolean @default(false)
+  // Cuenta borrada por su titular (SDD-02, GDPR art. 17): datos personales fuera, fila anonimizada.
+  deletedAt DateTime?
 
   // Perfil devocional (onboarding)
   onboarded         Boolean  @default(false)

@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 import { api, authRequest, clearToken, loadToken, signOutRequest } from "@/src/api";
 import { unregisterPush } from "@/src/push";
+import { queryClient } from "@/src/query-client";
 import { signInWithApple, signInWithGoogle, socialSignOut, type SocialProvider } from "@/src/social";
 import type { User } from "@/src/types";
 
@@ -15,6 +16,8 @@ type AuthCtx = {
   /** false si la persona cancela en la pantalla de Google o Apple. */
   loginWithProvider: (provider: SocialProvider) => Promise<boolean>;
   logout: () => Promise<void>;
+  /** Borra la cuenta en el servidor y deja el dispositivo como recién instalado. */
+  deleteAccount: () => Promise<void>;
   refresh: () => Promise<void>;
   setUser: (u: User) => void;
 };
@@ -74,11 +77,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOutRequest();
     await socialSignOut();
     await clearToken();
+    // Nada de la persona anterior debe quedar en caché (intenciones privadas, votos...).
+    queryClient.clear();
+    setUserState(null);
+  }, []);
+  const deleteAccount = useCallback(async () => {
+    // Si falla, se lanza y la sesión sigue intacta.
+    await api("/me", { method: "DELETE", body: { confirm: true } });
+    // El servidor ya borró sesión y dispositivos; aquí solo se limpia lo local.
+    await unregisterPush();
+    await socialSignOut();
+    await clearToken();
+    queryClient.clear();
     setUserState(null);
   }, []);
 
   return (
-    <Ctx.Provider value={{ user, loading, register, login, loginWithProvider, logout, refresh, setUser: setUserState }}>
+    <Ctx.Provider value={{ user, loading, register, login, loginWithProvider, logout, deleteAccount, refresh, setUser: setUserState }}>
       {children}
     </Ctx.Provider>
   );
