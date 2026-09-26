@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api, deviceTimeZone } from "@/src/api";
+import { registerForPush } from "@/src/push";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
@@ -58,6 +59,8 @@ export default function Onboarding() {
           timezone: deviceTimeZone(),
         },
       });
+      // SDD-05 US-03: los horarios elegidos son para recibir los recordatorios. Se pide permiso aquí.
+      await registerForPush({ ask: true }).catch(() => undefined);
       setUser(updated);
     } catch {
       toast(t("authError"), "error");

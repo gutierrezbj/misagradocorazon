@@ -40,6 +40,10 @@ export function profileDto(u: User, streak: number) {
     morningTime: u.morningTime,
     angelusTime: u.angelusTime,
     nightTime: u.nightTime,
+    notifyMorning: u.notifyMorning,
+    notifyNight: u.notifyNight,
+    notifySaint: u.notifySaint,
+    notifyCommunity: u.notifyCommunity,
     streak,
   };
 }

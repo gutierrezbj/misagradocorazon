@@ -8,6 +8,7 @@ import { Dashboard } from "./pages/Dashboard.tsx";
 import { Forbidden, Login } from "./pages/Login.tsx";
 import { Masses } from "./pages/Masses.tsx";
 import { Moderation } from "./pages/Moderation.tsx";
+import { Notifications } from "./pages/Notifications.tsx";
 import { Users } from "./pages/Users.tsx";
 
 export function App() {
@@ -24,6 +25,7 @@ export function App() {
         {can(me, "moderator") && <Route path="moderacion" element={<Moderation />} />}
         {can(me, "editor") && <Route path="causas" element={<Causes />} />}
         {can(me, "editor") && <Route path="misas" element={<Masses />} />}
+        {can(me, "editor") && <Route path="notificaciones" element={<Notifications />} />}
         {can(me) && <Route path="usuarios" element={<Users />} />}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

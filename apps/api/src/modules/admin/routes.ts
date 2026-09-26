@@ -7,6 +7,7 @@ import {
   massInputSchema,
   moderationDecisionSchema,
   moderationWordSchema,
+  pushCampaignSchema,
   ROLES,
 } from "@msc/shared";
 import { z } from "zod";
@@ -22,6 +23,7 @@ import { causeDto } from "../causas/service.ts";
 import { getIo, roomOf } from "../misa/chat.ts";
 import { massDto } from "../misa/service.ts";
 import { normalizeText } from "../moderation/filter.ts";
+import { reachable } from "../push/service.ts";
 import { computeKpis } from "./kpis.ts";
 
 export const adminRouter = Router();
@@ -250,4 +252,39 @@ adminRouter.patch("/admin/users/:id", ...superadmin, async (req, res) => {
   // Bloquear corta las sesiones abiertas.
   if (input.blocked) await prisma.session.deleteMany({ where: { userId: updated.id } });
   ok(res, { id: updated.id, role: updated.role, blocked: updated.blocked });
+});
+
+// --- Notificaciones (avisos del equipo) --------------------------------------
+// Se crean aquí y las envía el worker en el minuto siguiente. Llegan a quien acepta avisos de la comunidad.
+
+const audienceWhere = { ...reachable, notifyCommunity: true };
+
+adminRouter.get("/admin/push/campaigns", ...editor, async (_req, res) => {
+  const [campaigns, audience] = await Promise.all([
+    prisma.pushCampaign.findMany({ orderBy: { createdAt: "desc" }, take: 50, include: { createdBy: { select: { name: true } } } }),
+    prisma.user.count({ where: audienceWhere }),
+  ]);
+  ok(res, {
+    audience,
+    campaigns: campaigns.map((c) => ({
+      id: c.id,
+      title: { es: c.titleEs, en: c.titleEn },
+      body: { es: c.bodyEs, en: c.bodyEn },
+      createdBy: c.createdBy.name,
+      createdAt: c.createdAt,
+      sentAt: c.sentAt,
+      recipients: c.recipients,
+    })),
+  });
+});
+
+adminRouter.post("/admin/push/campaigns", ...editor, async (req, res) => {
+  const actor = currentUser(req);
+  const input = pushCampaignSchema.parse(req.body);
+  const created = await prisma.$transaction(async (tx) => {
+    const c = await tx.pushCampaign.create({ data: { ...input, createdById: actor.id } });
+    await audit(tx, actor.id, "push.campaign_create", "push_campaign", c.id, { titleEs: c.titleEs });
+    return c;
+  });
+  ok(res, { id: created.id, sentAt: null }, 201);
 });

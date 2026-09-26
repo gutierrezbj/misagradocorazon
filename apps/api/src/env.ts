@@ -19,6 +19,8 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   // Login con Apple nativo (iOS): bundle ID de la app, audiencia del ID token de Apple.
   APPLE_BUNDLE_ID: z.string().min(1).optional(),
+  // Push: token de acceso de Expo, solo si se activa "enhanced security" en la cuenta de Expo.
+  EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

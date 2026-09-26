@@ -17,6 +17,10 @@ export type User = {
   morningTime: string;
   angelusTime: string;
   nightTime: string;
+  notifyMorning: boolean;
+  notifyNight: boolean;
+  notifySaint: boolean;
+  notifyCommunity: boolean;
   streak: number;
 };
 
