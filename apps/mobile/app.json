@@ -1,22 +1,22 @@
 {
   "expo": {
     "name": "Mi Sagrado Corazón",
-    "slug": "frontend",
+    "slug": "mi-sagrado-corazon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "misagradocorazon",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.emergent.appconceptreview.cpf9hz"
+      "bundleIdentifier": "com.misagradocorazon.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "com.emergent.appconceptreview.cpf9hz"
+      "package": "com.misagradocorazon.app"
     },
     "web": {
       "bundler": "metro",

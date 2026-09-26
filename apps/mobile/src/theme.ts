@@ -1,6 +1,6 @@
 // Design tokens for "Mi Sagrado Corazón" — devotional, warm, sacred, premium.
 // Light Ivory theme across the app; the Altar screen uses the warm-dark
-// `altar*` tokens so the candle flame glows. Keys match design_guidelines.json.
+// `altar*` tokens so the candle flame glows. Keys match docs/guia-diseno-entrega.json.
 import { useMemo } from "react";
 import { Appearance, StyleSheet, useColorScheme } from "react-native";
 
