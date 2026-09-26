@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, ScrollView } from "react-native";
+import { View, Text, Pressable, ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api, deviceTimeZone } from "@/src/api";
 import { registerForPush } from "@/src/push";
+import { applyAnalyticsConsent, track } from "@/src/analytics";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
@@ -34,6 +35,8 @@ export default function Onboarding() {
   const [morning, setMorning] = useState("07:30");
   const [night, setNight] = useState("21:30");
   const [busy, setBusy] = useState(false);
+  // Consentimiento explícito para la analítica de uso: apagado hasta que la persona lo active.
+  const [analytics, setAnalytics] = useState(false);
 
   const toggleSecondary = (id: string) => {
     if (id === patron) return;
@@ -57,8 +60,11 @@ export default function Onboarding() {
           nightTime: night,
           language: lang,
           timezone: deviceTimeZone(),
+          analyticsConsent: analytics,
         },
       });
+      await applyAnalyticsConsent(updated).catch(() => undefined);
+      track("onboarding_completed", { language: lang, secondarySaints: secondary.length });
       // SDD-05 US-03: los horarios elegidos son para recibir los recordatorios. Se pide permiso aquí.
       await registerForPush({ ask: true }).catch(() => undefined);
       setUser(updated);
@@ -139,6 +145,24 @@ export default function Onboarding() {
           </View>
         </View>
 
+        <View style={styles.section}>
+          <View style={styles.consent}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.consentTitle}>{t("analyticsConsent")}</Text>
+              <Text style={styles.consentText}>{t("analyticsConsentHint")}</Text>
+            </View>
+            <Switch
+              testID="analytics-consent"
+              value={analytics}
+              onValueChange={setAnalytics}
+              trackColor={{ true: colors.brandPrimary, false: colors.border }}
+              thumbColor={colors.surface}
+              {...({ activeThumbColor: colors.surface } as object)}
+              accessibilityLabel={t("analyticsConsent")}
+            />
+          </View>
+        </View>
+
         <View style={{ paddingHorizontal: spacing.md, marginTop: spacing.lg }}>
           <AppButton testID="finish-onboarding-button" label={t("finish")} onPress={finish} loading={busy} icon="arrow-right" />
         </View>
@@ -198,6 +222,9 @@ const useStyles = makeStyles((c) => ({
   hint: { fontFamily: fonts.body, fontSize: 14, color: c.muted, textAlign: "center", marginBottom: spacing.md },
   section: { paddingHorizontal: spacing.md, marginTop: spacing.md },
   sectionTitle: { fontFamily: fonts.displayBold, fontSize: 22, color: c.onSurface, marginBottom: spacing.sm },
+  consent: { flexDirection: "row", alignItems: "center", gap: spacing.md, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md },
+  consentTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
+  consentText: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: c.muted, marginTop: 2 },
   timeLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginTop: spacing.sm },
   timeChip: {
     height: 40,

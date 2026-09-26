@@ -7,11 +7,13 @@ import * as Haptics from "expo-haptics";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api, ApiError } from "@/src/api";
+import type { IntentionCategory } from "@msc/shared";
 import type { Intention } from "@/src/types";
 import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Chip, Icon, AppButton, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
+import { track } from "@/src/analytics";
 
 const CATS = [
   { key: "all", label: "catAll" },
@@ -43,12 +45,16 @@ export default function Muro() {
 
   const prayMut = useMutation({
     mutationFn: (id: string) => api(`/intentions/${id}/pray`, { method: "POST" }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["intentions"] }),
+    onSuccess: () => {
+      track("intention_prayed");
+      void queryClient.invalidateQueries({ queryKey: ["intentions"] });
+    },
   });
 
   const publishMut = useMutation({
     mutationFn: () => api<{ id: string; status: "approved" | "pending" }>("/intentions", { method: "POST", body: { text, category: newCat } }),
     onSuccess: (res) => {
+      track("intention_posted", { category: newCat as IntentionCategory, moderated: res.status === "pending" });
       setModal(false);
       setText("");
       queryClient.invalidateQueries({ queryKey: ["intentions"] });

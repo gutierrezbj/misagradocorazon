@@ -111,6 +111,10 @@ model User {
   notifySaint     Boolean @default(true) // santo del día, 07:00 local
   notifyCommunity Boolean @default(true) // causa ganadora y avisos del equipo
 
+  // Analítica de uso (ADR-011): solo con consentimiento explícito. Se guarda cuándo se dio o retiró.
+  analyticsConsent   Boolean   @default(false)
+  analyticsConsentAt DateTime?
+
   patronSaint Saint?      @relation("PatronSaint", fields: [patronSaintId], references: [id])
   sessions    Session[]
   accounts    Account[]
@@ -120,6 +124,7 @@ model User {
   intentionPrayers  IntentionPrayer[]
   privateIntentions PrivateIntention[]
   chatMessages      ChatMessage[]
+  massAttendances   MassAttendance[]
   votes             Vote[]
   auditLogs         AdminAuditLog[]
   pushTokens        PushToken[]
@@ -374,10 +379,45 @@ model Mass {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  messages ChatMessage[]
+  messages    ChatMessage[]
+  attendances MassAttendance[]
 
   @@index([scheduledAt])
   @@map("mass")
+}
+
+// Asistencia a misa (SDD-02 KPIs): quien tiene abierta la misa mientras está en directo.
+// Una fila por persona y misa, con el primer momento en que se la vio.
+model MassAttendance {
+  massId      String
+  userId      String
+  firstSeenAt DateTime @default(now())
+
+  mass Mass @relation(fields: [massId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([massId, userId])
+  @@index([userId])
+  @@map("mass_attendance")
+}
+
+// Agregados diarios de negocio (SDD-05 US-20, CLAUDE.md "KPIs"). Día natural en UTC.
+// Los calcula el worker cada noche a partir de las tablas de origen; nunca se teclean.
+model KpiDaily {
+  day           String   @id // YYYY-MM-DD
+  newUsers      Int
+  activeUsers   Int
+  prayers       Int
+  candles       Int
+  buyers        Int
+  revenueCents  Int
+  impactCents   Int
+  votes         Int
+  chatMessages  Int
+  massAttendees Int
+  computedAt    DateTime @updatedAt
+
+  @@map("kpi_daily")
 }
 
 model ChatMessage {

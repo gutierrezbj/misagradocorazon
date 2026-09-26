@@ -162,3 +162,49 @@ describe("chat de misa en tiempo real", () => {
     expect(history.body.data).toHaveLength(0);
   });
 });
+
+describe("asistencia a misa", () => {
+  const attendees = (massId: string) => prisma.massAttendance.count({ where: { massId } });
+
+  test("cuenta a quien abre la misa en directo, una vez; sin sesión no cuenta", async () => {
+    const editor = await signUpAs("editor");
+    const mass = await createMass(editor.token, -5);
+    const fiel = await signUp();
+    const s1 = await client(fiel.token);
+    await emit(s1, "chat:join", { massId: mass.id });
+    const s2 = await client(fiel.token);
+    await emit(s2, "chat:join", { massId: mass.id });
+    await emit(await client(), "chat:join", { massId: mass.id });
+    expect(await attendees(mass.id)).toBe(1);
+  });
+
+  test("quien la abre antes de empezar cuenta si sigue dentro al comenzar; si se va antes, no", async () => {
+    const editor = await signUpAs("editor");
+    const mass = await createMass(editor.token, 0.02); // empieza en ~1,2 s
+    const stays = await signUp();
+    const leaves = await signUp();
+    await emit(await client(stays.token), "chat:join", { massId: mass.id });
+    const s = await client(leaves.token);
+    await emit(s, "chat:join", { massId: mass.id });
+    s.close();
+    expect(await attendees(mass.id)).toBe(0);
+    await new Promise((r) => setTimeout(r, 2_000));
+    const rows = await prisma.massAttendance.findMany({ where: { massId: mass.id } });
+    expect(rows.map((r) => r.userId)).toEqual([stays.userId]);
+  });
+
+  test("una misa terminada no suma asistentes; el KPI solo cuenta fieles", async () => {
+    const editor = await signUpAs("editor");
+    const ended = await createMass(editor.token, -300);
+    const fiel = await signUp();
+    await emit(await client(fiel.token), "chat:join", { massId: ended.id });
+    expect(await attendees(ended.id)).toBe(0);
+
+    const live = await createMass(editor.token, -5);
+    await emit(await client(fiel.token), "chat:join", { massId: live.id });
+    await emit(await client(editor.token), "chat:join", { massId: live.id });
+    expect(await attendees(live.id)).toBe(2);
+    const k = await request(app).get("/api/admin/kpis").set(bearer(editor.token));
+    expect(k.body.data.mass).toMatchObject({ massId: live.id, attendees: 1, chatParticipants: 0 });
+  });
+});

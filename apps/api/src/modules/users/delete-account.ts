@@ -28,6 +28,7 @@ export async function deleteAccount(userId: string) {
     await tx.intentionPrayer.deleteMany(byUser);
     await tx.intention.deleteMany(byUser); // sus oraciones recibidas caen en cascada
     await tx.chatMessage.deleteMany(byUser);
+    await tx.massAttendance.deleteMany(byUser);
     await tx.prayerLog.deleteMany(byUser);
     await tx.verification.deleteMany({ where: { OR: [{ identifier: { contains: user.email } }, { value: userId }] } });
 
@@ -52,6 +53,7 @@ export async function deleteAccount(userId: string) {
         notifyNight: false,
         notifySaint: false,
         notifyCommunity: false,
+        analyticsConsent: false,
       },
     });
     // Sin datos personales: solo que ocurrió y cuándo.

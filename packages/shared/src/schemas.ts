@@ -17,6 +17,8 @@ export const onboardingSchema = z.object({
   language: localeSchema.default("es"),
   // Zona horaria IANA del dispositivo (p. ej. "America/Los_Angeles"); define el "hoy" del fiel.
   timezone: z.string().min(1).max(64).optional(),
+  // Consentimiento explícito para la analítica de uso (ADR-011). Sin él no se envía nada.
+  analyticsConsent: z.boolean().optional(),
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 

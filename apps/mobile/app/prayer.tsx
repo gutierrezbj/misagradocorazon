@@ -11,6 +11,7 @@ import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
 import { AudioPlayer } from "@/src/components/AudioPlayer";
+import { track } from "@/src/analytics";
 
 export default function Prayer() {
   const styles = useStyles();
@@ -34,6 +35,7 @@ export default function Prayer() {
   const completeMut = useMutation({
     mutationFn: () => api<{ streak: number }>("/prayers/complete", { method: "POST", body: { kind: isMorning ? "morning" : "night" } }),
     onSuccess: (res) => {
+      track("prayer_completed", { kind: isMorning ? "morning" : "night" });
       void refresh();
       toast(`${res.streak} ${t("streakDays")}`, "success");
       router.back();
@@ -60,7 +62,7 @@ export default function Prayer() {
           </View>
           {!!audioUrl && (
             <View style={{ marginBottom: spacing.lg }}>
-              <AudioPlayer url={audioUrl} title={isMorning ? t("morningPrayer") : t("nightPrayer")} autoPlay={autoplay === "1"} tone="altar" />
+              <AudioPlayer url={audioUrl} title={isMorning ? t("morningPrayer") : t("nightPrayer")} analyticsContent={isMorning ? "morning" : "night"} autoPlay={autoplay === "1"} tone="altar" />
             </View>
           )}
           <Text style={styles.prayer}>{loc(prayer)}</Text>

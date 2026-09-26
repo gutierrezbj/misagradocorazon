@@ -4,6 +4,7 @@ import { PgBoss } from "pg-boss";
 
 import { env } from "../env.ts";
 import { monthOf } from "../lib/dates.ts";
+import { refreshKpiDaily } from "../modules/admin/kpi-daily.ts";
 import { closeVoting, openVoting } from "../modules/causas/service.ts";
 import { announceVotingResult, runPendingCampaigns, runReminders } from "../modules/push/reminders.ts";
 import { processReceipts } from "../modules/push/service.ts";
@@ -14,6 +15,7 @@ const QUEUES = {
   pushReminders: "push-reminders",
   pushCampaigns: "push-campaigns",
   pushReceipts: "push-receipts",
+  kpiDaily: "kpi-daily",
 } as const;
 
 async function main() {
@@ -30,6 +32,8 @@ async function main() {
   await boss.schedule(QUEUES.pushReminders, "* * * * *", null, { tz: "UTC" });
   await boss.schedule(QUEUES.pushCampaigns, "* * * * *", null, { tz: "UTC" });
   await boss.schedule(QUEUES.pushReceipts, "*/15 * * * *", null, { tz: "UTC" });
+  // Agregados diarios de KPIs: cerrado el día UTC anterior.
+  await boss.schedule(QUEUES.kpiDaily, "20 0 * * *", null, { tz: "UTC" });
 
   await boss.work(QUEUES.openVoting, async () => {
     const r = await openVoting(monthOf(new Date()));
@@ -51,6 +55,10 @@ async function main() {
   await boss.work(QUEUES.pushReceipts, async () => {
     const r = await processReceipts();
     if (r.checked > 0) console.log("recibos de push", r);
+  });
+
+  await boss.work(QUEUES.kpiDaily, async () => {
+    console.log("agregados diarios", await refreshKpiDaily());
   });
 
   console.log("Worker de tareas programadas en marcha");

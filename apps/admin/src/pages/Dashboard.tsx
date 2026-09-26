@@ -60,7 +60,11 @@ export function Dashboard() {
             <Tile label={t("kpiRevenue")} value={formatUsd(k.money.revenueCents, lang)} hint={k.money.simulated ? t("kpiSimulated") : undefined} />
             <Tile label={t("kpiImpact")} value={formatUsd(k.money.impactCents, lang)} hint={k.money.simulated ? t("kpiSimulated") : undefined} />
             <Tile label={t("kpiVoting")} value={pctText(k.voting.participationRate)} hint={t("kpiVotes", { n: k.voting.votes, m: k.voting.month })} />
-            <Tile label={t("kpiMass")} value={k.mass ? formatNumber(k.mass.chatParticipants, lang) : "—"} hint={t("kpiMassHint")} />
+            <Tile
+              label={t("kpiMass")}
+              value={k.mass ? formatNumber(k.mass.attendees, lang) : "—"}
+              hint={k.mass ? t("kpiMassHint", { n: k.mass.chatParticipants }) : undefined}
+            />
             <Tile label={t("kpiPending")} value={formatNumber(k.moderation.pending, lang)} highlight={k.moderation.pending > 0} />
           </div>
 
@@ -77,18 +81,30 @@ export function Dashboard() {
                   columns={[
                     { key: "day", label: t("colDay") },
                     { key: "candles", label: t("colCandles"), num: true },
+                    { key: "active", label: t("colActive"), num: true },
                   ]}
-                  rows={k.candles.byDay.map((d) => ({ day: shortDay(d.day), candles: d.candles }))}
+                  rows={k.daily.map((d) => ({ day: shortDay(d.day), candles: d.candles, active: d.activeUsers }))}
                 />
               ) : (
-                <ColumnChart
-                  ariaLabel={t("chartCandlesByDay")}
-                  data={k.candles.byDay.map((d) => ({
-                    label: shortDay(d.day),
-                    value: d.candles,
-                    tooltip: `${shortDay(d.day)} · ${d.candles} ${t("colCandles").toLowerCase()}`,
-                  }))}
-                />
+                <>
+                  <ColumnChart
+                    ariaLabel={t("chartCandlesByDay")}
+                    data={k.daily.map((d) => ({
+                      label: shortDay(d.day),
+                      value: d.candles,
+                      tooltip: `${shortDay(d.day)} · ${d.candles} ${t("colCandles").toLowerCase()}`,
+                    }))}
+                  />
+                  <h2 style={{ margin: "20px 0 10px" }}>{t("chartActiveByDay")}</h2>
+                  <ColumnChart
+                    ariaLabel={t("chartActiveByDay")}
+                    data={k.daily.map((d) => ({
+                      label: shortDay(d.day),
+                      value: d.activeUsers,
+                      tooltip: `${shortDay(d.day)} · ${d.activeUsers} ${t("colActive").toLowerCase()}`,
+                    }))}
+                  />
+                </>
               )}
             </section>
             <div className="stack" style={{ gap: 16 }}>

@@ -1,5 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
+import { applyAnalyticsConsent } from "@/src/analytics";
+
 import { api, authRequest, clearToken, loadToken, signOutRequest } from "@/src/api";
 import { unregisterPush } from "@/src/push";
 import { queryClient } from "@/src/query-client";
@@ -70,6 +72,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     [refresh],
   );
+
+  // La analítica sigue al consentimiento del perfil; sin usuario se apaga y se olvida la identidad.
+  useEffect(() => {
+    void applyAnalyticsConsent(user ? { id: user.id, analyticsConsent: user.analyticsConsent } : null).catch(() => undefined);
+  }, [user?.id, user?.analyticsConsent]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const logout = useCallback(async () => {
     // Primero se da de baja el dispositivo: hace falta la sesión todavía válida.

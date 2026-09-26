@@ -35,7 +35,7 @@ export default function Settings() {
   };
 
   const setPref = useCallback(
-    async (key: "notifyMorning" | "notifyNight" | "notifySaint" | "notifyCommunity", value: boolean) => {
+    async (key: "notifyMorning" | "notifyNight" | "notifySaint" | "notifyCommunity" | "analyticsConsent", value: boolean) => {
       if (!user) return;
       setUser({ ...user, [key]: value });
       try {
@@ -96,6 +96,15 @@ export default function Settings() {
         <Toggle testID="notify-saint" label={t("saintOfDay")} hint="07:00" value={!!user?.notifySaint} onChange={(v) => setPref("notifySaint", v)} />
         <Toggle testID="notify-community" label={t("pushCommunity")} hint={t("pushCommunityHint")} value={!!user?.notifyCommunity} onChange={(v) => setPref("notifyCommunity", v)} />
         {permission === "unavailable" && <Text style={styles.note}>{t("pushNote")}</Text>}
+
+        <Text style={styles.sectionTitle}>{t("privacySection")}</Text>
+        <Toggle
+          testID="analytics-consent"
+          label={t("analyticsConsent")}
+          hint={t("analyticsConsentHint")}
+          value={!!user?.analyticsConsent}
+          onChange={(v) => setPref("analyticsConsent", v)}
+        />
 
         <Text style={styles.sectionTitle}>{t("information")}</Text>
         <Row label={t("privacy")} chevron />

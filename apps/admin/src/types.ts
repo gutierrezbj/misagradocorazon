@@ -18,7 +18,8 @@ export type Kpis = {
   };
   money: { simulated: boolean; revenueCents: number; impactCents: number; transferredCents: number };
   voting: { month: string; votes: number; participationRate: number | null };
-  mass: { massId: string; scheduledAt: string; chatParticipants: number } | null;
+  mass: { massId: string; scheduledAt: string; attendees: number; chatParticipants: number } | null;
+  daily: { day: string; newUsers: number; activeUsers: number; candles: number; revenueCents: number }[];
   moderation: { pending: number };
 };
 

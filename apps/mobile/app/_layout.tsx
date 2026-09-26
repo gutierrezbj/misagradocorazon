@@ -11,6 +11,7 @@ import { ErrorBoundary } from "@/src/components/error-boundary";
 import { queryClient } from "@/src/query-client";
 import { AuthProvider, useAuth } from "@/src/auth";
 import { registerForPush, usePushNavigation } from "@/src/push";
+import { trackScreen } from "@/src/analytics";
 import { I18nProvider } from "@/src/i18n";
 import { ToastProvider } from "@/src/components/ui";
 import { useTheme } from "@/src/theme";
@@ -30,6 +31,12 @@ function Gate() {
   useEffect(() => {
     if (ready) registerForPush({ ask: false }).catch(() => undefined);
   }, [ready]);
+
+  // Pantallas por su ruta genérica (p. ej. "saint/[id]"): sin ids ni datos de la persona.
+  const route = segments.join("/") || "index";
+  useEffect(() => {
+    if (ready) trackScreen(route);
+  }, [ready, route]);
 
   useEffect(() => {
     if (loading) return;

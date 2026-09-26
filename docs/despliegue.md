@@ -75,7 +75,7 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
 - **Perfiles de `apps/mobile/eas.json`:**
   - `development` (con `expo-dev-client`) y `preview` apuntan a la API de staging;
   - `production` apunta a la de producción.
-- **Variables de Google** (`EXPO_PUBLIC_GOOGLE_*`): se definen en EAS (*Environment variables*), no en el repositorio.
+- **Variables de Google** (`EXPO_PUBLIC_GOOGLE_*`) y **de PostHog** (`EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_POSTHOG_HOST`, ver `docs/kpis.md`): se definen en EAS (*Environment variables*), no en el repositorio.
 - **Antes del primer build:** hace falta `eas init` con la cuenta de Expo del fundador (`docs/push.md`).
 
 ## Decisiones pendientes (SDD-08)
