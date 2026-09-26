@@ -54,6 +54,15 @@ async function main() {
   });
 
   console.log("Worker de tareas programadas en marcha");
+
+  // Al redesplegar, Railway envía SIGTERM: se terminan los trabajos en curso antes de salir.
+  const stop = async (signal: string) => {
+    console.log(`${signal}: parando el worker`);
+    await boss.stop({ graceful: true, timeout: 20_000 }).catch((err: unknown) => console.error(err));
+    process.exit(0);
+  };
+  process.once("SIGTERM", () => void stop("SIGTERM"));
+  process.once("SIGINT", () => void stop("SIGINT"));
 }
 
 main().catch((err) => {

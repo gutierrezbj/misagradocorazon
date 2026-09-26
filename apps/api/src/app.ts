@@ -4,7 +4,8 @@ import { toNodeHandler } from "better-auth/node";
 
 import { auth } from "./auth.ts";
 import { env } from "./env.ts";
-import { errorHandler, ok } from "./http.ts";
+import { prisma } from "./db.ts";
+import { errorHandler, HttpError, ok } from "./http.ts";
 import { adminRouter } from "./modules/admin/routes.ts";
 import { candlesRouter } from "./modules/candles/routes.ts";
 import { causasRouter } from "./modules/causas/routes.ts";
@@ -18,6 +19,8 @@ import { wallRouter } from "./modules/wall/routes.ts";
 export function createApp() {
   const app = express();
   app.disable("x-powered-by");
+  // Detrás del proxy de Railway: IP y protocolo reales del cliente.
+  app.set("trust proxy", 1);
 
   const origins = env.TRUSTED_ORIGINS.split(",").map((o) => o.trim()).filter(Boolean);
   app.use(cors({ origin: origins, credentials: true, exposedHeaders: ["set-auth-token"] }));
@@ -27,7 +30,15 @@ export function createApp() {
 
   app.use(express.json({ limit: "100kb" }));
 
-  app.get("/api/health", (_req, res) => ok(res, { status: "ok" }));
+  // Healthcheck del despliegue: la API responde y llega a la base de datos.
+  app.get("/api/health", async (_req, res) => {
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+    } catch {
+      throw new HttpError(503, "db_unavailable", "Base de datos no disponible");
+    }
+    ok(res, { status: "ok" });
+  });
   app.use("/api", usersRouter);
   app.use("/api", ritualRouter);
   app.use("/api", candlesRouter);

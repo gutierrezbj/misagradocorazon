@@ -1,0 +1,14 @@
+# Contexto de las imágenes de Railway (apps/api/Dockerfile, apps/admin/Dockerfile).
+**/node_modules
+**/dist
+**/.expo
+**/.metro-cache
+**/.env
+**/.env.*
+.git
+.github
+docs
+apps/mobile/app
+apps/mobile/src
+apps/mobile/assets
+apps/api/src/generated

@@ -51,5 +51,6 @@ pnpm test
 - `docs/requisitos-entrega.md`: condiciones de entrega del constructor
 - `docs/auditoria-entrega.md`: auditoría del prototipo entregado
 - `docs/propuesta-cambios-sdd.md`: cambios aprobados a los SDD
+- `docs/despliegue.md`: despliegue en Railway (API, worker, panel) y perfiles de EAS
 
 Propiedad: Juan Gutiérrez Blanco. Confidencial.
