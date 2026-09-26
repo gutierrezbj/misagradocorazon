@@ -1,6 +1,7 @@
 // Modelo de datos de Mi Sagrado Corazón (SDD-03, 26-sep-2026).
 // Bloque 1: autenticación (Better Auth), perfil, santos, contenido diario, oraciones, velas, libro.
 // Bloque 2: muro de intenciones y moderación, misa y chat, causas, votos y auditoría.
+// Bloque 3: notificaciones push (tokens, preferencias, entregas y campañas).
 
 generator client {
   provider = "prisma-client"
@@ -62,6 +63,14 @@ enum CauseStatus {
   archived
 }
 
+enum PushKind {
+  morning
+  night
+  saint_of_day
+  voting_result
+  campaign
+}
+
 enum LedgerEntryType {
   purchase
   impact_allocation
@@ -94,6 +103,12 @@ model User {
   angelusTime       String   @default("12:00")
   nightTime         String   @default("21:30")
 
+  // Preferencias de notificación (SDD-05, épica 5). Las de oración van a la hora local de arriba.
+  notifyMorning   Boolean @default(true)
+  notifyNight     Boolean @default(true)
+  notifySaint     Boolean @default(true) // santo del día, 07:00 local
+  notifyCommunity Boolean @default(true) // causa ganadora y avisos del equipo
+
   patronSaint Saint?      @relation("PatronSaint", fields: [patronSaintId], references: [id])
   sessions    Session[]
   accounts    Account[]
@@ -105,6 +120,9 @@ model User {
   chatMessages      ChatMessage[]
   votes             Vote[]
   auditLogs         AdminAuditLog[]
+  pushTokens        PushToken[]
+  pushDeliveries    PushDelivery[]
+  pushCampaigns     PushCampaign[]
 
   @@map("user")
 }
@@ -426,4 +444,65 @@ model Vote {
   @@id([userId, month])
   @@index([causeId])
   @@map("vote")
+}
+
+// ---------------------------------------------------------------------------
+// Notificaciones push (Expo Push Service)
+// ---------------------------------------------------------------------------
+
+// Un token por dispositivo. Si el dispositivo cambia de cuenta, el token pasa a la nueva.
+model PushToken {
+  token     String   @id
+  userId    String
+  platform  String   // ios | android
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("push_token")
+}
+
+// Un envío por persona, tipo y referencia (fecha local, mes o campaña): evita duplicados
+// si la tarea se repite y sirve para medir. Nunca guarda contenido de intenciones.
+model PushDelivery {
+  userId    String
+  kind      PushKind
+  ref       String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, kind, ref])
+  @@index([kind, createdAt])
+  @@map("push_delivery")
+}
+
+// Tickets de Expo pendientes de confirmar: el recibo dice si el token ya no es válido.
+model PushTicket {
+  id        String   @id
+  token     String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("push_ticket")
+}
+
+// Avisos del equipo desde el panel. Los envía el worker; se reanudan sin duplicar.
+model PushCampaign {
+  id          String    @id @default(uuid())
+  titleEs     String
+  titleEn     String
+  bodyEs      String
+  bodyEn      String
+  createdById String
+  createdAt   DateTime  @default(now())
+  sentAt      DateTime?
+  recipients  Int?
+
+  createdBy User @relation(fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@index([sentAt])
+  @@map("push_campaign")
 }

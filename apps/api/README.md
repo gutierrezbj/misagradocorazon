@@ -12,7 +12,7 @@ pnpm install                         # genera el cliente Prisma (postinstall)
 pnpm --filter @msc/api db:migrate    # aplica migraciones
 pnpm --filter @msc/api db:seed       # solo desarrollo: 7 santos + contenido de hoy y ayer
 pnpm --filter @msc/api dev           # http://localhost:8001/api/health (+ chat Socket.IO)
-pnpm --filter @msc/api worker        # tareas programadas (pg-boss): abrir y cerrar votaciones
+pnpm --filter @msc/api worker        # tareas programadas (pg-boss): votaciones y notificaciones push
 ```
 
 ## Cuentas de staff
@@ -51,7 +51,8 @@ Respuesta estándar `{ data, error }`. La sesión se envía como `Authorization:
 | POST | `/api/auth/sign-in/social` | — | Login con Google o Apple por ID token nativo (`docs/login-social.md`) |
 | GET | `/api/me` | ✔ | Perfil y racha |
 | PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria |
-| PATCH | `/api/me` | ✔ | Actualizar perfil |
+| PATCH | `/api/me` | ✔ | Actualizar perfil y preferencias de notificación |
+| PUT / DELETE | `/api/me/push-tokens` | ✔ | Registrar o dar de baja el dispositivo para push (`docs/push.md`) |
 | GET | `/api/saints` | — | Santos (`?patronOnly=true`) |
 | GET | `/api/saints/:id` | — | Ficha de santo |
 | GET | `/api/daily` | — | Contenido del día (`?date=YYYY-MM-DD` o `?tz=`); 404 si no hay |
@@ -90,6 +91,7 @@ Conexión con `auth: { token }` (el mismo token de sesión); sin token solo se l
 | POST | `/api/admin/moderation/intentions/:id` · `/api/admin/moderation/chat/:id` | moderador |
 | GET/POST/DELETE | `/api/admin/moderation/words` | moderador |
 | POST/PATCH | `/api/admin/masses` | editor |
+| GET/POST | `/api/admin/push/campaigns` (avisos del equipo; los envía el worker) | editor |
 | GET/POST/PATCH | `/api/admin/causes` (solo se edita mientras es candidata) | editor |
 | POST | `/api/admin/causes/:id/updates` (solo ganadoras) | editor |
 | POST | `/api/admin/causes/:id/transfers` (solo ganadoras; escribe en el libro) | superadmin |

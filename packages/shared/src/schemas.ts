@@ -20,9 +20,18 @@ export const onboardingSchema = z.object({
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
+export const notificationPrefsSchema = z.object({
+  notifyMorning: z.boolean(),
+  notifyNight: z.boolean(),
+  notifySaint: z.boolean(),
+  notifyCommunity: z.boolean(),
+});
+export type NotificationPrefs = z.infer<typeof notificationPrefsSchema>;
+
 export const profileUpdateSchema = onboardingSchema
   .omit({ patronSaintId: true })
   .extend({ patronSaintId: z.string().min(1) })
+  .extend(notificationPrefsSchema.shape)
   .partial();
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 
@@ -96,3 +105,19 @@ export const massInputSchema = z.object({
   recordingUrl: z.url().optional(),
 });
 export type MassInput = z.infer<typeof massInputSchema>;
+
+// Notificaciones push: token de Expo del dispositivo.
+export const pushTokenSchema = z.object({
+  token: z.string().regex(/^Expo(nent)?PushToken\[[^\]]+\]$/, "Token de Expo no válido"),
+  platform: z.enum(["ios", "android"]),
+});
+export type PushTokenInput = z.infer<typeof pushTokenSchema>;
+
+// Avisos del equipo (panel). Longitudes pensadas para que el texto no se corte en la pantalla de bloqueo.
+export const pushCampaignSchema = z.object({
+  titleEs: z.string().trim().min(1).max(60),
+  titleEn: z.string().trim().min(1).max(60),
+  bodyEs: z.string().trim().min(1).max(180),
+  bodyEn: z.string().trim().min(1).max(180),
+});
+export type PushCampaignInput = z.infer<typeof pushCampaignSchema>;

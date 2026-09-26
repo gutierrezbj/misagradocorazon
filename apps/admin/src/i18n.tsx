@@ -22,6 +22,7 @@ const dict = {
   navCauses: { es: "Causas", en: "Causes" },
   navMasses: { es: "Misas", en: "Masses" },
   navUsers: { es: "Usuarios", en: "Users" },
+  navNotifications: { es: "Notificaciones", en: "Notifications" },
   // roles
   role_user: { es: "Fiel", en: "Member" },
   role_moderator: { es: "Moderador", en: "Moderator" },
@@ -133,6 +134,33 @@ const dict = {
   you: { es: "tú", en: "you" },
   // genérico
   loading: { es: "Cargando…", en: "Loading…" },
+  // notificaciones
+  notificationsTitle: { es: "Notificaciones", en: "Notifications" },
+  notificationsSub: {
+    es: "Avisos del equipo a la comunidad. Los recordatorios de oración y el santo del día salen solos.",
+    en: "Team announcements to the community. Prayer reminders and the saint of the day go out automatically.",
+  },
+  sentCampaigns: { es: "Avisos enviados", en: "Sent announcements" },
+  noCampaigns: { es: "Aún no se ha enviado ningún aviso.", en: "No announcements sent yet." },
+  newCampaign: { es: "Nuevo aviso", en: "New announcement" },
+  campaignHint: {
+    es: "Llega a quien tiene la app instalada y acepta avisos de la comunidad. Sin datos personales ni intenciones.",
+    en: "Reaches people with the app installed who accept community notices. No personal data or intentions.",
+  },
+  messageEs: { es: "Mensaje (ES)", en: "Message (ES)" },
+  messageEn: { es: "Mensaje (EN)", en: "Message (EN)" },
+  campaignReview: { es: "Revisar y enviar", en: "Review and send" },
+  campaignConfirm: {
+    es: "Se enviará ahora a {n} personas y no se puede deshacer.",
+    en: "It will be sent now to {n} people and cannot be undone.",
+  },
+  campaignSendNow: { es: "Enviar a {n} personas", en: "Send to {n} people" },
+  campaignSent: { es: "Enviado a {n}", en: "Sent to {n}" },
+  campaignQueued: { es: "En cola", en: "Queued" },
+  campaignNoAudience: {
+    es: "Todavía nadie puede recibir avisos: hace falta la app instalada con notificaciones activadas.",
+    en: "Nobody can receive notices yet: people need the app installed with notifications on.",
+  },
   genericError: { es: "Algo ha fallado. Inténtalo de nuevo.", en: "Something went wrong. Please try again." },
   saved: { es: "Guardado", en: "Saved" },
 } as const;

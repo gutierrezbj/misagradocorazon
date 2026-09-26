@@ -54,3 +54,16 @@ export type Queue = {
 };
 
 export type AdminUser = { id: string; name: string; email: string; role: Role; blocked: boolean; onboarded: boolean; createdAt: string };
+
+export type PushCampaigns = {
+  audience: number;
+  campaigns: {
+    id: string;
+    title: Localized;
+    body: Localized;
+    createdBy: string;
+    createdAt: string;
+    sentAt: string | null;
+    recipients: number | null;
+  }[];
+};

@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { api, authRequest, clearToken, loadToken, signOutRequest } from "@/src/api";
+import { unregisterPush } from "@/src/push";
 import { signInWithApple, signInWithGoogle, socialSignOut, type SocialProvider } from "@/src/social";
 import type { User } from "@/src/types";
 
@@ -68,6 +69,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
+    // Primero se da de baja el dispositivo: hace falta la sesión todavía válida.
+    await unregisterPush();
     await signOutRequest();
     await socialSignOut();
     await clearToken();

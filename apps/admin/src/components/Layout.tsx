@@ -11,6 +11,7 @@ export function Layout() {
     { to: "/moderacion", label: "navModeration", show: can(me, "moderator") },
     { to: "/causas", label: "navCauses", show: can(me, "editor") },
     { to: "/misas", label: "navMasses", show: can(me, "editor") },
+    { to: "/notificaciones", label: "navNotifications", show: can(me, "editor") },
     { to: "/usuarios", label: "navUsers", show: can(me) },
   ];
   return (

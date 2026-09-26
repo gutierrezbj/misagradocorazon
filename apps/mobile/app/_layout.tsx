@@ -10,6 +10,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ErrorBoundary } from "@/src/components/error-boundary";
 import { queryClient } from "@/src/query-client";
 import { AuthProvider, useAuth } from "@/src/auth";
+import { registerForPush, usePushNavigation } from "@/src/push";
 import { I18nProvider } from "@/src/i18n";
 import { ToastProvider } from "@/src/components/ui";
 import { useTheme } from "@/src/theme";
@@ -21,6 +22,14 @@ function Gate() {
   const segments = useSegments();
   const router = useRouter();
   const { colors } = useTheme();
+  const ready = !loading && !!user?.onboarded;
+
+  // Al tocar una notificación se abre su pantalla; al abrir la app se refresca el token
+  // sin volver a pedir permiso (el permiso se pide al terminar el onboarding o en Ajustes).
+  usePushNavigation(ready);
+  useEffect(() => {
+    if (ready) registerForPush({ ask: false }).catch(() => undefined);
+  }, [ready]);
 
   useEffect(() => {
     if (loading) return;
