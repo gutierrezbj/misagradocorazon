@@ -52,3 +52,36 @@ export async function closeVoting(month: string) {
 export function votingState(now = new Date()) {
   return { month: monthOf(now), open: isVotingOpen(now) };
 }
+
+// Transparencia (ADR-015): por mes, ingresos, 20 % y transferencias salen del libro de movimientos.
+// pendingCents = 20 % del mes aún no transferido a su causa (solo lo ve el panel).
+export async function transparencySummary() {
+  const rows = await prisma.ledgerEntry.groupBy({ by: ["month", "type"], _sum: { amountCents: true } });
+  const winners = await prisma.cause.findMany({ where: { status: { in: ["won", "funded"] } } });
+  const byMonth = new Map<string, { revenueCents: number; impactCents: number; transferredCents: number }>();
+  for (const r of rows) {
+    const m = byMonth.get(r.month) ?? { revenueCents: 0, impactCents: 0, transferredCents: 0 };
+    const amount = r._sum.amountCents ?? 0;
+    if (r.type === "purchase") m.revenueCents += amount;
+    if (r.type === "impact_allocation") m.impactCents += amount;
+    if (r.type === "transfer") m.transferredCents += amount;
+    byMonth.set(r.month, m);
+  }
+  const months = [...byMonth.entries()]
+    .sort(([a], [b]) => b.localeCompare(a))
+    .map(([month, totals]) => {
+      const w = winners.find((c) => c.month === month);
+      return {
+        month,
+        ...totals,
+        pendingCents: Math.max(totals.impactCents - totals.transferredCents, 0),
+        cause: w ? { id: w.id, name: { es: w.nameEs, en: w.nameEn }, status: w.status } : null,
+      };
+    });
+  const sum = (k: "revenueCents" | "impactCents" | "transferredCents" | "pendingCents") => months.reduce((a, m) => a + m[k], 0);
+  return {
+    totals: { revenueCents: sum("revenueCents"), impactCents: sum("impactCents"), transferredCents: sum("transferredCents") },
+    pendingCents: sum("pendingCents"),
+    months,
+  };
+}

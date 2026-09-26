@@ -14,7 +14,9 @@ export function Layout() {
     { to: "/causas", label: "navCauses", show: can(me, "editor") },
     { to: "/misas", label: "navMasses", show: can(me, "editor") },
     { to: "/notificaciones", label: "navNotifications", show: can(me, "editor") },
+    { to: "/transparencia", label: "navTransparency", show: can(me, "moderator", "editor") },
     { to: "/usuarios", label: "navUsers", show: can(me) },
+    { to: "/registro", label: "navAudit", show: can(me) },
   ];
   return (
     <div className="shell">

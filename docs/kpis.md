@@ -83,3 +83,17 @@ Son variables de EAS (*Environment variables*), no del repositorio:
 - **Cuenta de PostHog:** crearla a nombre del fundador, elegir región y configurar embudos y retención.
 - **Aviso de privacidad:** incluir la analítica en el aviso legal y en la ficha de privacidad de App Store y Google Play (datos de uso, vinculados al id interno, no usados para rastreo).
 - **Borrado en PostHog:** al borrar una cuenta, borrar también la persona en PostHog. Se hace con su API y una clave personal del fundador; hasta entonces, el móvil solo olvida la identidad local. Los datos que quedan en PostHog no tienen nombre ni email.
+
+## Transparencia y registro de cambios en el panel
+
+- **Transparencia** (moderador, editor y superadmin):
+  - Totales de ingresos, 20 %, transferido y pendiente de transferir.
+  - Tabla por mes con la causa ganadora.
+  - Movimientos de cada mes, filtrables por compra, 20 % o transferencia.
+  - Todo sale del libro de movimientos, así que las cifras coinciden con las que ve la app.
+  - Los movimientos no enlazan a ninguna persona.
+  - El pendiente solo lo ve el panel.
+- **Registro de cambios** (solo superadmin):
+  - Quién hizo cada cambio, qué hizo y cuándo, del más reciente al más antiguo.
+  - Se filtra por tipo y se pagina de 50 en 50.
+  - De una cuenta borrada no queda el nombre: aparece como "Cuenta borrada".
