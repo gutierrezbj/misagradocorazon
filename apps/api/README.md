@@ -92,6 +92,9 @@ Conexión con `auth: { token }` (el mismo token de sesión); sin token solo se l
 | GET/POST/DELETE | `/api/admin/moderation/words` | moderador |
 | POST/PATCH | `/api/admin/masses` | editor |
 | GET/POST | `/api/admin/push/campaigns` (avisos del equipo; los envía el worker) | editor |
+| GET/POST/PATCH/DELETE | `/api/admin/saints` (+ `/:id/restore`; baja lógica, no si está en uso) | editor |
+| GET/PUT | `/api/admin/daily` (calendario) · `/api/admin/daily/:date` | editor |
+| POST | `/api/admin/uploads` (URL firmada de subida a R2; `docs/contenido.md`) | editor |
 | GET/POST/PATCH | `/api/admin/causes` (solo se edita mientras es candidata) | editor |
 | POST | `/api/admin/causes/:id/updates` (solo ganadoras) | editor |
 | POST | `/api/admin/causes/:id/transfers` (solo ganadoras; escribe en el libro) | superadmin |
