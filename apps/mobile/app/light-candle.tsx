@@ -17,6 +17,7 @@ import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
+import { ShareCandlePanel } from "@/src/components/ShareCandlePanel";
 
 // Precios de @msc/shared (céntimos): 0,99 / 1,99 / 2,99 USD, los tiers de las stores.
 const TYPES = [
@@ -43,9 +44,10 @@ export default function LightCandle() {
   const [type, setType] = useState<Exclude<CandleVariant, "pillar">>("basic");
   const [forDeceased, setForDeceased] = useState(false);
   const [done, setDone] = useState(false);
+  const [sharing, setSharing] = useState(false);
 
   const lightMut = useMutation({
-    mutationFn: () => api("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
+    mutationFn: () => api<{ saint: { name: string } }>("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
@@ -66,6 +68,21 @@ export default function LightCandle() {
     lightMut.mutate();
   };
 
+  if (done && sharing) {
+    return (
+      <View style={styles.root}>
+        <StatusBar style="light" />
+        <ShareCandlePanel
+          saintName={lightMut.data?.saint.name ?? saints.find((s) => s.id === saintId)?.name ?? ""}
+          intention={intention.trim()}
+          variant={type}
+          mourning={forDeceased}
+          onClose={() => router.back()}
+        />
+      </View>
+    );
+  }
+
   if (done) {
     return (
       <View style={[styles.root, styles.doneWrap, { paddingTop: insets.top }]}>
@@ -75,8 +92,11 @@ export default function LightCandle() {
         </View>
         <Text style={styles.doneTitle}>{t("candleLit")}</Text>
         <Text style={styles.doneSub}>{t("candleLitSub")}</Text>
-        <Pressable testID="candle-done-button" onPress={() => router.back()} style={styles.doneBtn}>
-          <Text style={styles.doneBtnText}>{t("continue")}</Text>
+        <Pressable testID="share-candle-button" onPress={() => setSharing(true)} style={styles.doneBtn}>
+          <Text style={styles.doneBtnText}>{t("shareCandle")}</Text>
+        </Pressable>
+        <Pressable testID="candle-done-button" onPress={() => router.back()} style={styles.doneSecondary}>
+          <Text style={styles.doneSecondaryText}>{t("continue")}</Text>
         </Pressable>
       </View>
     );
@@ -216,5 +236,7 @@ const useStyles = makeStyles((c) => ({
   doneTitle: { fontFamily: fonts.displayBold, fontSize: 30, color: c.gold, marginTop: spacing.lg, textAlign: "center" },
   doneSub: { fontFamily: fonts.body, fontSize: 16, color: c.onAltar, textAlign: "center", marginTop: spacing.sm, fontStyle: "italic" },
   doneBtn: { marginTop: spacing.xl, backgroundColor: c.brandSecondary, borderRadius: radius.lg, paddingHorizontal: spacing.xl, height: 52, justifyContent: "center" },
+  doneSecondary: { marginTop: spacing.md, paddingVertical: spacing.sm, paddingHorizontal: spacing.lg },
+  doneSecondaryText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onAltarMuted },
   doneBtnText: { fontFamily: fonts.bodyBold, fontSize: 17, color: c.onBrandSecondary },
 }));

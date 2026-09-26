@@ -85,6 +85,7 @@ export default function Profile() {
         )}
 
         <View style={{ height: spacing.lg }} />
+        <MenuRow icon="lock" label={t("privateIntentions")} onPress={() => router.push("/intentions")} testID="open-intentions-button" />
         <MenuRow icon="settings" label={t("settings")} onPress={() => router.push("/settings")} testID="open-settings-button" />
         <MenuRow icon="log-out" label={t("logout")} onPress={logout} testID="logout-button" danger />
       </ScrollView>
