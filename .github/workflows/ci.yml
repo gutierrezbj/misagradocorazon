@@ -40,3 +40,25 @@ jobs:
         run: pnpm test
       - name: Build del panel
         run: pnpm --filter @msc/admin build
+
+  # Las imágenes de Railway se construyen en cada PR: un Dockerfile roto no llega a main.
+  images:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Imagen de la API y el worker
+        run: docker build -f apps/api/Dockerfile -t msc-api .
+      - name: Imagen del panel
+        run: docker build -f apps/admin/Dockerfile --build-arg VITE_API_URL=https://api.misagradocorazon.com -t msc-admin .
+      - name: La API arranca y aplica migraciones
+        run: |
+          docker network create msc
+          docker run -d --name db --network msc -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=msc postgres:16
+          for i in $(seq 1 30); do docker exec db pg_isready -U postgres && break; sleep 2; done
+          ENV="-e DATABASE_URL=postgresql://postgres:postgres@db:5432/msc -e BETTER_AUTH_SECRET=ci-secret-ci-secret-ci-secret-0123456 -e BETTER_AUTH_URL=http://localhost:8001 -e INTENTIONS_KEY=$(head -c 32 /dev/zero | base64)"
+          docker run --rm --network msc $ENV msc-api prisma migrate deploy
+          docker run --rm --network msc $ENV msc-api tsx prisma/seed-catalog.ts
+          docker run -d --name api --network msc -p 8001:8001 $ENV msc-api
+          for i in $(seq 1 30); do curl -fsS localhost:8001/api/health && exit 0; sleep 2; done
+          docker logs api
+          exit 1

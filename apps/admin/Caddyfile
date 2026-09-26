@@ -1,0 +1,29 @@
+# Sirve el panel (SPA) en el puerto que asigna Railway.
+{
+	admin off
+}
+
+:{$PORT:8080} {
+	root * /srv
+	encode zstd gzip
+
+	header {
+		# Las subidas van directo a R2 con URL firmada; las imágenes y audios pueden venir de otros dominios HTTPS.
+		Content-Security-Policy "default-src 'self'; connect-src 'self' {$API_ORIGIN} https://*.r2.cloudflarestorage.com; img-src 'self' https: data:; media-src 'self' https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Los ficheros de /assets llevan hash en el nombre: caché larga. El resto (index.html y rutas
+	# de la SPA) se revalida siempre, para que un despliegue nuevo se vea al momento.
+	@assets path /assets/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+	@app not path /assets/*
+	header @app Cache-Control "no-cache"
+
+	try_files {path} /index.html
+	file_server
+}
