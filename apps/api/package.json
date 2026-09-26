@@ -11,7 +11,8 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "worker": "tsx src/jobs/worker.ts"
   },
   "dependencies": {
     "@msc/shared": "workspace:*",
@@ -21,6 +22,8 @@
     "cors": "2.8.6",
     "express": "5.2.1",
     "pg": "8.23.0",
+    "pg-boss": "12.34.0",
+    "socket.io": "4.8.4",
     "zod": "4.1.12"
   },
   "devDependencies": {
@@ -30,6 +33,7 @@
     "@types/pg": "8.23.1",
     "@types/supertest": "7.2.1",
     "prisma": "7.10.0",
+    "socket.io-client": "4.8.4",
     "supertest": "7.3.0",
     "tsx": "4.23.15",
     "typescript": "6.0.3",

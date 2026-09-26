@@ -31,3 +31,10 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   console.error(err);
   return res.status(500).json({ data: null, error: { code: "internal", message: "Error interno" } });
 }
+
+// Parámetro de ruta como string validado (Express tipa params como string | string[]).
+export function pathParam(req: Request, name: string): string {
+  const v = req.params[name];
+  if (typeof v !== "string" || v.length === 0) throw new HttpError(400, "invalid_input", `Parámetro ${name} no válido`);
+  return v;
+}

@@ -1,6 +1,6 @@
 // Modelo de datos de Mi Sagrado Corazón (SDD-03, 26-sep-2026).
-// Bloque 1: autenticación (tablas de Better Auth), perfil, santos, contenido diario,
-// oraciones, velas y libro de movimientos. Muro, misa y causas llegan en bloques siguientes.
+// Bloque 1: autenticación (Better Auth), perfil, santos, contenido diario, oraciones, velas, libro.
+// Bloque 2: muro de intenciones y moderación, misa y chat, causas, votos y auditoría.
 
 generator client {
   provider = "prisma-client"
@@ -39,6 +39,29 @@ enum PrayerKind {
   night
 }
 
+enum IntentionCategory {
+  salud
+  familia
+  trabajo
+  difuntos
+  agradecimiento
+  general
+}
+
+enum ModerationStatus {
+  pending
+  approved
+  hidden
+}
+
+enum CauseStatus {
+  candidate
+  voting
+  won
+  funded
+  archived
+}
+
 enum LedgerEntryType {
   purchase
   impact_allocation
@@ -74,8 +97,14 @@ model User {
   patronSaint Saint?      @relation("PatronSaint", fields: [patronSaintId], references: [id])
   sessions    Session[]
   accounts    Account[]
-  candles     Candle[]
-  prayerLogs  PrayerLog[]
+  candles           Candle[]
+  prayerLogs        PrayerLog[]
+  intentions        Intention[]
+  intentionPrayers  IntentionPrayer[]
+  privateIntentions PrivateIntention[]
+  chatMessages      ChatMessage[]
+  votes             Vote[]
+  auditLogs         AdminAuditLog[]
 
   @@map("user")
 }
@@ -231,7 +260,170 @@ model LedgerEntry {
   createdAt   DateTime        @default(now())
 
   candle Candle? @relation(fields: [candleId], references: [id])
+  cause  Cause?  @relation(fields: [causeId], references: [id])
 
   @@index([month, type])
   @@map("ledger_entry")
+}
+
+// ---------------------------------------------------------------------------
+// Muro de intenciones y moderación
+// ---------------------------------------------------------------------------
+
+model Intention {
+  id        String            @id @default(uuid())
+  userId    String
+  text      String            // Pública por decisión del autor; no se cifra.
+  category  IntentionCategory @default(general)
+  status    ModerationStatus
+  createdAt DateTime          @default(now())
+
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  prayers IntentionPrayer[]
+
+  @@index([status, createdAt])
+  @@map("intention")
+}
+
+model IntentionPrayer {
+  intentionId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  intention Intention @relation(fields: [intentionId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([intentionId, userId])
+  @@map("intention_prayer")
+}
+
+// "Por quién rezo hoy": privadas y cifradas (GDPR art. 9).
+model PrivateIntention {
+  id            String   @id @default(uuid())
+  userId        String
+  textEncrypted String
+  createdAt     DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("private_intention")
+}
+
+model ModerationWord {
+  word      String   @id // normalizada: minúsculas y sin tildes
+  createdAt DateTime @default(now())
+
+  @@map("moderation_word")
+}
+
+// Registro de quién hace cada cambio en la gestión (panel, moderación).
+model AdminAuditLog {
+  id        String   @id @default(uuid())
+  actorId   String
+  action    String
+  entity    String
+  entityId  String
+  data      Json?
+  createdAt DateTime @default(now())
+
+  actor User @relation(fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("admin_audit_log")
+}
+
+// ---------------------------------------------------------------------------
+// Misa en vivo
+// ---------------------------------------------------------------------------
+
+model Mass {
+  id           String   @id @default(uuid())
+  titleEs      String
+  titleEn      String
+  youtubeUrl   String
+  scheduledAt  DateTime
+  durationMin  Int      @default(120)
+  isSpecial    Boolean  @default(false)
+  recordingUrl String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  messages ChatMessage[]
+
+  @@index([scheduledAt])
+  @@map("mass")
+}
+
+model ChatMessage {
+  id        String           @id @default(uuid())
+  massId    String
+  userId    String
+  text      String
+  status    ModerationStatus
+  createdAt DateTime         @default(now())
+
+  mass Mass @relation(fields: [massId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([massId, status, createdAt])
+  @@map("chat_message")
+}
+
+// ---------------------------------------------------------------------------
+// Causas, votación
+// ---------------------------------------------------------------------------
+
+model Cause {
+  id            String      @id @default(uuid())
+  month         String      // YYYY-MM en que se vota
+  nameEs        String
+  nameEn        String
+  location      String
+  responsible   String
+  descriptionEs String
+  descriptionEn String
+  budgetCents   Int
+  photos        String[]    @default([])
+  timeline      String
+  status        CauseStatus @default(candidate)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  votes   Vote[]
+  updates CauseUpdate[]
+  ledger  LedgerEntry[]
+
+  @@index([month, status])
+  @@map("cause")
+}
+
+model CauseUpdate {
+  id        String   @id @default(uuid())
+  causeId   String
+  textEs    String
+  textEn    String
+  photoUrl  String?
+  createdAt DateTime @default(now())
+
+  cause Cause @relation(fields: [causeId], references: [id], onDelete: Cascade)
+
+  @@index([causeId, createdAt])
+  @@map("cause_update")
+}
+
+// Un voto por usuario y mes, garantizado por la base de datos.
+model Vote {
+  userId    String
+  month     String
+  causeId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cause Cause @relation(fields: [causeId], references: [id], onDelete: Restrict)
+
+  @@id([userId, month])
+  @@index([causeId])
+  @@map("vote")
 }

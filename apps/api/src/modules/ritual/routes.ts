@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { prisma } from "../../db.ts";
 import { isValidTimeZone, localDate } from "../../lib/dates.ts";
-import { HttpError, notFound, ok } from "../../http.ts";
+import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
 import { dailyDto, saintDto } from "./serializers.ts";
 import { currentStreak } from "./streak.ts";
@@ -21,7 +21,7 @@ ritualRouter.get("/saints", async (req, res) => {
 });
 
 ritualRouter.get("/saints/:id", async (req, res) => {
-  const saint = await prisma.saint.findFirst({ where: { id: req.params.id, deletedAt: null } });
+  const saint = await prisma.saint.findFirst({ where: { id: pathParam(req, "id"), deletedAt: null } });
   if (!saint) throw notFound("Santo");
   ok(res, saintDto(saint));
 });
