@@ -17,7 +17,6 @@ apps/
   admin/         Panel de gestión web (React + Vite): KPIs, moderación, causas, misas, usuarios
 packages/
   shared/        Constantes de dominio y esquemas de validación compartidos
-backend/         Backend del prototipo (FastAPI + MongoDB): la app ya no lo usa; pendiente de retirar
 docs/            Especificación, auditoría y decisiones
 ```
 
