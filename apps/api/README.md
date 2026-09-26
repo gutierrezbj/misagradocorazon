@@ -15,6 +15,22 @@ pnpm --filter @msc/api dev           # http://localhost:8001/api/health (+ chat 
 pnpm --filter @msc/api worker        # tareas programadas (pg-boss): abrir y cerrar votaciones
 ```
 
+## Cuentas de staff
+
+El panel solo lo abre un superadmin, así que el primero se crea por línea de comandos:
+
+```bash
+pnpm --filter @msc/api staff:create --email tu@correo.com --name "Juan"
+# En Railway: railway run pnpm --filter @msc/api staff:create --email tu@correo.com --name "Juan"
+```
+
+- Si la cuenta no existe, pide la contraseña sin mostrarla (mínimo 8 caracteres). Sin terminal interactiva, la lee de `STAFF_PASSWORD`. Nunca va como argumento.
+- Si la cuenta existe, la asciende y la desbloquea sin tocar su contraseña. Sirve para recuperar el acceso si el único superadmin queda bloqueado.
+- `--role editor|moderator` da otros roles; por defecto `superadmin`. No baja de rol a un superadmin: eso se hace desde el panel.
+- Queda registrado en `admin_audit_log` como `staff.bootstrap`. Es idempotente.
+
+El resto del staff se gestiona desde el panel (Usuarios).
+
 ## Tests
 
 Integración contra PostgreSQL real, sin mocks. Usan `TEST_DATABASE_URL`, que tiene que apuntar a una base cuyo nombre termine en `_test`: la limpieza entre tests se niega a actuar sobre cualquier otra.
