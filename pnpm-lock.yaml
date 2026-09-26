@@ -239,6 +239,9 @@ importers:
       react-native-worklets:
         specifier: 0.10.1
         version: 0.10.1(@babel/core@7.29.7)(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(react-native@0.86.3(@babel/core@7.29.7)(@react-native/metro-config@0.86.3(@babel/core@7.29.7))(@types/react@19.2.10)(react@19.2.3))(react@19.2.3)
+      socket.io-client:
+        specifier: 4.8.4
+        version: 4.8.4
     devDependencies:
       '@types/react':
         specifier: 19.2.10

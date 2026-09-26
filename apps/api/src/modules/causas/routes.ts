@@ -44,6 +44,23 @@ causasRouter.post("/causes/:id/vote", requireUser, async (req, res) => {
   ok(res, { voted: true, causeId: cause.id }, 201);
 });
 
+causasRouter.get("/votes/me", requireUser, async (req, res) => {
+  const user = currentUser(req);
+  const votes = await prisma.vote.findMany({
+    where: { userId: user.id },
+    orderBy: { month: "desc" },
+    include: { cause: { select: { id: true, nameEs: true, nameEn: true, status: true } } },
+  });
+  ok(
+    res,
+    votes.map((v) => ({
+      month: v.month,
+      cause: { id: v.cause.id, name: { es: v.cause.nameEs, en: v.cause.nameEn }, status: v.cause.status },
+      createdAt: v.createdAt,
+    })),
+  );
+});
+
 causasRouter.get("/causes/history", async (_req, res) => {
   const causes = await prisma.cause.findMany({
     where: { status: { in: ["won", "funded"] } },

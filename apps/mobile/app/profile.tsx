@@ -7,6 +7,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api } from "@/src/api";
+import type { MyCandle, MyVote, Saint } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
@@ -19,18 +20,15 @@ export default function Profile() {
   const { t } = useI18n();
   const { user, logout } = useAuth();
 
-  const { data: candlesData } = useQuery({ queryKey: ["candles", "me"], queryFn: () => api("/candles/me") });
-  const { data: votesData } = useQuery({ queryKey: ["votes", "me"], queryFn: () => api("/votes/me") });
-  const { data: patronData } = useQuery({
-    queryKey: ["saint", user?.patron_saint_id],
-    queryFn: () => api(`/saints/${user?.patron_saint_id}`, { auth: false }),
-    enabled: !!user?.patron_saint_id,
+  const { data: candlesData } = useQuery({ queryKey: ["candles", "me"], queryFn: () => api<MyCandle[]>("/candles/me") });
+  const { data: votesData } = useQuery({ queryKey: ["votes", "me"], queryFn: () => api<MyVote[]>("/votes/me") });
+  const { data: patron } = useQuery({
+    queryKey: ["saint", user?.patronSaintId],
+    queryFn: () => api<Saint>(`/saints/${user?.patronSaintId}`),
+    enabled: !!user?.patronSaintId,
   });
-
-  const candles = candlesData?.candles ?? [];
-  const votes = votesData?.votes ?? [];
-  const patron = patronData?.saint;
-  const isStaff = user?.role && user.role !== "user";
+  const candles = candlesData ?? [];
+  const votes = votesData ?? [];
 
   return (
     <View style={styles.root}>
@@ -40,31 +38,26 @@ export default function Profile() {
           <Icon name="arrow-left" size={22} color={colors.onAltar} />
         </Pressable>
         <View style={styles.avatar}>
-          {user?.picture ? (
-            <Image source={{ uri: user.picture }} style={{ width: 80, height: 80, borderRadius: 40 }} />
+          {user?.image ? (
+            <Image source={{ uri: user.image }} style={{ width: 80, height: 80, borderRadius: 40 }} />
           ) : (
             <Icon name="user" size={36} color={colors.gold} />
           )}
         </View>
         <Text style={styles.name}>{user?.name}</Text>
         <Text style={styles.email}>{user?.email}</Text>
-        {isStaff && (
-          <View style={styles.roleBadge}>
-            <Text style={styles.roleText}>{user?.role}</Text>
-          </View>
-        )}
       </View>
 
       <ScrollView contentContainerStyle={{ padding: spacing.md, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
         <View style={styles.statsRow}>
           <Stat value={user?.streak ?? 0} label={t("streakDays")} />
-          <Stat value={candles.length} label="velas" />
-          <Stat value={votes.length} label="votos" />
+          <Stat value={candles.length} label={t("candlesLabel")} />
+          <Stat value={votes.length} label={t("votesLabel")} />
         </View>
 
         {patron && (
           <Pressable style={styles.patronCard} onPress={() => router.push(`/saint/${patron.id}`)}>
-            <Image source={{ uri: patron.image_url }} style={styles.patronImg} contentFit="cover" />
+            <Image source={{ uri: patron.imageUrl }} style={styles.patronImg} contentFit="cover" />
             <View style={{ flex: 1 }}>
               <Text style={styles.patronLabel}>{t("myPatron")}</Text>
               <Text style={styles.patronName}>{patron.name}</Text>
@@ -77,24 +70,21 @@ export default function Profile() {
         {candles.length === 0 ? (
           <Text style={styles.empty}>{t("noCandles")}</Text>
         ) : (
-          candles.slice(0, 10).map((c: any) => (
+          candles.slice(0, 10).map((c) => (
             <View key={c.id} style={styles.historyRow}>
               <Icon name="feather" size={18} color={colors.brandSecondary} />
               <View style={{ flex: 1 }}>
-                <Text style={styles.historySaint}>{c.saint_name}</Text>
+                <Text style={styles.historySaint}>{c.saint.name}</Text>
                 <Text style={styles.historyIntention} numberOfLines={1}>
                   {c.intention}
                 </Text>
               </View>
-              <Text style={styles.historyPrice}>${c.price}</Text>
+              <Text style={styles.historyPrice}>${(c.priceCents / 100).toFixed(2)}</Text>
             </View>
           ))
         )}
 
         <View style={{ height: spacing.lg }} />
-        {isStaff && (
-          <MenuRow icon="grid" label={t("adminPanel")} onPress={() => router.push("/admin")} testID="open-admin-button" />
-        )}
         <MenuRow icon="settings" label={t("settings")} onPress={() => router.push("/settings")} testID="open-settings-button" />
         <MenuRow icon="log-out" label={t("logout")} onPress={logout} testID="logout-button" danger />
       </ScrollView>
@@ -131,8 +121,6 @@ const useStyles = makeStyles((c) => ({
   avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: c.altarCard, borderWidth: 2, borderColor: c.gold, alignItems: "center", justifyContent: "center", marginTop: spacing.md },
   name: { fontFamily: fonts.displayBold, fontSize: 26, color: c.onAltar, marginTop: spacing.sm },
   email: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted },
-  roleBadge: { backgroundColor: c.brandSecondary, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 4, marginTop: spacing.sm },
-  roleText: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.onBrandSecondary, textTransform: "uppercase" },
   statsRow: { flexDirection: "row", justifyContent: "space-around", backgroundColor: c.surfaceSecondary, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.md },
   stat: { alignItems: "center" },
   statValue: { fontFamily: fonts.displayBold, fontSize: 28, color: c.brand },

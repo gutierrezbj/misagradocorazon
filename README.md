@@ -13,11 +13,11 @@ App móvil católica para la comunidad hispana (EE. UU. + México). Tres pilares
 ```
 apps/
   mobile/        App Expo + React Native (iOS, Android, web)
-  api/           API Node + TypeScript + PostgreSQL (en construcción, sustituye a backend/)
+  api/           API Node + TypeScript + PostgreSQL (la usan la app y el panel)
   admin/         Panel de gestión web (React + Vite): KPIs, moderación, causas, misas, usuarios
 packages/
   shared/        Constantes de dominio y esquemas de validación compartidos
-backend/         Backend provisional del prototipo (FastAPI + MongoDB), congelado
+backend/         Backend del prototipo (FastAPI + MongoDB): la app ya no lo usa; pendiente de retirar
 docs/            Especificación, auditoría y decisiones
 ```
 

@@ -5,7 +5,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, spacing, useTheme } from "@/src/theme";
-import { api } from "@/src/api";
+import { api, deviceTimeZone } from "@/src/api";
+import type { Daily } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
@@ -17,19 +18,21 @@ export default function Prayer() {
   const router = useRouter();
   const { t, loc } = useI18n();
   const toast = useToast();
-  const { refresh } = useAuth();
+  const { user, refresh } = useAuth();
   const { kind } = useLocalSearchParams<{ kind: string }>();
   const isMorning = kind !== "night";
 
-  const { data, isLoading } = useQuery({ queryKey: ["daily"], queryFn: () => api("/daily", { auth: false }) });
-  const daily = data?.daily;
-  const prayer = isMorning ? daily?.morning_prayer : daily?.night_prayer;
+  const { data: daily, isLoading } = useQuery({
+    queryKey: ["daily"],
+    queryFn: () => api<Daily>(`/daily?tz=${encodeURIComponent(user?.timezone ?? deviceTimeZone())}`),
+  });
+  const prayer = isMorning ? daily?.morningPrayer : daily?.nightPrayer;
 
   const completeMut = useMutation({
-    mutationFn: () => api("/daily/complete", { method: "POST", body: { kind: isMorning ? "morning" : "night" } }),
-    onSuccess: (res: any) => {
-      refresh();
-      toast(`🔥 ${res.streak} ${t("streakDays")}`, "success");
+    mutationFn: () => api<{ streak: number }>("/prayers/complete", { method: "POST", body: { kind: isMorning ? "morning" : "night" } }),
+    onSuccess: (res) => {
+      void refresh();
+      toast(`${res.streak} ${t("streakDays")}`, "success");
       router.back();
     },
   });
@@ -54,7 +57,7 @@ export default function Prayer() {
           </View>
           <Text style={styles.prayer}>{loc(prayer)}</Text>
           <View style={{ height: spacing.xl }} />
-          <AppButton testID="complete-prayer-button" label="Amén · Completar" onPress={() => completeMut.mutate()} loading={completeMut.isPending} variant="gold" icon="check" />
+          <AppButton testID="complete-prayer-button" label={t("amenComplete")} onPress={() => completeMut.mutate()} loading={completeMut.isPending} variant="gold" icon="check" />
         </ScrollView>
       )}
     </View>

@@ -217,7 +217,12 @@ describe("velas", () => {
     const mine = await request(app).get("/api/candles/me").set(bearer(a.token));
     const other = await request(app).get("/api/candles/me").set(bearer(b.token));
     expect(mine.body.data).toHaveLength(1);
-    expect(mine.body.data[0]).toMatchObject({ intention: vela.intention, active: true });
+    expect(mine.body.data[0]).toMatchObject({
+      intention: vela.intention,
+      active: true,
+      priceCents: 199,
+      saint: { id: "saint_guadalupe", name: "Virgen de Guadalupe" },
+    });
     expect(other.body.data).toHaveLength(0);
   });
 

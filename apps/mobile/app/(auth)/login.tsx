@@ -9,7 +9,6 @@ import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, useToast } from "@/src/components/ui";
 import { CandleFlame } from "@/src/components/CandleFlame";
-import { GoogleLogo } from "@/src/components/GoogleLogo";
 import { ApiError } from "@/src/api";
 
 export default function LoginScreen() {
@@ -18,7 +17,7 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useI18n();
   const toast = useToast();
-  const { login, register, googleLogin } = useAuth();
+  const { login, register } = useAuth();
 
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
@@ -36,19 +35,9 @@ export default function LoginScreen() {
       if (mode === "login") await login(email.trim(), password);
       else await register(email.trim(), password, name.trim());
     } catch (e) {
-      const msg = e instanceof ApiError ? e.message : t("authError");
-      toast(msg, "error");
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const google = async () => {
-    setBusy(true);
-    try {
-      await googleLogin();
-    } catch {
-      toast(t("authError"), "error");
+      // Better Auth responde en inglés: se traducen los casos conocidos.
+      const code = e instanceof ApiError ? e.code : "";
+      toast(code === "USER_ALREADY_EXISTS" ? t("emailTaken") : code === "PASSWORD_TOO_SHORT" ? t("passwordTooShort") : t("authError"), "error");
     } finally {
       setBusy(false);
     }
@@ -96,7 +85,7 @@ export default function LoginScreen() {
               autoCapitalize="none"
               keyboardType="email-address"
               style={styles.input}
-              placeholder="tu@correo.com"
+              placeholder={t("emailPlaceholder")}
               placeholderTextColor={colors.muted}
             />
           </View>
@@ -122,17 +111,7 @@ export default function LoginScreen() {
             loading={busy}
           />
 
-          <View style={styles.dividerRow}>
-            <View style={styles.line} />
-            <Text style={styles.or}>o</Text>
-            <View style={styles.line} />
-          </View>
-
-          <Pressable testID="google-login-button" onPress={google} style={styles.googleBtn}>
-            <GoogleLogo size={20} />
-            <Text style={styles.googleText}>{t("continueGoogle")}</Text>
-          </Pressable>
-
+          {/* Google y Apple se activan cuando existan las credenciales a nombre del fundador (Better Auth). */}
           <Pressable
             testID="toggle-auth-mode"
             onPress={() => setMode(mode === "login" ? "register" : "login")}

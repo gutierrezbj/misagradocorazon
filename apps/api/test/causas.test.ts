@@ -65,6 +65,9 @@ describe("causas y votación", () => {
     expect(again.status).toBe(409);
     expect(again.body.error.code).toBe("already_voted");
 
+    const mine = await request(app).get("/api/votes/me").set(bearer(a.token));
+    expect(mine.body.data).toMatchObject([{ month: "2026-10", cause: { id: ids[0], name: { es: "Causa 1" } } }]);
+
     const current = await request(app).get("/api/causes/current").set(bearer(a.token));
     expect(current.body.data).toMatchObject({ month: "2026-10", votingOpen: true, totalVotes: 2, myVoteCauseId: ids[0] });
     expect(current.body.data.causes.map((c: { percentage: number }) => c.percentage)).toEqual([50, 50, 0]);
