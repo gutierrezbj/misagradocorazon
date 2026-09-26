@@ -10,6 +10,8 @@ import { useI18n } from "@/src/i18n";
 import { AppButton, useToast } from "@/src/components/ui";
 import { CandleFlame } from "@/src/components/CandleFlame";
 import { ApiError } from "@/src/api";
+import { SocialButtons } from "@/src/components/SocialButtons";
+import type { SocialProvider } from "@/src/social";
 
 export default function LoginScreen() {
   const styles = useStyles();
@@ -17,13 +19,14 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const { t } = useI18n();
   const toast = useToast();
-  const { login, register } = useAuth();
+  const { login, register, loginWithProvider } = useAuth();
 
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [socialBusy, setSocialBusy] = useState<SocialProvider | null>(null);
 
   const submit = async () => {
     if (!email.trim() || !password.trim() || (mode === "register" && !name.trim())) {
@@ -40,6 +43,19 @@ export default function LoginScreen() {
       toast(code === "USER_ALREADY_EXISTS" ? t("emailTaken") : code === "PASSWORD_TOO_SHORT" ? t("passwordTooShort") : t("authError"), "error");
     } finally {
       setBusy(false);
+    }
+  };
+
+  const social = async (provider: SocialProvider) => {
+    setSocialBusy(provider);
+    try {
+      await loginWithProvider(provider);
+    } catch (e) {
+      // OAUTH_LINK_ERROR: ya hay una cuenta con ese correo creada con contraseña.
+      const code = e instanceof ApiError ? e.code : "";
+      toast(code === "OAUTH_LINK_ERROR" ? t("socialLinkBlocked") : t("socialError"), "error");
+    } finally {
+      setSocialBusy(null);
     }
   };
 
@@ -111,7 +127,9 @@ export default function LoginScreen() {
             loading={busy}
           />
 
-          {/* Google y Apple se activan cuando existan las credenciales a nombre del fundador (Better Auth). */}
+          {/* Solo aparecen en iOS/Android y con las credenciales configuradas (src/social). */}
+          <SocialButtons onPress={social} busy={socialBusy} />
+
           <Pressable
             testID="toggle-auth-mode"
             onPress={() => setMode(mode === "login" ? "register" : "login")}
@@ -161,20 +179,6 @@ const useStyles = makeStyles((c) => ({
     color: c.onSurface,
     backgroundColor: c.surfaceSecondary,
   },
-  dividerRow: { flexDirection: "row", alignItems: "center", marginVertical: spacing.md },
-  line: { flex: 1, height: 1, backgroundColor: c.divider },
-  or: { marginHorizontal: spacing.md, color: c.muted, fontFamily: fonts.body },
-  googleBtn: {
-    height: 52,
-    borderRadius: radius.md,
-    borderWidth: 1.5,
-    borderColor: c.borderStrong,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-  },
-  googleText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
   toggle: { marginTop: spacing.lg, alignItems: "center" },
   toggleText: { fontFamily: fonts.bodyMedium, color: c.brand, fontSize: 15 },
 }));

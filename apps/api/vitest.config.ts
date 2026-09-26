@@ -12,6 +12,9 @@ export default defineConfig({
       BETTER_AUTH_URL: "http://localhost:8001",
       TRUSTED_ORIGINS: "http://localhost:8081",
       INTENTIONS_KEY: Buffer.alloc(32, 7).toString("base64"),
+      // Login social: los tests firman sus propios ID tokens y sirven sus claves (test/social.test.ts).
+      GOOGLE_CLIENT_ID: "msc-test.apps.googleusercontent.com",
+      APPLE_BUNDLE_ID: "com.misagradocorazon.app",
     },
   },
 });

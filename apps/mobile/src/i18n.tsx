@@ -41,6 +41,12 @@ const dict = {
   password: { es: "Contraseña", en: "Password" },
   name: { es: "Nombre", en: "Name" },
   continueGoogle: { es: "Continuar con Google", en: "Continue with Google" },
+  orDivider: { es: "o", en: "or" },
+  socialError: { es: "No pudimos iniciar sesión. Inténtalo de nuevo.", en: "We couldn't sign you in. Please try again." },
+  socialLinkBlocked: {
+    es: "Ya tienes una cuenta con ese correo. Entra con tu contraseña.",
+    en: "You already have an account with that email. Sign in with your password.",
+  },
   noAccount: { es: "¿No tienes cuenta? Regístrate", en: "No account? Sign up" },
   haveAccount: { es: "¿Ya tienes cuenta? Inicia sesión", en: "Already have an account? Sign in" },
   logout: { es: "Cerrar sesión", en: "Log out" },

@@ -56,7 +56,11 @@ export async function api<T>(path: string, options: { method?: string; body?: un
 }
 
 // Registro e inicio de sesión (Better Auth). El token llega en la cabecera set-auth-token.
-export async function authRequest(path: "/auth/sign-in/email" | "/auth/sign-up/email", body: Record<string, string>) {
+// Google y Apple entran por /auth/sign-in/social con el ID token que da el sistema operativo.
+export async function authRequest(
+  path: "/auth/sign-in/email" | "/auth/sign-up/email" | "/auth/sign-in/social",
+  body: Record<string, unknown>,
+) {
   const res = await fetch(`${BASE}/api${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
