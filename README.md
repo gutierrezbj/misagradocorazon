@@ -52,6 +52,7 @@ pnpm test
 - `docs/auditoria-entrega.md`: auditoría del prototipo entregado
 - `docs/propuesta-cambios-sdd.md`: cambios aprobados a los SDD
 - `docs/despliegue.md`: despliegue en Railway (API, worker, panel) y perfiles de EAS
+- `docs/testing.md`: qué test cubre cada obligación de SDD-07 y cobertura mínima de la API
 - `docs/seguridad.md`: límites de uso, IP real tras el proxy y qué comprobar en el primer despliegue
 - `docs/kpis.md`: KPIs de negocio (agregados diarios, asistencia a misa) y analítica con PostHog bajo consentimiento
 - `docs/borrado-cuenta.md`: borrado de cuenta desde la app (qué se borra y qué se conserva anonimizado)
