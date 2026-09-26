@@ -3,7 +3,7 @@
 Última revisión: 26-sep-2026. Arquitectura objetivo aprobada por el fundador en esta fecha.
 
 ### Contexto de la fase
-- El prototipo lo entregó un constructor externo (Emergent) y está integrado en `main` (`backend/` y `frontend/`). El equipo del fundador asume el mantenimiento y la evolución.
+- El prototipo lo entregó un constructor externo (Emergent) y está integrado en `main`: la app móvil vive en `apps/mobile` y el backend provisional en `backend/`. El equipo del fundador asume el mantenimiento y la evolución.
 - El diseño y la app móvil de esa entrega son la base del producto. El backend se sustituye (ver "Arquitectura objetivo").
 - Antes de cualquier trabajo, leer:
   - Los SDD del cuaderno de Notion: https://app.notion.com/p/3407981f08ef81eba744fee55d42e461 (SDD-01 a SDD-08, Documentación, Checklist de Kickoff).
@@ -29,7 +29,7 @@
 
 ### Arquitectura objetivo (aprobada 26-sep-2026)
 - **Monorepo:** `apps/mobile`, `apps/admin`, `apps/api`, `packages/shared` (tipos, esquemas de validación, i18n).
-- **App móvil:** Expo + React Native + TypeScript, a partir de `frontend/` de la entrega, reorganizada por pilar.
+- **App móvil:** Expo + React Native + TypeScript, en `apps/mobile` (antes `frontend/` de la entrega), a reorganizar por pilar.
 - **API:** Node.js + TypeScript + Express + Zod, en módulos `auth`, `ritual`, `misa`, `causas`, `admin`.
 - **Base de datos:** PostgreSQL con Prisma. Los movimientos de dinero van a un libro de solo inserción; el 20% y la transparencia se calculan de ahí, nunca se teclean a mano.
 - **Autenticación:** librería propia en el backend (Better Auth): email, Google, Apple, sesiones y roles. Nada que dependa de Emergent.
@@ -46,7 +46,7 @@
 
 ### Diseño
 - Mi Sagrado Corazón tiene identidad propia. No hereda la de ninguna agencia ni otro proyecto. **System Rapid Solutions ya no existe y su Design System no aplica.**
-- La base visual es el tema de la entrega (`frontend/src/theme.ts`):
+- La base visual es el tema de la entrega (`apps/mobile/src/theme.ts`):
   - Colores: rojo Sagrado Corazón, dorado de acento y marfil; altar en tonos oscuros cálidos.
   - Tipografía: serif en los títulos (Playfair Display) y sans en el cuerpo (Libre Franklin).
 - Carácter: devocional, cálido, sagrado, premium. Nada kitsch. Nada de valores por defecto de librerías de UI.

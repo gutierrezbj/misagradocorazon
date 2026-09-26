@@ -1,15 +1,14 @@
 {
-  "name": "frontend",
+  "name": "@msc/mobile",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "preinstall": "./scripts/cmd-guard.js --preinstall",
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@expo/metro-runtime": "57.0.16",
@@ -46,7 +45,8 @@
     "react-native-svg": "15.15.4",
     "react-native-web": "0.21.2",
     "react-native-webview": "13.16.1",
-    "react-native-worklets": "0.10.1"
+    "react-native-worklets": "0.10.1",
+    "@msc/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "19.2.10",
@@ -55,17 +55,5 @@
     "expo-doctor": "1.19.8",
     "typescript": "6.0.3"
   },
-  "resolutions": {
-    "@eslint/plugin-kit": "0.3.4",
-    "postcss": "8.5.10",
-    "uuid": "11.1.1",
-    "undici": "6.27.0",
-    "tar": "7.5.19",
-    "**/@eslint/eslintrc/js-yaml": "4.3.0",
-    "**/@expo/xcpretty/js-yaml": "4.3.0",
-    "**/@istanbuljs/load-nyc-config/js-yaml": "3.15.0",
-    "shell-quote": "1.9.0"
-  },
-  "private": true,
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "private": true
 }
