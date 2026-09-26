@@ -42,7 +42,7 @@
 - **Push:** expo-notifications y el servicio de push de Expo.
 - **Medios:** Cloudflare R2.
 - **Hosting:** Railway.
-- **Transición:** `backend/` (FastAPI + MongoDB) es provisional. No se amplía. Se sustituye por `apps/api`, usando `backend/tests/test_api.py` como referencia del contrato.
+- **Transición:** desde el 26-sep-2026 la app y el panel usan `apps/api`. `backend/` (FastAPI + MongoDB) ya no lo usa nada: no se amplía y se retirará con aprobación del fundador.
 
 ### Diseño
 - Mi Sagrado Corazón tiene identidad propia. No hereda la de ninguna agencia ni otro proyecto. **System Rapid Solutions ya no existe y su Design System no aplica.**

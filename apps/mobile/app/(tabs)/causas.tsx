@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api, ApiError } from "@/src/api";
+import type { CurrentCauses, Transparency } from "@/src/types";
 import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
@@ -23,12 +24,12 @@ export default function Causas() {
   const toast = useToast();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
 
-  const { data, isLoading } = useQuery({ queryKey: ["causes", "current"], queryFn: () => api("/causes/current") });
-  const { data: transp } = useQuery({ queryKey: ["transparency"], queryFn: () => api("/transparency", { auth: false }) });
+  const { data, isLoading } = useQuery({ queryKey: ["causes", "current"], queryFn: () => api<CurrentCauses>("/causes/current") });
+  const { data: transp } = useQuery({ queryKey: ["transparency"], queryFn: () => api<Transparency>("/transparency") });
 
   const causes = data?.causes ?? [];
-  const myVote = data?.my_vote_cause_id;
-  const votingOpen = data?.voting_open;
+  const myVote = data?.myVoteCauseId;
+  const votingOpen = data?.votingOpen;
 
   const voteMut = useMutation({
     mutationFn: (id: string) => api(`/causes/${id}/vote`, { method: "POST" }),
@@ -36,11 +37,12 @@ export default function Causas() {
       queryClient.invalidateQueries({ queryKey: ["causes", "current"] });
       toast(t("voteRegistered"), "success");
     },
-    onError: (e) => toast(e instanceof ApiError ? e.message : t("authError"), "error"),
+    onError: (e) => toast(e instanceof ApiError && e.code === "already_voted" ? t("alreadyVoted") : t("authError"), "error"),
   });
 
-  const records = transp?.records ?? [];
-  const totalImpact = transp?.total_impact ?? 0;
+  // Meses con causa ganadora o financiada; el importe transferido sale del libro de movimientos.
+  const records = (transp?.months ?? []).filter((m) => m.cause);
+  const totalTransferredCents = transp?.totals.transferredCents ?? 0;
 
   if (isLoading) {
     return (
@@ -63,7 +65,7 @@ export default function Causas() {
           <View style={styles.votesPill}>
             <Icon name="check-circle" size={15} color={colors.onBrandTertiary} />
             <Text style={styles.votesPillText}>
-              {data?.total_votes ?? 0} {t("totalVotes")}
+              {data?.totalVotes ?? 0} {t("totalVotes")}
             </Text>
           </View>
         </View>
@@ -90,14 +92,14 @@ export default function Causas() {
                 </Text>
                 <View style={styles.metaRow}>
                   <Meta icon="user" label={t("responsible")} value={cause.responsible} />
-                  <Meta icon="dollar-sign" label={t("budget")} value={`$${cause.budget?.toLocaleString?.() ?? cause.budget}`} />
+                  <Meta icon="dollar-sign" label={t("budget")} value={`$${(cause.budgetCents / 100).toLocaleString()}`} />
                 </View>
 
                 {/* Progress */}
                 <View style={styles.progressTrack}>
                   <View style={[styles.progressFill, { width: `${cause.percentage ?? 0}%` }]} />
                 </View>
-                <Text style={styles.percentage}>{cause.percentage ?? 0}% · {cause.votes ?? 0} votos</Text>
+                <Text style={styles.percentage}>{cause.percentage ?? 0}% · {cause.votes ?? 0} {t("votesLabel")}</Text>
 
                 <Pressable
                   testID={`vote-${cause.id}`}
@@ -132,21 +134,21 @@ export default function Causas() {
           <Text style={styles.transpTitle}>{t("transparency")}</Text>
           <LinearGradient colors={[colors.brand, colors.brandPrimary]} style={styles.impactCard}>
             <Text style={styles.impactLabel}>{t("totalImpact")}</Text>
-            <Text style={styles.impactValue}>${totalImpact.toLocaleString()}</Text>
-            <Text style={styles.impactNote}>20% de la facturación mensual</Text>
+            <Text style={styles.impactValue}>${(totalTransferredCents / 100).toLocaleString()}</Text>
+            <Text style={styles.impactNote}>{t("impactNote")}</Text>
           </LinearGradient>
 
           <Text style={styles.fundedTitle}>{t("fundedCauses")}</Text>
-          {records.map((r: any) => (
+          {records.map((r) => (
             <View key={r.month} style={styles.fundedRow}>
               <View style={styles.fundedIcon}>
                 <Icon name="gift" size={18} color={colors.brand} />
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.fundedName}>{r.cause_name || r.month}</Text>
+                <Text style={styles.fundedName}>{r.cause ? loc(r.cause.name) : r.month}</Text>
                 <Text style={styles.fundedMonth}>{r.month}</Text>
               </View>
-              <Text style={styles.fundedAmount}>${(r.transferred ?? 0).toLocaleString()}</Text>
+              <Text style={styles.fundedAmount}>${(r.transferredCents / 100).toLocaleString()}</Text>
             </View>
           ))}
         </View>

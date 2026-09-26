@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api } from "@/src/api";
+import type { User } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
@@ -21,9 +22,10 @@ export default function Settings() {
   const changeLang = async (l: "es" | "en") => {
     setLang(l);
     try {
-      const res = await api<{ user: any }>("/auth/profile", { method: "PUT", body: { language: l } });
-      setUser(res.user);
-    } catch {}
+      setUser(await api<User>("/me", { method: "PATCH", body: { language: l } }));
+    } catch {
+      /* el idioma local ya ha cambiado; se sincroniza en el próximo intento */
+    }
   };
 
   return (
@@ -48,12 +50,12 @@ export default function Settings() {
         </View>
 
         <Text style={styles.sectionTitle}>{t("notifications")}</Text>
-        <Row label={t("morning")} value={user?.morning_time ?? "—"} />
-        <Row label={t("angelus")} value={user?.angelus_time ?? "—"} />
-        <Row label={t("night")} value={user?.night_time ?? "—"} />
-        <Text style={styles.note}>Las notificaciones push funcionan al generar el build en un dispositivo real.</Text>
+        <Row label={t("morning")} value={user?.morningTime ?? "—"} />
+        <Row label={t("angelus")} value={user?.angelusTime ?? "—"} />
+        <Row label={t("night")} value={user?.nightTime ?? "—"} />
+        <Text style={styles.note}>{t("pushNote")}</Text>
 
-        <Text style={styles.sectionTitle}>Información</Text>
+        <Text style={styles.sectionTitle}>{t("information")}</Text>
         <Row label={t("privacy")} chevron />
         <Row label={t("terms")} chevron />
         <Row label={t("support")} value="soporte@misagradocorazon.com" />

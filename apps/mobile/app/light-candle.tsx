@@ -8,18 +8,23 @@ import { StatusBar } from "expo-status-bar";
 import * as Haptics from "expo-haptics";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
+import { CANDLE_TYPES } from "@msc/shared";
+
 import { api } from "@/src/api";
+import type { Saint } from "@/src/types";
 import { queryClient } from "@/src/query-client";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
 
+// Precios de @msc/shared (céntimos): 0,99 / 1,99 / 2,99 USD, los tiers de las stores.
 const TYPES = [
-  { key: "basic", price: 1, label: "candleBasic", desc: "candleBasicDesc" },
-  { key: "solemn", price: 2, label: "candleSolemn", desc: "candleSolemnDesc" },
-  { key: "permanent", price: 3, label: "candlePermanent", desc: "candlePermanentDesc" },
+  { key: "basic", label: "candleBasic", desc: "candleBasicDesc" },
+  { key: "solemn", label: "candleSolemn", desc: "candleSolemnDesc" },
+  { key: "permanent", label: "candlePermanent", desc: "candlePermanentDesc" },
 ] as const;
+const priceLabel = (key: keyof typeof CANDLE_TYPES) => `$${(CANDLE_TYPES[key].priceCents / 100).toFixed(2)}`;
 
 export default function LightCandle() {
   const styles = useStyles();
@@ -30,17 +35,17 @@ export default function LightCandle() {
   const toast = useToast();
   const { user } = useAuth();
 
-  const { data } = useQuery({ queryKey: ["saints", "all"], queryFn: () => api("/saints", { auth: false }) });
-  const saints = data?.saints ?? [];
+  const { data } = useQuery({ queryKey: ["saints", "all"], queryFn: () => api<Saint[]>("/saints") });
+  const saints = data ?? [];
 
-  const [saintId, setSaintId] = useState<string | null>(user?.patron_saint_id ?? null);
+  const [saintId, setSaintId] = useState<string | null>(user?.patronSaintId ?? null);
   const [intention, setIntention] = useState("");
   const [type, setType] = useState<Exclude<CandleVariant, "pillar">>("basic");
   const [forDeceased, setForDeceased] = useState(false);
   const [done, setDone] = useState(false);
 
   const lightMut = useMutation({
-    mutationFn: () => api("/candles", { method: "POST", body: { saint_id: saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
+    mutationFn: () => api("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
@@ -70,7 +75,6 @@ export default function LightCandle() {
         </View>
         <Text style={styles.doneTitle}>{t("candleLit")}</Text>
         <Text style={styles.doneSub}>{t("candleLitSub")}</Text>
-        <Text style={styles.impactSmall}>{t("impactNote")}</Text>
         <Pressable testID="candle-done-button" onPress={() => router.back()} style={styles.doneBtn}>
           <Text style={styles.doneBtnText}>{t("continue")}</Text>
         </Pressable>
@@ -95,14 +99,14 @@ export default function LightCandle() {
 
         <Text style={styles.sectionLabel}>{t("forWhichSaint")}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingVertical: spacing.sm }}>
-          {saints.map((s: any) => (
+          {saints.map((s) => (
             <Pressable
               key={s.id}
               testID={`candle-saint-${s.id}`}
               onPress={() => setSaintId(s.id)}
               style={[styles.saintChip, saintId === s.id && styles.saintChipActive]}
             >
-              <Image source={{ uri: s.image_url }} style={styles.saintChipImg} contentFit="cover" />
+              <Image source={{ uri: s.imageUrl }} style={styles.saintChipImg} contentFit="cover" />
               <Text style={styles.saintChipName} numberOfLines={1}>
                 {s.name}
               </Text>
@@ -140,7 +144,7 @@ export default function LightCandle() {
               <Text style={styles.typeName}>{t(ty.label)}</Text>
               <Text style={styles.typeDesc}>{t(ty.desc)}</Text>
             </View>
-            <Text style={styles.typePrice}>${ty.price}{ty.key === "permanent" ? "/sem" : ""}</Text>
+            <Text style={styles.typePrice}>{priceLabel(ty.key)}{ty.key === "permanent" ? t("perWeek") : ""}</Text>
             <View style={[styles.radio, type === ty.key && styles.radioActive]}>
               {type === ty.key && <View style={styles.radioDot} />}
             </View>
@@ -211,7 +215,6 @@ const useStyles = makeStyles((c) => ({
   doneWrap: { alignItems: "center", justifyContent: "center", padding: spacing.lg },
   doneTitle: { fontFamily: fonts.displayBold, fontSize: 30, color: c.gold, marginTop: spacing.lg, textAlign: "center" },
   doneSub: { fontFamily: fonts.body, fontSize: 16, color: c.onAltar, textAlign: "center", marginTop: spacing.sm, fontStyle: "italic" },
-  impactSmall: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, textAlign: "center", marginTop: spacing.lg },
   doneBtn: { marginTop: spacing.xl, backgroundColor: c.brandSecondary, borderRadius: radius.lg, paddingHorizontal: spacing.xl, height: 52, justifyContent: "center" },
   doneBtnText: { fontFamily: fonts.bodyBold, fontSize: 17, color: c.onBrandSecondary },
 }));

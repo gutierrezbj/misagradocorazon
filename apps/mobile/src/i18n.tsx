@@ -6,6 +6,22 @@ export type Lang = "es" | "en";
 const LANG_KEY = "msc.lang";
 
 const dict = {
+  // conexión con la API nueva (26-sep-2026)
+  emailPlaceholder: { es: "tu@correo.com", en: "you@email.com" },
+  emailTaken: { es: "Ya existe una cuenta con ese correo", en: "An account with that email already exists" },
+  passwordTooShort: { es: "La contraseña debe tener al menos 8 caracteres", en: "Password must be at least 8 characters" },
+  longPressHint: { es: "mantén pulsado para añadir", en: "long press to add" },
+  pushNote: { es: "Los recordatorios llegarán cuando la app esté publicada en las tiendas.", en: "Reminders will arrive once the app is published in the stores." },
+  information: { es: "Información", en: "Information" },
+  meditation: { es: "Meditación", en: "Meditation" },
+  history: { es: "Historia", en: "History" },
+  patronages: { es: "Advocaciones", en: "Patronages" },
+  prayerLabel: { es: "Oración", en: "Prayer" },
+  amenComplete: { es: "Amén · Completar", en: "Amen · Complete" },
+  candlesLabel: { es: "velas", en: "candles" },
+  votesLabel: { es: "votos", en: "votes" },
+  perWeek: { es: "/sem", en: "/wk" },
+  tooFast: { es: "Espera un momento antes de volver a enviar", en: "Please wait a moment before sending again" },
   // generic
   appName: { es: "Mi Sagrado Corazón", en: "My Sacred Heart" },
   tagline: { es: "La comunidad de fe que enciende el mundo", en: "The community of faith that lights the world" },
@@ -130,12 +146,10 @@ const dict = {
   candleHistory: { es: "Historial de velas", en: "Candle history" },
   voteHistory: { es: "Historial de votos", en: "Vote history" },
   notifications: { es: "Notificaciones", en: "Notifications" },
-  adminPanel: { es: "Panel de gestión", en: "Admin panel" },
   privacy: { es: "Política de privacidad", en: "Privacy policy" },
   terms: { es: "Términos de uso", en: "Terms of use" },
   support: { es: "Soporte", en: "Support" },
   // admin
-  adminDashboard: { es: "Panel de gestión", en: "Admin dashboard" },
 };
 
 type Key = keyof typeof dict;

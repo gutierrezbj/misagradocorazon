@@ -9,7 +9,8 @@ import * as Haptics from "expo-haptics";
 import { Platform } from "react-native";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
-import { api } from "@/src/api";
+import { api, deviceTimeZone } from "@/src/api";
+import type { Daily, MyCandle, Saint } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
@@ -25,17 +26,19 @@ export default function Altar() {
   const { user } = useAuth();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
 
-  const { data: daily } = useQuery({ queryKey: ["daily"], queryFn: () => api("/daily", { auth: false }) });
-  const { data: candlesData, isLoading } = useQuery({ queryKey: ["candles", "me"], queryFn: () => api("/candles/me") });
-  const { data: patronData } = useQuery({
-    queryKey: ["saint", user?.patron_saint_id],
-    queryFn: () => api(`/saints/${user?.patron_saint_id}`, { auth: false }),
-    enabled: !!user?.patron_saint_id,
+  const { data: daily } = useQuery({
+    queryKey: ["daily"],
+    queryFn: () => api<Daily>(`/daily?tz=${encodeURIComponent(user?.timezone ?? deviceTimeZone())}`),
   });
-
-  const patron = patronData?.saint;
-  const candles = candlesData?.candles ?? [];
-  const saintOfDay = daily?.daily?.saint_of_day;
+  const { data: myCandles, isLoading } = useQuery({ queryKey: ["candles", "me"], queryFn: () => api<MyCandle[]>("/candles/me") });
+  const { data: patron } = useQuery({
+    queryKey: ["saint", user?.patronSaintId],
+    queryFn: () => api<Saint>(`/saints/${user?.patronSaintId}`),
+    enabled: !!user?.patronSaintId,
+  });
+  // En el altar solo las velas que siguen encendidas.
+  const candles = (myCandles ?? []).filter((c) => c.active);
+  const saintOfDay = daily?.saintOfDay;
 
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t("greetingMorning") : hour < 19 ? t("greetingAfternoon") : t("greetingEvening");
@@ -48,8 +51,8 @@ export default function Altar() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      {patron?.image_url && (
-        <Image source={{ uri: patron.image_url }} style={styles.bgImage} contentFit="cover" blurRadius={30} />
+      {patron?.imageUrl && (
+        <Image source={{ uri: patron.imageUrl }} style={styles.bgImage} contentFit="cover" blurRadius={30} />
       )}
       <LinearGradient
         colors={[colors.altarBgDeep + "F2", colors.altarBg + "FA", colors.altarBg]}
@@ -106,7 +109,7 @@ export default function Altar() {
             testID="gospel-card"
             icon="book-open"
             title={t("gospelToday")}
-            subtitle={daily?.daily?.gospel_ref || ""}
+            subtitle={daily?.gospel.ref ?? ""}
             onPress={() => router.push("/gospel")}
           />
           {saintOfDay && (
@@ -133,11 +136,11 @@ export default function Altar() {
             <Text style={styles.empty}>{t("noCandles")}</Text>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingRight: spacing.md }}>
-              {candles.map((c: any) => (
+              {candles.map((c) => (
                 <View key={c.id} style={styles.miniCandle}>
                   <CandleFlame size={54} lit variant={c.type} mourning={c.category === "difuntos"} />
                   <Text style={styles.miniSaint} numberOfLines={1}>
-                    {c.saint_name}
+                    {c.saint.name}
                   </Text>
                   <Text style={styles.miniIntention} numberOfLines={2}>
                     {c.intention}

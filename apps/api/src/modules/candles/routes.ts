@@ -60,6 +60,7 @@ candlesRouter.post("/candles", requireUser, async (req, res) => {
     {
       id: candle.id,
       saintId: candle.saintId,
+      saint: { id: saint.id, name: saint.name, imageUrl: saint.imageUrl },
       intention: input.intention,
       type: candle.type,
       category: candle.category,
@@ -76,6 +77,7 @@ candlesRouter.get("/candles/me", requireUser, async (req, res) => {
     where: { userId: user.id },
     orderBy: { litAt: "desc" },
     take: 200,
+    include: { saint: { select: { id: true, name: true, imageUrl: true } } },
   });
   const now = Date.now();
   ok(
@@ -83,9 +85,11 @@ candlesRouter.get("/candles/me", requireUser, async (req, res) => {
     candles.map((c) => ({
       id: c.id,
       saintId: c.saintId,
+      saint: c.saint,
       intention: decryptText(c.intentionEncrypted, env.INTENTIONS_KEY),
       type: c.type,
       category: c.category,
+      priceCents: c.priceCents,
       litAt: c.litAt,
       expiresAt: c.expiresAt,
       active: c.expiresAt.getTime() > now,

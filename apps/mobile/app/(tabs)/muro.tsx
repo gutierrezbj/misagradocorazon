@@ -6,7 +6,8 @@ import { StatusBar } from "expo-status-bar";
 import * as Haptics from "expo-haptics";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
-import { api } from "@/src/api";
+import { api, ApiError } from "@/src/api";
+import type { Intention } from "@/src/types";
 import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Chip, Icon, AppButton, useToast } from "@/src/components/ui";
@@ -36,9 +37,9 @@ export default function Muro() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["intentions", cat],
-    queryFn: () => api(`/intentions${cat !== "all" ? `?category=${cat}` : ""}`, { auth: false }),
+    queryFn: () => api<Intention[]>(`/intentions${cat !== "all" ? `?category=${cat}` : ""}`),
   });
-  const intentions = data?.intentions ?? [];
+  const intentions = data ?? [];
 
   const prayMut = useMutation({
     mutationFn: (id: string) => api(`/intentions/${id}/pray`, { method: "POST" }),
@@ -46,14 +47,14 @@ export default function Muro() {
   });
 
   const publishMut = useMutation({
-    mutationFn: () => api("/intentions", { method: "POST", body: { text, category: newCat } }),
-    onSuccess: (res: any) => {
+    mutationFn: () => api<{ id: string; status: "approved" | "pending" }>("/intentions", { method: "POST", body: { text, category: newCat } }),
+    onSuccess: (res) => {
       setModal(false);
       setText("");
       queryClient.invalidateQueries({ queryKey: ["intentions"] });
-      toast(res.flagged ? t("intentionFlagged") : t("intentionSent"), res.flagged ? "info" : "success");
+      toast(res.status === "pending" ? t("intentionFlagged") : t("intentionSent"), res.status === "pending" ? "info" : "success");
     },
-    onError: () => toast(t("authError"), "error"),
+    onError: (e) => toast(e instanceof ApiError && e.code === "rate_limited" ? t("tooFast") : t("authError"), "error"),
   });
 
   const catLabel = (k: string) => t(CATS.find((c) => c.key === k)?.label ?? "catAll");
@@ -88,7 +89,7 @@ export default function Muro() {
           renderItem={({ item }) => (
             <View testID={`intention-${item.id}`} style={styles.card}>
               <View style={styles.cardTop}>
-                <Text style={styles.author}>{item.author_name}</Text>
+                <Text style={styles.author}>{item.author}</Text>
                 <View style={styles.catBadge}>
                   <Text style={styles.catBadgeText}>{catLabel(item.category)}</Text>
                 </View>
@@ -96,7 +97,7 @@ export default function Muro() {
               <Text style={styles.intentionText}>{item.text}</Text>
               <View style={styles.cardBottom}>
                 <Text style={styles.prayCount}>
-                  {item.pray_count} {t("peoplePraying")}
+                  {item.prayCount} {t("peoplePraying")}
                 </Text>
                 <Pressable
                   testID={`pray-${item.id}`}

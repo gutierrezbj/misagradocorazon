@@ -5,7 +5,9 @@ import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, spacing, useTheme } from "@/src/theme";
-import { api } from "@/src/api";
+import { api, deviceTimeZone } from "@/src/api";
+import { useAuth } from "@/src/auth";
+import type { Daily } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
 
@@ -16,8 +18,11 @@ export default function Gospel() {
   const router = useRouter();
   const { t, loc } = useI18n();
 
-  const { data, isLoading } = useQuery({ queryKey: ["daily"], queryFn: () => api("/daily", { auth: false }) });
-  const daily = data?.daily;
+  const { user } = useAuth();
+  const { data: daily, isLoading } = useQuery({
+    queryKey: ["daily"],
+    queryFn: () => api<Daily>(`/daily?tz=${encodeURIComponent(user?.timezone ?? deviceTimeZone())}`),
+  });
 
   return (
     <View style={styles.root}>
@@ -34,11 +39,11 @@ export default function Gospel() {
         <ActivityIndicator color={colors.brand} style={{ marginTop: spacing.xl }} />
       ) : (
         <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
-          <Text style={styles.ref}>{daily?.gospel_ref}</Text>
-          <Text style={styles.gospel}>{loc(daily?.gospel_text)}</Text>
+          <Text style={styles.ref}>{daily?.gospel.ref}</Text>
+          <Text style={styles.gospel}>{loc(daily?.gospel)}</Text>
           <View style={styles.divider} />
-          <Text style={styles.medLabel}>Meditación</Text>
-          <Text style={styles.meditation}>{loc(daily?.meditation_text)}</Text>
+          <Text style={styles.medLabel}>{t("meditation")}</Text>
+          <Text style={styles.meditation}>{loc(daily?.meditation)}</Text>
         </ScrollView>
       )}
     </View>

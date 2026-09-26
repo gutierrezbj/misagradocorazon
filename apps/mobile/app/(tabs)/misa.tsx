@@ -3,13 +3,14 @@ import { View, Text, Pressable, FlatList, TextInput, ActivityIndicator, Platform
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { WebView } from "react-native-webview";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { YouTubeEmbed } from "@/src/components/YouTubeEmbed";
+import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api } from "@/src/api";
-import { queryClient } from "@/src/query-client";
+import { useMassChat } from "@/src/chat";
+import type { CommunityCandles, Mass } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
@@ -30,27 +31,30 @@ export default function Misa() {
   const toast = useToast();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
 
-  const { data, isLoading } = useQuery({ queryKey: ["mass", "next"], queryFn: () => api("/masses/next", { auth: false }) });
-  const { data: candlesData } = useQuery({ queryKey: ["candles", "community"], queryFn: () => api("/candles/community", { auth: false }) });
-  const mass = data?.mass;
-
-  const { data: chatData } = useQuery({
-    queryKey: ["chat", mass?.id],
-    queryFn: () => api(`/masses/${mass.id}/chat`, { auth: false }),
-    enabled: !!mass?.id,
-    refetchInterval: 8000,
+  // El estado de la misa lo decide el servidor; se refresca cada minuto.
+  const { data: mass, isLoading } = useQuery({
+    queryKey: ["mass", "next"],
+    queryFn: () => api<Mass | null>("/masses/next"),
+    refetchInterval: 60_000,
   });
-  const messages = chatData?.messages ?? [];
+  const { data: candlesData } = useQuery({ queryKey: ["candles", "community"], queryFn: () => api<CommunityCandles>("/candles/community") });
 
+  const { messages, send } = useMassChat(mass?.id);
   const [msg, setMsg] = useState("");
-  const chatMut = useMutation({
-    mutationFn: () => api(`/masses/${mass.id}/chat`, { method: "POST", body: { text: msg } }),
-    onSuccess: (res: any) => {
+  const [sending, setSending] = useState(false);
+  const sendMessage = async () => {
+    const text = msg.trim();
+    if (!text || !mass) return;
+    setSending(true);
+    const res = await send(text);
+    setSending(false);
+    if (res.ok) {
       setMsg("");
-      queryClient.invalidateQueries({ queryKey: ["chat"] });
-      if (res.flagged) toast(t("intentionFlagged"), "info");
-    },
-  });
+      if (res.status === "pending") toast(t("intentionFlagged"), "info");
+    } else {
+      toast(res.error === "unauthenticated" ? t("chatLoginNote") : res.error === "rate_limited" ? t("tooFast") : t("authError"), "error");
+    }
+  };
 
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
@@ -58,15 +62,16 @@ export default function Misa() {
     return () => clearInterval(i);
   }, []);
 
-  const scheduled = mass ? new Date(mass.scheduled_at).getTime() : 0;
-  const isLive = mass && now >= scheduled && now <= scheduled + 2 * 3600 * 1000;
+  const scheduled = mass ? new Date(mass.scheduledAt).getTime() : 0;
+  // Si la hora de inicio llega con la pantalla abierta, se pasa a "en vivo" sin esperar al refresco.
+  const isLive = !!mass && (mass.status === "live" || (mass.status === "scheduled" && now >= scheduled));
   const diff = Math.max(0, scheduled - now);
   const d = Math.floor(diff / 86400000);
   const h = Math.floor((diff % 86400000) / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   const s = Math.floor((diff % 60000) / 1000);
 
-  const vid = mass ? youtubeId(mass.youtube_url) : null;
+  const vid = mass ? youtubeId(mass.youtubeUrl) : null;
 
   if (isLoading) {
     return (
@@ -82,11 +87,7 @@ export default function Misa() {
       {/* Video / hero */}
       <View style={[styles.videoWrap, { paddingTop: insets.top }]}>
         {isLive && vid ? (
-          <WebView
-            style={styles.video}
-            source={{ uri: `https://www.youtube.com/embed/${vid}?autoplay=1&playsinline=1` }}
-            allowsFullscreenVideo
-          />
+          <YouTubeEmbed videoId={vid} style={styles.video} />
         ) : (
           <View style={styles.video}>
             <Image source={{ uri: HERO }} style={styles.heroImg} contentFit="cover" />
@@ -115,7 +116,7 @@ export default function Misa() {
       <View style={styles.candleBanner}>
         <Icon name="feather" size={18} color={colors.gold} />
         <Text style={styles.candleBannerText}>
-          {candlesData?.total ?? 0} {t("candlesThisWeek")}
+          {candlesData?.last7d ?? 0} {t("candlesThisWeek")}
         </Text>
       </View>
 
@@ -125,13 +126,13 @@ export default function Misa() {
       </View>
       <FlatList
         data={messages}
-        keyExtractor={(m: any) => m.id}
+        keyExtractor={(m) => m.id}
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: spacing.md, gap: spacing.sm }}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <View style={styles.msgRow}>
-            <Text style={styles.msgName}>{item.name}</Text>
+            <Text style={styles.msgName}>{item.author}</Text>
             <Text style={styles.msgText}>{item.text}</Text>
           </View>
         )}
@@ -148,7 +149,8 @@ export default function Misa() {
         />
         <Pressable
           testID="chat-send-button"
-          onPress={() => msg.trim() && mass && chatMut.mutate()}
+          onPress={() => void sendMessage()}
+          disabled={sending}
           style={styles.sendBtn}
         >
           <Icon name="send" size={20} color={colors.onBrandPrimary} />

@@ -1,13 +1,12 @@
+// Cliente de la API (apps/api). Respuesta estándar { data, error }; sesión como token Bearer
+// (plugin bearer de Better Auth), guardado en el almacén seguro del dispositivo.
 import { storage } from "@/src/utils/storage";
 
-const BASE = process.env.EXPO_PUBLIC_BACKEND_URL;
+export const BASE = process.env.EXPO_PUBLIC_BACKEND_URL ?? "";
 export const TOKEN_KEY = "msc.session_token";
 
 let memToken: string | null = null;
 
-export function setToken(token: string | null) {
-  memToken = token;
-}
 export function getMemToken() {
   return memToken;
 }
@@ -29,35 +28,57 @@ export async function clearToken() {
 }
 
 export class ApiError extends Error {
-  status: number;
-  constructor(status: number, message: string) {
+  constructor(
+    public status: number,
+    public code: string,
+    message: string,
+  ) {
     super(message);
-    this.status = status;
   }
 }
 
-export async function api<T = any>(
-  path: string,
-  options: { method?: string; body?: any; auth?: boolean } = {},
-): Promise<T> {
-  const { method = "GET", body, auth = true } = options;
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
-  if (auth && memToken) headers.Authorization = `Bearer ${memToken}`;
+type Envelope<T> = { data: T; error: { code: string; message: string } | null };
+
+export async function api<T>(path: string, options: { method?: string; body?: unknown } = {}): Promise<T> {
+  const headers: Record<string, string> = {};
+  if (memToken) headers.Authorization = `Bearer ${memToken}`;
+  if (options.body !== undefined) headers["Content-Type"] = "application/json";
   const res = await fetch(`${BASE}/api${path}`, {
-    method,
+    method: options.method ?? "GET",
     headers,
-    body: body ? JSON.stringify(body) : undefined,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
-  let data: any = null;
-  const text = await res.text();
+  const json = (await res.json().catch(() => null)) as Envelope<T> | null;
+  if (!res.ok || !json || json.error) {
+    throw new ApiError(res.status, json?.error?.code ?? "http_error", json?.error?.message ?? res.statusText);
+  }
+  return json.data;
+}
+
+// Registro e inicio de sesión (Better Auth). El token llega en la cabecera set-auth-token.
+export async function authRequest(path: "/auth/sign-in/email" | "/auth/sign-up/email", body: Record<string, string>) {
+  const res = await fetch(`${BASE}/api${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  const token = res.headers.get("set-auth-token");
+  if (!res.ok || !token) {
+    const json = (await res.json().catch(() => null)) as { code?: string; message?: string } | null;
+    throw new ApiError(res.status, json?.code ?? "auth_error", json?.message ?? res.statusText);
+  }
+  await persistToken(token);
+}
+
+export async function signOutRequest() {
+  if (!memToken) return;
+  await fetch(`${BASE}/api/auth/sign-out`, { method: "POST", headers: { Authorization: `Bearer ${memToken}` } }).catch(() => undefined);
+}
+
+export function deviceTimeZone(): string {
   try {
-    data = text ? JSON.parse(text) : null;
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Mexico_City";
   } catch {
-    data = text;
+    return "America/Mexico_City";
   }
-  if (!res.ok) {
-    const detail = (data && data.detail) || res.statusText || "Request failed";
-    throw new ApiError(res.status, typeof detail === "string" ? detail : "Request failed");
-  }
-  return data as T;
 }

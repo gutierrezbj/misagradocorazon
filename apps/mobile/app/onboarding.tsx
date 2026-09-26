@@ -6,13 +6,12 @@ import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
-import { api } from "@/src/api";
+import { api, deviceTimeZone } from "@/src/api";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
 
-type Saint = { id: string; name: string; image_url: string; feast_date: string };
-
+import type { Saint, User } from "@/src/types";
 const TIMES = ["06:00", "06:30", "07:00", "07:30", "08:00", "12:00", "18:00", "20:00", "21:00", "21:30", "22:00"];
 
 export default function Onboarding() {
@@ -25,9 +24,9 @@ export default function Onboarding() {
 
   const { data } = useQuery({
     queryKey: ["saints", "patron"],
-    queryFn: () => api<{ saints: Saint[] }>("/saints?patron_only=true", { auth: false }),
+    queryFn: () => api<Saint[]>("/saints?patronOnly=true"),
   });
-  const saints = data?.saints ?? [];
+  const saints = data ?? [];
 
   const [patron, setPatron] = useState<string | null>(null);
   const [secondary, setSecondary] = useState<string[]>([]);
@@ -47,18 +46,19 @@ export default function Onboarding() {
     }
     setBusy(true);
     try {
-      const res = await api<{ user: any }>("/auth/onboarding", {
+      const updated = await api<User>("/me/onboarding", {
         method: "PUT",
         body: {
-          patron_saint_id: patron,
-          secondary_saint_ids: secondary,
-          morning_time: morning,
-          angelus_time: "12:00",
-          night_time: night,
+          patronSaintId: patron,
+          secondarySaintIds: secondary,
+          morningTime: morning,
+          angelusTime: "12:00",
+          nightTime: night,
           language: lang,
+          timezone: deviceTimeZone(),
         },
       });
-      setUser(res.user);
+      setUser(updated);
     } catch {
       toast(t("authError"), "error");
     } finally {
@@ -90,7 +90,7 @@ export default function Onboarding() {
                 onLongPress={() => toggleSecondary(s.id)}
                 style={[styles.saintCard, isPatron && styles.saintCardActive]}
               >
-                <Image source={{ uri: s.image_url }} style={styles.saintImg} contentFit="cover" />
+                <Image source={{ uri: s.imageUrl }} style={styles.saintImg} contentFit="cover" />
                 {isPatron && (
                   <View style={styles.badge}>
                     <Icon name="star" size={14} color={colors.onBrandSecondary} />
@@ -108,7 +108,7 @@ export default function Onboarding() {
             );
           })}
         </View>
-        <Text style={styles.hint}>{t("secondarySaints")} · manténlo pulsado / long press</Text>
+        <Text style={styles.hint}>{t("secondarySaints")} · {t("longPressHint")}</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("prayerTimes")}</Text>

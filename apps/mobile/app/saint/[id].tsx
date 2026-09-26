@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api } from "@/src/api";
+import type { Saint } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon } from "@/src/components/ui";
 
@@ -19,8 +20,7 @@ export default function SaintDetail() {
   const { t, loc } = useI18n();
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const { data, isLoading } = useQuery({ queryKey: ["saint", id], queryFn: () => api(`/saints/${id}`, { auth: false }) });
-  const saint = data?.saint;
+  const { data: saint, isLoading } = useQuery({ queryKey: ["saint", id], queryFn: () => api<Saint>(`/saints/${id}`) });
 
   return (
     <View style={styles.root}>
@@ -30,28 +30,28 @@ export default function SaintDetail() {
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
-            <Image source={{ uri: saint.image_url }} style={styles.heroImg} contentFit="cover" />
+            <Image source={{ uri: saint.imageUrl }} style={styles.heroImg} contentFit="cover" />
             <LinearGradient colors={["rgba(28,15,14,0.5)", "transparent", "rgba(28,15,14,0.95)"]} style={styles.heroScrim} />
             <Pressable testID="back-button" onPress={() => router.back()} style={[styles.back, { top: insets.top + spacing.sm }]}>
               <Icon name="arrow-left" size={22} color="#FDFBF7" />
             </Pressable>
             <View style={styles.heroText}>
               <Text style={styles.name}>{saint.name}</Text>
-              {!!saint.feast_date && (
+              {!!saint.feastDate && (
                 <View style={styles.feastRow}>
                   <Icon name="calendar" size={14} color={colors.goldSoft} />
-                  <Text style={styles.feast}>{saint.feast_date}</Text>
+                  <Text style={styles.feast}>{saint.feastDate}</Text>
                 </View>
               )}
             </View>
           </View>
 
           <View style={styles.body}>
-            <Section title="Historia" text={loc(saint.history)} />
-            {!!loc(saint.patronages) && <Section title="Advocaciones" text={loc(saint.patronages)} />}
+            <Section title={t("history")} text={loc(saint.history)} />
+            {!!loc(saint.patronages) && <Section title={t("patronages")} text={loc(saint.patronages)} />}
             {!!loc(saint.prayer) && (
               <View style={styles.prayerBox}>
-                <Text style={styles.prayerLabel}>Oración</Text>
+                <Text style={styles.prayerLabel}>{t("prayerLabel")}</Text>
                 <Text style={styles.prayerText}>{loc(saint.prayer)}</Text>
               </View>
             )}

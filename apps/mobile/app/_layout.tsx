@@ -27,8 +27,6 @@ function Gate() {
     const group = segments[0];
     const inAuth = group === "(auth)";
     const inOnboarding = group === "onboarding";
-    const inAdmin = group === "admin";
-
     if (!user) {
       if (!inAuth) router.replace("/(auth)/login");
       return;
@@ -40,9 +38,6 @@ function Gate() {
     if (inAuth || inOnboarding) {
       router.replace("/(tabs)");
       return;
-    }
-    if (inAdmin && user.role === "user") {
-      router.replace("/(tabs)");
     }
   }, [user, loading, segments, router]);
 
