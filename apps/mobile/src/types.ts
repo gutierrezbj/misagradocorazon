@@ -3,6 +3,9 @@ import type { CandleCategory, CandleType, IntentionCategory, Locale, Role } from
 
 export type Localized = { es: string; en: string };
 
+// Audio grabado por el equipo en cada idioma; null si aún no existe (SDD-05 US-07).
+export type LocalizedAudio = { es: string | null; en: string | null };
+
 export type User = {
   id: string;
   name: string;
@@ -29,7 +32,7 @@ export type Saint = {
   name: string;
   feastDate: string;
   imageUrl: string;
-  audioUrl: { es: string | null; en: string | null };
+  audioUrl: LocalizedAudio;
   history: Localized;
   patronages: Localized;
   prayer: Localized;
@@ -40,9 +43,9 @@ export type Daily = {
   date: string;
   saintOfDay: Saint | null;
   gospel: { ref: string } & Localized;
-  meditation: Localized & { audioUrl: string | null };
-  morningPrayer: Localized & { audioUrl: string | null };
-  nightPrayer: Localized & { audioUrl: string | null };
+  meditation: Localized & { audioUrl: LocalizedAudio };
+  morningPrayer: Localized & { audioUrl: LocalizedAudio };
+  nightPrayer: Localized & { audioUrl: LocalizedAudio };
 };
 
 export type MyCandle = {

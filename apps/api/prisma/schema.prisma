@@ -212,13 +212,17 @@ model DailyContent {
   gospelEn          String
   meditationEs      String
   meditationEn      String
-  meditationAudioUrl String?
+  // Audio por idioma (SDD-05 US-07): el fiel escucha el de su idioma.
+  meditationAudioUrlEs String?
+  meditationAudioUrlEn String?
   morningPrayerEs   String
   morningPrayerEn   String
   nightPrayerEs     String
   nightPrayerEn     String
-  morningAudioUrl   String?
-  nightAudioUrl     String?
+  morningAudioUrlEs String?
+  morningAudioUrlEn String?
+  nightAudioUrlEs   String?
+  nightAudioUrlEn   String?
   updatedAt         DateTime @updatedAt
 
   saintOfDay Saint? @relation(fields: [saintOfDayId], references: [id])

@@ -19,9 +19,9 @@ export function dailyDto(d: DailyContent & { saintOfDay: Saint | null }) {
     date: d.date,
     saintOfDay: d.saintOfDay ? saintDto(d.saintOfDay) : null,
     gospel: { ref: d.gospelRef, es: d.gospelEs, en: d.gospelEn },
-    meditation: { es: d.meditationEs, en: d.meditationEn, audioUrl: d.meditationAudioUrl },
-    morningPrayer: { es: d.morningPrayerEs, en: d.morningPrayerEn, audioUrl: d.morningAudioUrl },
-    nightPrayer: { es: d.nightPrayerEs, en: d.nightPrayerEn, audioUrl: d.nightAudioUrl },
+    meditation: { es: d.meditationEs, en: d.meditationEn, audioUrl: { es: d.meditationAudioUrlEs, en: d.meditationAudioUrlEn } },
+    morningPrayer: { es: d.morningPrayerEs, en: d.morningPrayerEn, audioUrl: { es: d.morningAudioUrlEs, en: d.morningAudioUrlEn } },
+    nightPrayer: { es: d.nightPrayerEs, en: d.nightPrayerEn, audioUrl: { es: d.nightAudioUrlEs, en: d.nightAudioUrlEn } },
   };
 }
 

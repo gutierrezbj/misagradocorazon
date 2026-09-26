@@ -10,16 +10,17 @@ import type { Daily } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
+import { AudioPlayer } from "@/src/components/AudioPlayer";
 
 export default function Prayer() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { t, loc } = useI18n();
+  const { t, loc, lang } = useI18n();
   const toast = useToast();
   const { user, refresh } = useAuth();
-  const { kind } = useLocalSearchParams<{ kind: string }>();
+  const { kind, autoplay } = useLocalSearchParams<{ kind: string; autoplay?: string }>();
   const isMorning = kind !== "night";
 
   const { data: daily, isLoading } = useQuery({
@@ -27,6 +28,8 @@ export default function Prayer() {
     queryFn: () => api<Daily>(`/daily?tz=${encodeURIComponent(user?.timezone ?? deviceTimeZone())}`),
   });
   const prayer = isMorning ? daily?.morningPrayer : daily?.nightPrayer;
+  // Solo el audio del idioma del fiel (US-07): si aún no está grabado, se reza con el texto.
+  const audioUrl = prayer?.audioUrl[lang];
 
   const completeMut = useMutation({
     mutationFn: () => api<{ streak: number }>("/prayers/complete", { method: "POST", body: { kind: isMorning ? "morning" : "night" } }),
@@ -55,6 +58,11 @@ export default function Prayer() {
           <View style={styles.iconWrap}>
             <Icon name={isMorning ? "sunrise" : "moon"} size={40} color={colors.gold} />
           </View>
+          {!!audioUrl && (
+            <View style={{ marginBottom: spacing.lg }}>
+              <AudioPlayer url={audioUrl} title={isMorning ? t("morningPrayer") : t("nightPrayer")} autoPlay={autoplay === "1"} tone="altar" />
+            </View>
+          )}
           <Text style={styles.prayer}>{loc(prayer)}</Text>
           <View style={{ height: spacing.xl }} />
           <AppButton testID="complete-prayer-button" label={t("amenComplete")} onPress={() => completeMut.mutate()} loading={completeMut.isPending} variant="gold" icon="check" />

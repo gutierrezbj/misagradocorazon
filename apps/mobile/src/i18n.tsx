@@ -28,6 +28,12 @@ const dict = {
   candlesLabel: { es: "velas", en: "candles" },
   votesLabel: { es: "votos", en: "votes" },
   perWeek: { es: "/sem", en: "/wk" },
+  audioPlay: { es: "Reproducir", en: "Play" },
+  audioPause: { es: "Pausar", en: "Pause" },
+  audioBack15: { es: "Retroceder 15 segundos", en: "Back 15 seconds" },
+  audioForward15: { es: "Avanzar 15 segundos", en: "Forward 15 seconds" },
+  audioProgress: { es: "Progreso del audio", en: "Audio progress" },
+  audioError: { es: "No se pudo cargar el audio.", en: "The audio could not be loaded." },
   tooFast: { es: "Espera un momento antes de volver a enviar", en: "Please wait a moment before sending again" },
   // generic
   appName: { es: "Mi Sagrado Corazón", en: "My Sacred Heart" },

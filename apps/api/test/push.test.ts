@@ -98,7 +98,7 @@ describe("recordatorios de oración", () => {
     expect(byToken.get(es.pushToken)).toMatchObject({
       title: "Oración de la mañana",
       body: "Buenos días. Tu oración de la mañana está lista.",
-      data: { url: "/prayer?kind=morning" },
+      data: { url: "/prayer?kind=morning&autoplay=1" },
       ttl: 7200,
     });
     expect(byToken.get(en.pushToken)?.title).toBe("Morning prayer");
@@ -154,7 +154,7 @@ describe("santo del día", () => {
     expect(msg).toMatchObject({
       title: "Saint of the day",
       body: `Today we celebrate ${saint.name}. Discover their story.`,
-      data: { url: "/saint/saint_guadalupe" },
+      data: { url: "/saint/saint_guadalupe?autoplay=1" },
       richContent: { image: saint.imageUrl },
     });
   });

@@ -40,6 +40,14 @@
       "expo-secure-store",
       "expo-apple-authentication",
       "expo-notifications",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": true
+        }
+      ],
       "expo-web-browser",
       "expo-status-bar",
       "@react-native-vector-icons/feather"

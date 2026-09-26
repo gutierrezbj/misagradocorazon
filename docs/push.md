@@ -8,9 +8,9 @@ Alcance de SDD-05, épica 5 (US-15, US-16, US-17), SDD-05, épica 11 (anuncio de
 
 | Aviso | Cuándo | Texto (ES) | Abre | Preferencia |
 |---|---|---|---|---|
-| Oración de la mañana | Hora de mañana del fiel, en su zona horaria | "Buenos días. Tu oración de la mañana está lista." | Oración de la mañana | `notifyMorning` |
-| Oración de la noche | Hora de noche del fiel | "Hora de dar gracias. Tu oración de la noche está lista." | Oración de la noche | `notifyNight` |
-| Santo del día | 07:00 locales, si hay contenido del día con santo | "Hoy celebramos a [Santo]. Conoce su historia." (con imagen) | Ficha del santo | `notifySaint` |
+| Oración de la mañana | Hora de mañana del fiel, en su zona horaria | "Buenos días. Tu oración de la mañana está lista." | Oración de la mañana, con el audio en marcha si existe | `notifyMorning` |
+| Oración de la noche | Hora de noche del fiel | "Hora de dar gracias. Tu oración de la noche está lista." | Oración de la noche, con el audio en marcha si existe | `notifyNight` |
+| Santo del día | 07:00 locales, si hay contenido del día con santo | "Hoy celebramos a [Santo]. Conoce su historia." (con imagen) | Ficha del santo, con el audio en marcha si existe | `notifySaint` |
 | Causa ganadora | Día 8, al cerrar la votación | "La comunidad ha elegido: [causa]." | Causas | `notifyCommunity` |
 | Avisos del equipo | Al enviarlos desde el panel (Notificaciones), rol editor o superior | El que escriba el equipo, en ES y EN | Altar | `notifyCommunity` |
 

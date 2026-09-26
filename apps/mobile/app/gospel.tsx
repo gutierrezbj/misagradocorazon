@@ -10,13 +10,14 @@ import { useAuth } from "@/src/auth";
 import type { Daily } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
+import { AudioPlayer } from "@/src/components/AudioPlayer";
 
 export default function Gospel() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { t, loc } = useI18n();
+  const { t, loc, lang } = useI18n();
 
   const { user } = useAuth();
   const { data: daily, isLoading } = useQuery({
@@ -43,6 +44,11 @@ export default function Gospel() {
           <Text style={styles.gospel}>{loc(daily?.gospel)}</Text>
           <View style={styles.divider} />
           <Text style={styles.medLabel}>{t("meditation")}</Text>
+          {!!daily?.meditation.audioUrl[lang] && (
+            <View style={{ marginBottom: spacing.md }}>
+              <AudioPlayer url={daily.meditation.audioUrl[lang]!} title={t("meditation")} />
+            </View>
+          )}
           <Text style={styles.meditation}>{loc(daily?.meditation)}</Text>
         </ScrollView>
       )}

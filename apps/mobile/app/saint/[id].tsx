@@ -11,14 +11,15 @@ import { api } from "@/src/api";
 import type { Saint } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon } from "@/src/components/ui";
+import { AudioPlayer } from "@/src/components/AudioPlayer";
 
 export default function SaintDetail() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { t, loc } = useI18n();
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t, loc, lang } = useI18n();
+  const { id, autoplay } = useLocalSearchParams<{ id: string; autoplay?: string }>();
 
   const { data: saint, isLoading } = useQuery({ queryKey: ["saint", id], queryFn: () => api<Saint>(`/saints/${id}`) });
 
@@ -47,6 +48,11 @@ export default function SaintDetail() {
           </View>
 
           <View style={styles.body}>
+            {!!saint.audioUrl[lang] && (
+              <View style={{ marginBottom: spacing.lg }}>
+                <AudioPlayer url={saint.audioUrl[lang]!} title={saint.name} artworkUrl={saint.imageUrl} autoPlay={autoplay === "1"} />
+              </View>
+            )}
             <Section title={t("history")} text={loc(saint.history)} />
             {!!loc(saint.patronages) && <Section title={t("patronages")} text={loc(saint.patronages)} />}
             {!!loc(saint.prayer) && (
