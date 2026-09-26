@@ -67,3 +67,50 @@ export type PushCampaigns = {
     recipients: number | null;
   }[];
 };
+
+export type AdminSaint = {
+  id: string;
+  name: string;
+  feastDate: string;
+  imageUrl: string;
+  audioUrlEs: string | null;
+  audioUrlEn: string | null;
+  historyEs: string;
+  historyEn: string;
+  patronagesEs: string;
+  patronagesEn: string;
+  prayerEs: string;
+  prayerEn: string;
+  isPatronCatalog: boolean;
+  sortOrder: number;
+  deletedAt: string | null;
+};
+
+type LangFlags = { es: boolean; en: boolean };
+export type DailyDay = {
+  date: string;
+  filled: boolean;
+  saintOfDay: string | null;
+  gospelRef: string | null;
+  audio: { morning: LangFlags; night: LangFlags; meditation: LangFlags } | null;
+};
+
+export type DailyRow = {
+  date: string;
+  saintOfDayId: string | null;
+  gospelRef: string;
+  gospelEs: string;
+  gospelEn: string;
+  meditationEs: string;
+  meditationEn: string;
+  morningPrayerEs: string;
+  morningPrayerEn: string;
+  nightPrayerEs: string;
+  nightPrayerEn: string;
+  meditationAudioUrlEs: string | null;
+  meditationAudioUrlEn: string | null;
+  morningAudioUrlEs: string | null;
+  morningAudioUrlEn: string | null;
+  nightAudioUrlEs: string | null;
+  nightAudioUrlEn: string | null;
+};

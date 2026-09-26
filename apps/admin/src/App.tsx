@@ -4,11 +4,13 @@ import { can, isStaff, useAuth } from "./auth.tsx";
 import { Layout } from "./components/Layout.tsx";
 import { useI18n } from "./i18n.tsx";
 import { Causes } from "./pages/Causes.tsx";
+import { Daily } from "./pages/Daily.tsx";
 import { Dashboard } from "./pages/Dashboard.tsx";
 import { Forbidden, Login } from "./pages/Login.tsx";
 import { Masses } from "./pages/Masses.tsx";
 import { Moderation } from "./pages/Moderation.tsx";
 import { Notifications } from "./pages/Notifications.tsx";
+import { Saints } from "./pages/Saints.tsx";
 import { Users } from "./pages/Users.tsx";
 
 export function App() {
@@ -23,6 +25,8 @@ export function App() {
       <Route element={<Layout />}>
         <Route index element={<Dashboard />} />
         {can(me, "moderator") && <Route path="moderacion" element={<Moderation />} />}
+        {can(me, "editor") && <Route path="contenido" element={<Daily />} />}
+        {can(me, "editor") && <Route path="santoral" element={<Saints />} />}
         {can(me, "editor") && <Route path="causas" element={<Causes />} />}
         {can(me, "editor") && <Route path="misas" element={<Masses />} />}
         {can(me, "editor") && <Route path="notificaciones" element={<Notifications />} />}

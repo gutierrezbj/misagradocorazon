@@ -9,6 +9,8 @@ export function Layout() {
   const links: { to: string; label: I18nKey; show: boolean }[] = [
     { to: "/", label: "navDashboard", show: true },
     { to: "/moderacion", label: "navModeration", show: can(me, "moderator") },
+    { to: "/contenido", label: "navDaily", show: can(me, "editor") },
+    { to: "/santoral", label: "navSaints", show: can(me, "editor") },
     { to: "/causas", label: "navCauses", show: can(me, "editor") },
     { to: "/misas", label: "navMasses", show: can(me, "editor") },
     { to: "/notificaciones", label: "navNotifications", show: can(me, "editor") },

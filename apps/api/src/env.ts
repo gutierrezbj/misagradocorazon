@@ -21,6 +21,13 @@ const envSchema = z.object({
   APPLE_BUNDLE_ID: z.string().min(1).optional(),
   // Push: token de acceso de Expo, solo si se activa "enhanced security" en la cuenta de Expo.
   EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
+  // Cloudflare R2 (medios: imágenes y audio). Cuenta a nombre del fundador. Sin ellas, el panel
+  // no sube ficheros (se pueden pegar URLs). R2_PUBLIC_BASE_URL: dominio público del bucket.
+  R2_ACCOUNT_ID: z.string().min(1).optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET: z.string().min(1).optional(),
+  R2_PUBLIC_BASE_URL: z.url().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

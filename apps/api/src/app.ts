@@ -8,6 +8,7 @@ import { errorHandler, ok } from "./http.ts";
 import { adminRouter } from "./modules/admin/routes.ts";
 import { candlesRouter } from "./modules/candles/routes.ts";
 import { causasRouter } from "./modules/causas/routes.ts";
+import { contentRouter } from "./modules/content/routes.ts";
 import { misaRouter } from "./modules/misa/routes.ts";
 import { pushRouter } from "./modules/push/routes.ts";
 import { ritualRouter } from "./modules/ritual/routes.ts";
@@ -35,6 +36,7 @@ export function createApp() {
   app.use("/api", causasRouter);
   app.use("/api", pushRouter);
   app.use("/api", adminRouter);
+  app.use("/api", contentRouter);
 
   app.use(errorHandler);
   return app;
