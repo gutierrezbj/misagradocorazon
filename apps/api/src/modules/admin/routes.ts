@@ -7,6 +7,7 @@ import {
   massInputSchema,
   moderationDecisionSchema,
   moderationWordSchema,
+  ROLES,
 } from "@msc/shared";
 import { z } from "zod";
 
@@ -21,6 +22,7 @@ import { causeDto } from "../causas/service.ts";
 import { getIo, roomOf } from "../misa/chat.ts";
 import { massDto } from "../misa/service.ts";
 import { normalizeText } from "../moderation/filter.ts";
+import { computeKpis } from "./kpis.ts";
 
 export const adminRouter = Router();
 
@@ -184,4 +186,68 @@ adminRouter.post("/admin/causes/:id/transfers", ...superadmin, async (req, res) 
     return entry;
   });
   ok(res, { ledgerEntryId: result.id }, 201);
+});
+
+// --- KPIs --------------------------------------------------------------------
+
+const kpiQuery = z.object({ days: z.coerce.number().int().min(1).max(365).default(30) });
+
+// Métricas del negocio: cualquier miembro del staff las ve.
+adminRouter.get("/admin/kpis", ...requireRole("moderator", "editor"), async (req, res) => {
+  const { days } = kpiQuery.parse(req.query);
+  ok(res, await computeKpis(days));
+});
+
+// --- Misas (listado) -----------------------------------------------------------
+
+adminRouter.get("/admin/masses", ...editor, async (_req, res) => {
+  const masses = await prisma.mass.findMany({ orderBy: { scheduledAt: "desc" }, take: 100 });
+  ok(res, masses.map((m) => massDto(m)));
+});
+
+// --- Usuarios y roles (solo superadmin) ------------------------------------------
+
+const userQuery = z.object({ search: z.string().trim().max(100).optional() });
+
+adminRouter.get("/admin/users", ...superadmin, async (req, res) => {
+  const { search } = userQuery.parse(req.query);
+  const users = await prisma.user.findMany({
+    where: search
+      ? { OR: [{ email: { contains: search, mode: "insensitive" } }, { name: { contains: search, mode: "insensitive" } }] }
+      : {},
+    orderBy: { createdAt: "desc" },
+    take: 100,
+    select: { id: true, name: true, email: true, role: true, blocked: true, onboarded: true, createdAt: true },
+  });
+  ok(res, users);
+});
+
+const userPatchSchema = z
+  .object({ role: z.enum(ROLES).optional(), blocked: z.boolean().optional() })
+  .refine((v) => v.role !== undefined || v.blocked !== undefined, "Nada que cambiar");
+
+adminRouter.patch("/admin/users/:id", ...superadmin, async (req, res) => {
+  const actor = currentUser(req);
+  const input = userPatchSchema.parse(req.body);
+  const targetId = pathParam(req, "id");
+  if (targetId === actor.id) throw new HttpError(409, "self_change", "No puedes cambiar tu propio rol ni bloquearte");
+  const updated = await prisma.$transaction(async (tx) => {
+    const target = await tx.user.findUnique({ where: { id: targetId } });
+    if (!target) throw notFound("Usuario");
+    // Nunca dejar el sistema sin superadmin activo.
+    const losesSuperadmin = target.role === "superadmin" && (input.role !== undefined && input.role !== "superadmin" || input.blocked === true);
+    if (losesSuperadmin) {
+      const others = await tx.user.count({ where: { role: "superadmin", blocked: false, id: { not: target.id } } });
+      if (others === 0) throw new HttpError(409, "last_superadmin", "Debe quedar al menos un superadmin activo");
+    }
+    const u = await tx.user.update({ where: { id: target.id }, data: input });
+    await audit(tx, actor.id, "user.update", "user", target.id, {
+      from: { role: target.role, blocked: target.blocked },
+      to: { role: u.role, blocked: u.blocked },
+    });
+    return u;
+  });
+  // Bloquear corta las sesiones abiertas.
+  if (input.blocked) await prisma.session.deleteMany({ where: { userId: updated.id } });
+  ok(res, { id: updated.id, role: updated.role, blocked: updated.blocked });
 });

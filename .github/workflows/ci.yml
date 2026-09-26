@@ -38,3 +38,5 @@ jobs:
         run: pnpm lint
       - name: Tests
         run: pnpm test
+      - name: Build del panel
+        run: pnpm --filter @msc/admin build

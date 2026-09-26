@@ -14,7 +14,7 @@ App móvil católica para la comunidad hispana (EE. UU. + México). Tres pilares
 apps/
   mobile/        App Expo + React Native (iOS, Android, web)
   api/           API Node + TypeScript + PostgreSQL (en construcción, sustituye a backend/)
-  admin/         Panel de gestión web (pendiente)
+  admin/         Panel de gestión web (React + Vite): KPIs, moderación, causas, misas, usuarios
 packages/
   shared/        Constantes de dominio y esquemas de validación compartidos
 backend/         Backend provisional del prototipo (FastAPI + MongoDB), congelado
@@ -34,6 +34,7 @@ La arquitectura objetivo y las reglas de trabajo están en `CLAUDE.md`. Los SDD 
 pnpm install
 cp .env.example apps/mobile/.env   # rellenar EXPO_PUBLIC_BACKEND_URL
 pnpm mobile                        # arranca Expo
+pnpm --filter @msc/admin dev       # panel en http://localhost:5173 (proxy /api → localhost:8001)
 ```
 
 Comprobaciones (las mismas que ejecuta el CI en cada PR):
