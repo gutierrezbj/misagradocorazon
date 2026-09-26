@@ -1,0 +1,237 @@
+// Modelo de datos de Mi Sagrado Corazón (SDD-03, 26-sep-2026).
+// Bloque 1: autenticación (tablas de Better Auth), perfil, santos, contenido diario,
+// oraciones, velas y libro de movimientos. Muro, misa y causas llegan en bloques siguientes.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  user
+  moderator
+  editor
+  superadmin
+}
+
+enum Locale {
+  es
+  en
+}
+
+enum CandleType {
+  basic
+  solemn
+  permanent
+}
+
+enum CandleCategory {
+  general
+  difuntos
+}
+
+enum PrayerKind {
+  morning
+  night
+}
+
+enum LedgerEntryType {
+  purchase
+  impact_allocation
+  transfer
+}
+
+// ---------------------------------------------------------------------------
+// Autenticación (Better Auth). Nombres de campos fijados por la librería.
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String   @id
+  name          String
+  email         String   @unique
+  emailVerified Boolean  @default(false)
+  image         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  role    Role    @default(user)
+  blocked Boolean @default(false)
+
+  // Perfil devocional (onboarding)
+  onboarded         Boolean  @default(false)
+  patronSaintId     String?
+  secondarySaintIds String[] @default([])
+  language          Locale   @default(es)
+  timezone          String   @default("America/Mexico_City")
+  morningTime       String   @default("07:30")
+  angelusTime       String   @default("12:00")
+  nightTime         String   @default("21:30")
+
+  patronSaint Saint?      @relation("PatronSaint", fields: [patronSaintId], references: [id])
+  sessions    Session[]
+  accounts    Account[]
+  candles     Candle[]
+  prayerLogs  PrayerLog[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---------------------------------------------------------------------------
+// Ritual diario
+// ---------------------------------------------------------------------------
+
+model Saint {
+  id              String   @id
+  name            String
+  feastDate       String   // MM-DD
+  imageUrl        String
+  audioUrlEs      String?
+  audioUrlEn      String?
+  historyEs       String
+  historyEn       String
+  patronagesEs    String
+  patronagesEn    String
+  prayerEs        String
+  prayerEn        String
+  isPatronCatalog Boolean  @default(false)
+  sortOrder       Int      @default(100)
+  deletedAt       DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  patronOf   User[]         @relation("PatronSaint")
+  candles    Candle[]
+  dailyItems DailyContent[]
+
+  @@map("saint")
+}
+
+model DailyContent {
+  date              String  @id // YYYY-MM-DD
+  saintOfDayId      String?
+  gospelRef         String
+  gospelEs          String
+  gospelEn          String
+  meditationEs      String
+  meditationEn      String
+  meditationAudioUrl String?
+  morningPrayerEs   String
+  morningPrayerEn   String
+  nightPrayerEs     String
+  nightPrayerEn     String
+  morningAudioUrl   String?
+  nightAudioUrl     String?
+  updatedAt         DateTime @updatedAt
+
+  saintOfDay Saint? @relation(fields: [saintOfDayId], references: [id])
+
+  @@map("daily_content")
+}
+
+model PrayerLog {
+  id        String     @id @default(uuid())
+  userId    String
+  localDate String     // YYYY-MM-DD en la zona horaria del usuario
+  kind      PrayerKind
+  createdAt DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, localDate, kind])
+  @@index([userId, localDate])
+  @@map("prayer_log")
+}
+
+// ---------------------------------------------------------------------------
+// Vela y dinero
+// ---------------------------------------------------------------------------
+
+model Candle {
+  id                 String         @id @default(uuid())
+  userId             String
+  saintId            String
+  intentionEncrypted String         // AES-256-GCM (GDPR art. 9)
+  type               CandleType
+  category           CandleCategory @default(general)
+  priceCents         Int
+  paymentProvider    String
+  paymentRef         String         @unique
+  litAt              DateTime       @default(now())
+  expiresAt          DateTime
+
+  user   User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  saint  Saint         @relation(fields: [saintId], references: [id])
+  ledger LedgerEntry[]
+
+  @@index([userId, litAt])
+  @@index([expiresAt])
+  @@map("candle")
+}
+
+// Libro de movimientos de solo inserción (ADR-015). Nunca se actualiza ni se borra.
+model LedgerEntry {
+  id          String          @id @default(uuid())
+  type        LedgerEntryType
+  amountCents Int
+  month       String          // YYYY-MM
+  candleId    String?
+  causeId     String?
+  note        String?
+  createdAt   DateTime        @default(now())
+
+  candle Candle? @relation(fields: [candleId], references: [id])
+
+  @@index([month, type])
+  @@map("ledger_entry")
+}

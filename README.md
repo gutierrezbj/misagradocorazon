@@ -13,7 +13,7 @@ App móvil católica para la comunidad hispana (EE. UU. + México). Tres pilares
 ```
 apps/
   mobile/        App Expo + React Native (iOS, Android, web)
-  api/           API Node + TypeScript + PostgreSQL (pendiente, sustituye a backend/)
+  api/           API Node + TypeScript + PostgreSQL (en construcción, sustituye a backend/)
   admin/         Panel de gestión web (pendiente)
 packages/
   shared/        Constantes de dominio y esquemas de validación compartidos

@@ -15,8 +15,19 @@ export const onboardingSchema = z.object({
   angelusTime: hhmm.default("12:00"),
   nightTime: hhmm.default("21:30"),
   language: localeSchema.default("es"),
+  // Zona horaria IANA del dispositivo (p. ej. "America/Los_Angeles"); define el "hoy" del fiel.
+  timezone: z.string().min(1).max(64).optional(),
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
+
+export const profileUpdateSchema = onboardingSchema
+  .omit({ patronSaintId: true })
+  .extend({ patronSaintId: z.string().min(1) })
+  .partial();
+export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
+
+export const prayerCompleteSchema = z.object({ kind: z.enum(["morning", "night"]) });
+export type PrayerCompleteInput = z.infer<typeof prayerCompleteSchema>;
 
 export const lightCandleSchema = z.object({
   saintId: z.string().min(1),

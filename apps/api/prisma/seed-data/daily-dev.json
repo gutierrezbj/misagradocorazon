@@ -1,0 +1,18 @@
+{
+  "_comment": "Contenido de ejemplo para desarrollo. En producción lo carga el equipo desde el panel.",
+  "saintRotation": [
+    "saint_corazon",
+    "saint_guadalupe"
+  ],
+  "template": {
+    "gospelRef": "Jn 15, 9-17",
+    "gospelEs": "Como el Padre me amó, así os he amado yo; permaneced en mi amor. Este es mi mandamiento: que os améis unos a otros como yo os he amado. Nadie tiene amor más grande que el que da la vida por sus amigos.",
+    "gospelEn": "As the Father has loved me, so have I loved you; abide in my love. This is my commandment: love one another as I have loved you. No one has greater love than to lay down one's life for one's friends.",
+    "meditationEs": "El amor de Cristo no es una idea, es una entrega concreta. Hoy, ¿a quién puedes amar con hechos? Deja que el Corazón de Jesús ensanche el tuyo y encuentra en la caridad tu descanso.",
+    "meditationEn": "Christ's love is not an idea but a concrete gift of self. Today, whom can you love through actions? Let the Heart of Jesus enlarge your own and find your rest in charity.",
+    "morningPrayerEs": "Señor, te ofrezco este día: mis pensamientos, palabras y obras. Que todo lo que haga sea para tu gloria y el bien de los demás. Amén.",
+    "morningPrayerEn": "Lord, I offer you this day: my thoughts, words, and works. May all I do be for your glory and the good of others. Amen.",
+    "nightPrayerEs": "Gracias, Señor, por este día. Perdona mis faltas, protege a los que amo y concédeme un descanso en tu paz. Amén.",
+    "nightPrayerEn": "Thank you, Lord, for this day. Forgive my faults, protect those I love, and grant me rest in your peace. Amen."
+  }
+}
