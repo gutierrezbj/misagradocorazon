@@ -47,3 +47,52 @@ export const chatMessageSchema = z.object({
   text: z.string().trim().min(1).max(300),
 });
 export type ChatMessageInput = z.infer<typeof chatMessageSchema>;
+
+export const privateIntentionSchema = z.object({
+  text: z.string().trim().min(1).max(500),
+});
+export type PrivateIntentionInput = z.infer<typeof privateIntentionSchema>;
+
+export const moderationDecisionSchema = z.object({
+  action: z.enum(["approve", "hide"]),
+  reason: z.string().trim().max(300).optional(),
+});
+export type ModerationDecisionInput = z.infer<typeof moderationDecisionSchema>;
+
+export const moderationWordSchema = z.object({
+  word: z.string().trim().min(2).max(60),
+});
+
+const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Formato YYYY-MM");
+
+export const causeInputSchema = z.object({
+  month: yearMonth,
+  nameEs: z.string().trim().min(1).max(120),
+  nameEn: z.string().trim().min(1).max(120),
+  location: z.string().trim().min(1).max(120),
+  responsible: z.string().trim().min(1).max(120),
+  descriptionEs: z.string().trim().min(1).max(4000),
+  descriptionEn: z.string().trim().min(1).max(4000),
+  budgetCents: z.number().int().positive(),
+  photos: z.array(z.url()).max(12).default([]),
+  timeline: z.string().trim().min(1).max(120),
+});
+export type CauseInput = z.infer<typeof causeInputSchema>;
+
+export const causeUpdateInputSchema = z.object({
+  textEs: z.string().trim().min(1).max(2000),
+  textEn: z.string().trim().min(1).max(2000),
+  photoUrl: z.url().optional(),
+});
+export type CauseUpdateInput = z.infer<typeof causeUpdateInputSchema>;
+
+export const massInputSchema = z.object({
+  titleEs: z.string().trim().min(1).max(160),
+  titleEn: z.string().trim().min(1).max(160),
+  youtubeUrl: z.url(),
+  scheduledAt: z.iso.datetime({ offset: true }),
+  durationMin: z.number().int().min(15).max(480).default(120),
+  isSpecial: z.boolean().default(false),
+  recordingUrl: z.url().optional(),
+});
+export type MassInput = z.infer<typeof massInputSchema>;
