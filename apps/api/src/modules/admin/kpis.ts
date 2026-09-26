@@ -28,7 +28,7 @@ export async function computeKpis(days: number, now = new Date()) {
     `SELECT count(*) AS total,
             count(*) FILTER (WHERE "createdAt" >= $1) AS new_users,
             count(*) FILTER (WHERE onboarded) AS onboarded
-       FROM "user" WHERE role = 'user'`,
+       FROM "user" WHERE role = 'user' AND "deletedAt" IS NULL`,
     since,
   );
 
@@ -48,7 +48,7 @@ export async function computeKpis(days: number, now = new Date()) {
     const [r] = await prisma.$queryRawUnsafe<{ cohort: bigint; retained: bigint }[]>(
       `WITH cohort AS (
          SELECT id, "createdAt" FROM "user"
-          WHERE role = 'user' AND "createdAt" <= $1 AND "createdAt" > $2
+          WHERE role = 'user' AND "deletedAt" IS NULL AND "createdAt" <= $1 AND "createdAt" > $2
        )
        SELECT count(*) AS cohort,
               count(*) FILTER (WHERE EXISTS (

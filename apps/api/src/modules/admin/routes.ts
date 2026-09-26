@@ -214,9 +214,10 @@ const userQuery = z.object({ search: z.string().trim().max(100).optional() });
 adminRouter.get("/admin/users", ...superadmin, async (req, res) => {
   const { search } = userQuery.parse(req.query);
   const users = await prisma.user.findMany({
-    where: search
-      ? { OR: [{ email: { contains: search, mode: "insensitive" } }, { name: { contains: search, mode: "insensitive" } }] }
-      : {},
+    where: {
+      deletedAt: null,
+      ...(search && { OR: [{ email: { contains: search, mode: "insensitive" } }, { name: { contains: search, mode: "insensitive" } }] }),
+    },
     orderBy: { createdAt: "desc" },
     take: 100,
     select: { id: true, name: true, email: true, role: true, blocked: true, onboarded: true, createdAt: true },

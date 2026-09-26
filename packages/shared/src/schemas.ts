@@ -187,3 +187,6 @@ export const dailyContentInputSchema = z.object({
   nightAudioUrlEn: optionalUrl,
 });
 export type DailyContentInput = z.infer<typeof dailyContentInputSchema>;
+
+// Borrado de cuenta (SDD-02, transversal): confirmación explícita desde la app.
+export const accountDeleteSchema = z.object({ confirm: z.literal(true) });
