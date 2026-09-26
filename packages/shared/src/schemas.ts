@@ -121,3 +121,69 @@ export const pushCampaignSchema = z.object({
   bodyEn: z.string().trim().min(1).max(180),
 });
 export type PushCampaignInput = z.infer<typeof pushCampaignSchema>;
+
+// --- Gestión de contenido (panel) -------------------------------------------
+
+// Subidas a R2: tipos y tamaños admitidos. El audio lo graba el equipo (MP3 o M4A).
+export const UPLOAD_RULES = {
+  image: { maxBytes: 5 * 1024 * 1024, types: { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" } },
+  audio: {
+    maxBytes: 50 * 1024 * 1024,
+    types: { "audio/mpeg": "mp3", "audio/mp4": "m4a", "audio/x-m4a": "m4a", "audio/aac": "aac" },
+  },
+} as const;
+export type UploadKind = keyof typeof UPLOAD_RULES;
+
+export const uploadRequestSchema = z
+  .object({
+    kind: z.enum(["image", "audio"]),
+    contentType: z.string().min(1),
+    size: z.number().int().positive(),
+  })
+  .superRefine((v, ctx) => {
+    const rule = UPLOAD_RULES[v.kind];
+    if (!(v.contentType in rule.types)) ctx.addIssue({ code: "custom", path: ["contentType"], message: "Tipo de fichero no admitido" });
+    if (v.size > rule.maxBytes) ctx.addIssue({ code: "custom", path: ["size"], message: "Fichero demasiado grande" });
+  });
+export type UploadRequest = z.infer<typeof uploadRequestSchema>;
+
+const httpsUrl = z.url({ protocol: /^https?$/ });
+const optionalUrl = httpsUrl.nullable().optional();
+
+export const saintInputSchema = z.object({
+  name: z.string().trim().min(1).max(120),
+  feastDate: z.string().regex(/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, "Formato MM-DD"),
+  imageUrl: httpsUrl,
+  audioUrlEs: optionalUrl,
+  audioUrlEn: optionalUrl,
+  historyEs: z.string().trim().min(1).max(5000),
+  historyEn: z.string().trim().min(1).max(5000),
+  patronagesEs: z.string().trim().max(500).default(""),
+  patronagesEn: z.string().trim().max(500).default(""),
+  prayerEs: z.string().trim().max(3000).default(""),
+  prayerEn: z.string().trim().max(3000).default(""),
+  isPatronCatalog: z.boolean().default(false),
+  sortOrder: z.number().int().min(0).max(10000).default(100),
+});
+export type SaintInput = z.infer<typeof saintInputSchema>;
+export const saintUpdateSchema = saintInputSchema.partial();
+
+export const dailyContentInputSchema = z.object({
+  saintOfDayId: z.string().min(1).nullable().optional(),
+  gospelRef: z.string().trim().min(1).max(120),
+  gospelEs: z.string().trim().min(1).max(8000),
+  gospelEn: z.string().trim().min(1).max(8000),
+  meditationEs: z.string().trim().min(1).max(8000),
+  meditationEn: z.string().trim().min(1).max(8000),
+  morningPrayerEs: z.string().trim().min(1).max(3000),
+  morningPrayerEn: z.string().trim().min(1).max(3000),
+  nightPrayerEs: z.string().trim().min(1).max(3000),
+  nightPrayerEn: z.string().trim().min(1).max(3000),
+  meditationAudioUrlEs: optionalUrl,
+  meditationAudioUrlEn: optionalUrl,
+  morningAudioUrlEs: optionalUrl,
+  morningAudioUrlEn: optionalUrl,
+  nightAudioUrlEs: optionalUrl,
+  nightAudioUrlEn: optionalUrl,
+});
+export type DailyContentInput = z.infer<typeof dailyContentInputSchema>;
