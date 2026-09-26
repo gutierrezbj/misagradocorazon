@@ -5,13 +5,19 @@ import { bearer } from "better-auth/plugins/bearer";
 import { prisma } from "./db.ts";
 import { env } from "./env.ts";
 
-const socialProviders: Record<string, { clientId: string; clientSecret: string }> = {};
-if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
-  socialProviders.google = { clientId: env.GOOGLE_CLIENT_ID, clientSecret: env.GOOGLE_CLIENT_SECRET };
-}
-if (env.APPLE_CLIENT_ID && env.APPLE_CLIENT_SECRET) {
-  socialProviders.apple = { clientId: env.APPLE_CLIENT_ID, clientSecret: env.APPLE_CLIENT_SECRET };
-}
+// Solo se activan los proveedores con credenciales. Los dos entran por ID token nativo
+// (POST /api/auth/sign-in/social con idToken): sin redirecciones ni cookies, encaja con el token Bearer.
+const socialProviders = {
+  ...(env.GOOGLE_CLIENT_ID && {
+    google: {
+      clientId: env.GOOGLE_CLIENT_ID,
+      ...(env.GOOGLE_CLIENT_SECRET && { clientSecret: env.GOOGLE_CLIENT_SECRET }),
+    },
+  }),
+  ...(env.APPLE_BUNDLE_ID && {
+    apple: { clientId: env.APPLE_BUNDLE_ID, appBundleIdentifier: env.APPLE_BUNDLE_ID },
+  }),
+};
 
 export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
@@ -21,6 +27,16 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, { provider: "postgresql" }),
   emailAndPassword: { enabled: true, minPasswordLength: 8 },
   socialProviders,
+  account: {
+    accountLinking: {
+      enabled: true,
+      // Google y Apple verifican el email. Aun así, Better Auth solo enlaza con una cuenta
+      // de email y contraseña si esa cuenta tiene el email verificado (evita el secuestro
+      // de cuentas pre-registradas). Sin verificación de email en el MVP, esa persona
+      // recibe OAUTH_LINK_ERROR y entra con su contraseña.
+      trustedProviders: ["google", "apple"],
+    },
+  },
   user: {
     additionalFields: {
       // input: false → el cliente no puede fijar su propio rol ni desbloquearse.

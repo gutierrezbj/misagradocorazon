@@ -48,6 +48,7 @@ Respuesta estándar `{ data, error }`. La sesión se envía como `Authorization:
 | GET | `/api/health` | — | Estado |
 | POST | `/api/auth/sign-up/email` | — | Registro (Better Auth) |
 | POST | `/api/auth/sign-in/email` | — | Login (Better Auth) |
+| POST | `/api/auth/sign-in/social` | — | Login con Google o Apple por ID token nativo (`docs/login-social.md`) |
 | GET | `/api/me` | ✔ | Perfil y racha |
 | PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria |
 | PATCH | `/api/me` | ✔ | Actualizar perfil |

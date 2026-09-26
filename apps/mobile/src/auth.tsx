@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 import { api, authRequest, clearToken, loadToken, signOutRequest } from "@/src/api";
+import { signInWithApple, signInWithGoogle, socialSignOut, type SocialProvider } from "@/src/social";
 import type { User } from "@/src/types";
 
 export type { User } from "@/src/types";
@@ -10,6 +11,8 @@ type AuthCtx = {
   loading: boolean;
   register: (email: string, password: string, name: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
+  /** false si la persona cancela en la pantalla de Google o Apple. */
+  loginWithProvider: (provider: SocialProvider) => Promise<boolean>;
   logout: () => Promise<void>;
   refresh: () => Promise<void>;
   setUser: (u: User) => void;
@@ -53,14 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [refresh],
   );
 
+  const loginWithProvider = useCallback(
+    async (provider: SocialProvider) => {
+      const cred = provider === "google" ? await signInWithGoogle() : await signInWithApple();
+      if (!cred) return false;
+      await authRequest("/auth/sign-in/social", cred);
+      await refresh();
+      return true;
+    },
+    [refresh],
+  );
+
   const logout = useCallback(async () => {
     await signOutRequest();
+    await socialSignOut();
     await clearToken();
     setUserState(null);
   }, []);
 
   return (
-    <Ctx.Provider value={{ user, loading, register, login, logout, refresh, setUser: setUserState }}>
+    <Ctx.Provider value={{ user, loading, register, login, loginWithProvider, logout, refresh, setUser: setUserState }}>
       {children}
     </Ctx.Provider>
   );

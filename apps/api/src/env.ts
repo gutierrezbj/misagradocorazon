@@ -13,10 +13,12 @@ const envSchema = z.object({
   INTENTIONS_KEY: z
     .string()
     .refine((v) => Buffer.from(v, "base64").length === 32, "INTENTIONS_KEY debe ser 32 bytes en base64"),
-  GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  APPLE_CLIENT_ID: z.string().optional(),
-  APPLE_CLIENT_SECRET: z.string().optional(),
+  // Login con Google: ID de cliente OAuth de tipo "web". La app nativa pide el ID token con él,
+  // así que es la audiencia que se verifica. El secreto no hace falta para el login nativo.
+  GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+  GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+  // Login con Apple nativo (iOS): bundle ID de la app, audiencia del ID token de Apple.
+  APPLE_BUNDLE_ID: z.string().min(1).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;
