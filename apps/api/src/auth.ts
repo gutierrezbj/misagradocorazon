@@ -4,6 +4,7 @@ import { bearer } from "better-auth/plugins/bearer";
 
 import { prisma } from "./db.ts";
 import { env } from "./env.ts";
+import { CLIENT_IP_HEADER } from "./middleware/limits.ts";
 
 // Solo se activan los proveedores con credenciales. Los dos entran por ID token nativo
 // (POST /api/auth/sign-in/social con idToken): sin redirecciones ni cookies, encaja con el token Bearer.
@@ -44,6 +45,8 @@ export const auth = betterAuth({
       blocked: { type: "boolean", defaultValue: false, input: false },
     },
   },
+  // IP real del cliente, resuelta por Express tras el proxy (ver middleware/limits.ts).
+  advanced: { ipAddress: { ipAddressHeaders: [CLIENT_IP_HEADER] } },
   // La app móvil envía la sesión como "Authorization: Bearer <token>" (cabecera set-auth-token).
   plugins: [bearer()],
 });
