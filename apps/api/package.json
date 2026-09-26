@@ -12,7 +12,8 @@
     "db:seed": "prisma db seed",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "worker": "tsx src/jobs/worker.ts"
+    "worker": "tsx src/jobs/worker.ts",
+    "staff:create": "tsx src/cli/create-staff.ts"
   },
   "dependencies": {
     "@msc/shared": "workspace:*",
