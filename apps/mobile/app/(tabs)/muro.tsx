@@ -124,7 +124,7 @@ export default function Muro() {
 
       {/* FAB */}
       <Pressable
-        testID="new-intention-fab"
+        testID="new-intention-fab" accessibilityRole="button" accessibilityLabel={t("shareIntention")}
         onPress={() => setModal(true)}
         style={[styles.fab, { bottom: bottomChrome + 16 }]}
       >

@@ -112,7 +112,7 @@ const useStyles = makeStyles((c) => ({
   back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onSurface },
   privacy: { flexDirection: "row", gap: spacing.sm, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md },
-  privacyText: { flex: 1, fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: c.onSurfaceSecondary },
+  privacyText: { flex: 1, fontFamily: fonts.body, fontSize: 16, lineHeight: 22, color: c.onSurfaceSecondary },
   input: { minHeight: 110, borderWidth: 1, borderColor: c.border, borderRadius: radius.md, padding: spacing.md, fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: c.onSurface, backgroundColor: c.surfaceSecondary, textAlignVertical: "top" },
   counter: { alignSelf: "flex-end", fontFamily: fonts.body, fontSize: 14, color: c.muted, marginVertical: spacing.xs },
   empty: { fontFamily: fonts.body, fontSize: 16, color: c.muted, textAlign: "center", marginTop: spacing.lg },

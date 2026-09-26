@@ -196,6 +196,12 @@ const dict = {
   privacy: { es: "Política de privacidad", en: "Privacy policy" },
   terms: { es: "Términos de uso", en: "Terms of use" },
   support: { es: "Soporte", en: "Support" },
+  // pantalla de error (fuera del proveedor de i18n)
+  errorTitle: { es: "Algo ha fallado", en: "Something went wrong" },
+  errorMessage: { es: "Vuelve a abrir la app para continuar.", en: "Please reload the app to continue." },
+  errorReload: { es: "Volver a abrir", en: "Reload app" },
+  errorShowDetails: { es: "Ver detalles", en: "Show details" },
+  errorHideDetails: { es: "Ocultar detalles", en: "Hide details" },
   // analítica de uso con consentimiento (ADR-011)
   analyticsConsent: { es: "Ayúdanos a mejorar la app", en: "Help us improve the app" },
   analyticsConsentHint: {
@@ -233,8 +239,17 @@ type Key = keyof typeof dict;
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (k: Key) => string; loc: (obj: any) => string };
 const Ctx = createContext<I18nCtx | null>(null);
 
+// Último idioma activo, para lo que se pinta fuera del proveedor (la pantalla de error).
+let activeLang: Lang = "es";
+export function translate(k: Key, lang: Lang = activeLang): string {
+  return dict[k]?.[lang] ?? dict[k]?.es ?? String(k);
+}
+
 export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>("es");
+  useEffect(() => {
+    activeLang = lang;
+  }, [lang]);
 
   useEffect(() => {
     storage.getItem<Lang>(LANG_KEY, "es").then((v) => v && setLangState(v));

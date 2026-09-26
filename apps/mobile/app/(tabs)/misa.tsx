@@ -157,7 +157,7 @@ export default function Misa() {
           style={styles.chatInput}
         />
         <Pressable
-          testID="chat-send-button"
+          testID="chat-send-button" accessibilityRole="button" accessibilityLabel={t("send")}
           onPress={() => void sendMessage()}
           disabled={sending}
           style={styles.sendBtn}

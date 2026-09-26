@@ -6,7 +6,8 @@ import { reloadAppAsync } from "expo";
 import { Component, type ErrorInfo, type PropsWithChildren, useState } from "react";
 import { Platform, Pressable, ScrollView, Text, View } from "react-native";
 
-import { makeStyles } from "@/src/theme";
+import { translate } from "@/src/i18n";
+import { fonts, makeStyles } from "@/src/theme";
 
 type ErrorBoundaryState = { error: Error | null };
 
@@ -49,8 +50,8 @@ function ErrorFallback({ error, resetError }: { error: Error; resetError: () => 
   return (
     <View style={styles.container} testID="error-fallback">
       <View style={styles.content}>
-        <Text style={styles.title}>Something went wrong</Text>
-        <Text style={styles.message}>Please reload the app to continue.</Text>
+        <Text style={styles.title}>{translate("errorTitle")}</Text>
+        <Text style={styles.message}>{translate("errorMessage")}</Text>
         {__DEV__ ? <Text style={styles.devMessage}>{error.message}</Text> : null}
         <Pressable
           onPress={handleReload}
@@ -58,11 +59,11 @@ function ErrorFallback({ error, resetError }: { error: Error; resetError: () => 
           accessibilityRole="button"
           style={({ pressed }) => [styles.button, pressed && styles.buttonPressed]}
         >
-          <Text style={styles.buttonText}>Reload app</Text>
+          <Text style={styles.buttonText}>{translate("errorReload")}</Text>
         </Pressable>
         {__DEV__ ? (
           <Pressable onPress={() => setShowDetails((v) => !v)} accessibilityRole="button" hitSlop={8}>
-            <Text style={styles.detailsToggle}>{showDetails ? "Hide details" : "Show details"}</Text>
+            <Text style={styles.detailsToggle}>{showDetails ? translate("errorHideDetails") : translate("errorShowDetails")}</Text>
           </Pressable>
         ) : null}
       </View>
@@ -90,13 +91,15 @@ const useStyles = makeStyles((colors) => ({
   },
   title: {
     color: colors.onSurface,
-    fontSize: 22,
-    fontWeight: "700",
+    fontFamily: fonts.displayBold,
+    fontSize: 24,
     textAlign: "center",
   },
   message: {
     color: colors.muted,
-    fontSize: 15,
+    fontFamily: fonts.body,
+    fontSize: 16,
+    lineHeight: 24,
     textAlign: "center",
   },
   devMessage: {
@@ -117,8 +120,8 @@ const useStyles = makeStyles((colors) => ({
   },
   buttonText: {
     color: colors.onBrandPrimary,
-    fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.bodySemibold,
+    fontSize: 16,
     textAlign: "center",
   },
   detailsToggle: {

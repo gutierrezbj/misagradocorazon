@@ -33,7 +33,7 @@ export default function SaintDetail() {
           <View style={styles.hero}>
             <Image source={{ uri: saint.imageUrl }} style={styles.heroImg} contentFit="cover" />
             <LinearGradient colors={["rgba(28,15,14,0.5)", "transparent", "rgba(28,15,14,0.95)"]} style={styles.heroScrim} />
-            <Pressable testID="back-button" onPress={() => router.back()} style={[styles.back, { top: insets.top + spacing.sm }]}>
+            <Pressable testID="back-button" accessibilityRole="button" accessibilityLabel={t("back")} onPress={() => router.back()} style={[styles.back, { top: insets.top + spacing.sm }]}>
               <Icon name="arrow-left" size={22} color="#FDFBF7" />
             </Pressable>
             <View style={styles.heroText}>

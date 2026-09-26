@@ -76,7 +76,7 @@ export default function Altar() {
               </Text>
             </View>
           </View>
-          <Pressable testID="profile-button" onPress={() => router.push("/profile")} style={styles.avatar}>
+          <Pressable testID="profile-button" accessibilityRole="button" accessibilityLabel={t("profile")} onPress={() => router.push("/profile")} style={styles.avatar}>
             <Icon name="user" size={22} color={colors.gold} />
           </Pressable>
         </View>
