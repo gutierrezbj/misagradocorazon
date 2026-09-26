@@ -61,7 +61,7 @@ export default function Settings() {
     <View style={styles.root}>
       <StatusBar style="dark" />
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable testID="back-button" onPress={() => router.back()} style={styles.back}>
+        <Pressable testID="back-button" accessibilityRole="button" accessibilityLabel={t("back")} onPress={() => router.back()} style={styles.back}>
           <Icon name="arrow-left" size={22} color={colors.onSurface} />
         </Pressable>
         <Text style={styles.headerTitle}>{t("settings")}</Text>

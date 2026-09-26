@@ -111,7 +111,7 @@ export default function LightCandle() {
       <StatusBar style="light" />
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
         <Text style={styles.title}>{t("lightCandleTitle")}</Text>
-        <Pressable testID="close-candle-button" onPress={() => router.back()} style={styles.close}>
+        <Pressable testID="close-candle-button" accessibilityRole="button" accessibilityLabel={t("close")} onPress={() => router.back()} style={styles.close}>
           <Icon name="x" size={22} color={colors.onAltar} />
         </Pressable>
       </View>

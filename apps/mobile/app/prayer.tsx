@@ -46,7 +46,7 @@ export default function Prayer() {
     <View style={[styles.root, { backgroundColor: colors.altarBg }]}>
       <StatusBar style="light" />
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <Pressable testID="back-button" onPress={() => router.back()} style={styles.back}>
+        <Pressable testID="back-button" accessibilityRole="button" accessibilityLabel={t("back")} onPress={() => router.back()} style={styles.back}>
           <Icon name="arrow-left" size={22} color={colors.onAltar} />
         </Pressable>
         <Text style={styles.headerTitle}>{isMorning ? t("morningPrayer") : t("nightPrayer")}</Text>

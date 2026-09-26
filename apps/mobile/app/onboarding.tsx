@@ -224,7 +224,7 @@ const useStyles = makeStyles((c) => ({
   sectionTitle: { fontFamily: fonts.displayBold, fontSize: 22, color: c.onSurface, marginBottom: spacing.sm },
   consent: { flexDirection: "row", alignItems: "center", gap: spacing.md, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md },
   consentTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
-  consentText: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: c.muted, marginTop: 2 },
+  consentText: { fontFamily: fonts.body, fontSize: 16, lineHeight: 22, color: c.muted, marginTop: 2 },
   timeLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginTop: spacing.sm },
   timeChip: {
     height: 40,
