@@ -2,7 +2,7 @@
 
 Registro de las mejoras que Emergent propuso durante las iteraciones del 25/09/2026, con la decisión tomada o pendiente. No es alcance aprobado: cualquier idea que entre se especifica primero en los SDD.
 
-Leyenda: **Hecho** (ya está en el código de `conflict_250926_1728`), **Rechazado**, **Post-MVP** (se valora después del lanzamiento), **SDD** (se decide al redactar los SDD).
+Leyenda: **Hecho** (ya está en el código de `conflict_250926_1728`), **Rechazado**, **Post-MVP** (se valora después del lanzamiento), **SDD** (se decide al redactar los SDD), **Descartado parcial** (se adopta una parte y se rechaza el resto).
 
 ## Vela y altar
 
@@ -40,3 +40,11 @@ Leyenda: **Hecho** (ya está en el código de `conflict_250926_1728`), **Rechaza
 | Publicar / desplegar y generar builds iOS/Android desde Emergent | Notas de cada iteración | **Rechazado por ahora** | Bundle ID de Emergent, login de Google a través de Emergent. Ver auditoría C3. |
 | Migrar las propiedades `shadow*` a `boxShadow` (aviso de RN Web) | Informe de pruebas, iteración 1 | **SDD** | Menor. |
 | Botón de cerrar sesión accesible en el perfil para las pruebas | Informe de pruebas, iteración 1 | **SDD** | Menor. |
+
+## Herramientas de trabajo del equipo
+
+Ideas sobre el flujo de desarrollo, no sobre el producto. No vienen del constructor; se anotan aquí para no perder la decisión.
+
+| Idea | Origen | Estado | Nota |
+|------|--------|--------|------|
+| Plugin de Codex dentro de Claude Code ("Claude decide, Codex ejecuta") | Artículo de tododeia, 26/09/2026 | **Descartado parcial** | Se adopta solo como segundo revisor (`/codex:review` y `/codex:adversarial-review`) sobre los PR de este repo, instalado en local. Se rechaza la regla de delegar la construcción a Codex: choca con SDD-first y con "sin SDD no hay código". Nada de esto entra en el `CLAUDE.md` del repo ni depende de cuentas de terceros; la configuración y la cuenta ChatGPT son personales o del fundador. Fuente primaria: repo oficial `openai/codex-plugin-cc`. |
