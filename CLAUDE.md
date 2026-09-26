@@ -3,7 +3,7 @@
 Última revisión: 26-sep-2026. Arquitectura objetivo aprobada por el fundador en esta fecha.
 
 ### Contexto de la fase
-- El prototipo lo entregó un constructor externo (Emergent) y está integrado en `main`: la app móvil vive en `apps/mobile` y el backend provisional en `backend/`. El equipo del fundador asume el mantenimiento y la evolución.
+- El prototipo lo entregó un constructor externo (Emergent) y está integrado en `main`: la app móvil vive en `apps/mobile`. Su backend provisional (`backend/`, FastAPI + MongoDB) se retiró el 26-sep-2026. El equipo del fundador asume el mantenimiento y la evolución.
 - El diseño y la app móvil de esa entrega son la base del producto. El backend se sustituye (ver "Arquitectura objetivo").
 - Antes de cualquier trabajo, leer:
   - Los SDD del cuaderno de Notion: https://app.notion.com/p/3407981f08ef81eba744fee55d42e461 (SDD-01 a SDD-08, Documentación, Checklist de Kickoff).
@@ -42,7 +42,7 @@
 - **Push:** expo-notifications y el servicio de push de Expo.
 - **Medios:** Cloudflare R2.
 - **Hosting:** Railway.
-- **Transición:** desde el 26-sep-2026 la app y el panel usan `apps/api`. `backend/` (FastAPI + MongoDB) ya no lo usa nada: no se amplía y se retirará con aprobación del fundador.
+- **Transición cerrada (26-sep-2026):** la app y el panel usan `apps/api`. `backend/` se eliminó con aprobación del fundador; su contrato HTTP está portado a los tests de `apps/api` y el código original queda en el historial de git.
 
 ### Diseño
 - Mi Sagrado Corazón tiene identidad propia. No hereda la de ninguna agencia ni otro proyecto. **System Rapid Solutions ya no existe y su Design System no aplica.**
