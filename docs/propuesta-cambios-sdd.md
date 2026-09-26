@@ -1,6 +1,12 @@
 # Propuesta de cambios a los SDD (Notion)
 
-Fecha: 26-sep-2026. Estado: **pendiente de aprobación del fundador**. No se ha modificado nada en Notion.
+Fecha: 26-sep-2026. Estado: **aprobada por el fundador y aplicada en Notion el 26-sep-2026** (SDD-02 a SDD-08 y página principal; SDD-01 sin cambios).
+
+Decisiones tomadas:
+- **Misa en vivo en el MVP:** sí, en versión mínima, con la misa de una parroquia colaboradora mientras no esté fichado el sacerdote definitivo.
+- **Lanzamiento:** se mantiene la novena guadalupana (1–12 dic 2026), con misa y causas en versión mínima.
+- **Precio de la vela:** 0,99 / 1,99 / 2,99 USD.
+- **Notion:** lo actualiza Claude.
 
 - **Origen:** arquitectura aprobada el 26-sep-2026 (ver `CLAUDE.md`, sección "Arquitectura objetivo") y la entrega del constructor como base de diseño.
 - **Objetivo:** que los SDD de Notion vuelvan a ser la fuente de verdad coherente con lo que se va a construir.

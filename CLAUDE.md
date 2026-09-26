@@ -9,7 +9,7 @@
   - Los SDD del cuaderno de Notion: https://app.notion.com/p/3407981f08ef81eba744fee55d42e461 (SDD-01 a SDD-08, Documentación, Checklist de Kickoff).
   - `docs/especificacion-funcional.docx` y `docs/requisitos-entrega.md`.
   - `docs/auditoria-entrega.md`: estado real del código entregado.
-  - `docs/propuesta-cambios-sdd.md`: cambios a los SDD pendientes de aprobar.
+  - `docs/propuesta-cambios-sdd.md`: registro de los cambios aprobados y aplicados a los SDD el 26-sep-2026.
 
 ### Metodología: SDD-first (no negociable)
 - SDD-01 a SDD-08 completos y aprobados por el fundador ANTES de tocar código.
