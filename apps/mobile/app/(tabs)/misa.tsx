@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useFocusEffect } from "expo-router";
-import { View, Text, Pressable, FlatList, TextInput, ActivityIndicator, Platform } from "react-native";
+import { View, Text, Pressable, FlatList, TextInput, ActivityIndicator, Linking } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -29,7 +29,7 @@ export default function Misa() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { t, loc } = useI18n();
+  const { t, loc, lang } = useI18n();
   const toast = useToast();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
 
@@ -39,6 +39,12 @@ export default function Misa() {
     queryFn: () => api<Mass | null>("/masses/next"),
     refetchInterval: 60_000,
   });
+  // Grabación para quien no pudo asistir (pilar 2): la de la última misa terminada que la tenga.
+  const { data: recording } = useQuery({
+    queryKey: ["mass", "latest-recording"],
+    queryFn: () => api<Mass | null>("/masses/latest-recording"),
+  });
+  const [watching, setWatching] = useState(false);
   const { data: candlesData } = useQuery({ queryKey: ["candles", "community"], queryFn: () => api<CommunityCandles>("/candles/community") });
 
   const { messages, send } = useMassChat(mass?.id);
@@ -81,6 +87,15 @@ export default function Misa() {
   const s = Math.floor((diff % 60000) / 1000);
 
   const vid = mass ? youtubeId(mass.youtubeUrl) : null;
+  const recordingVid = recording?.recordingUrl ? youtubeId(recording.recordingUrl) : null;
+  const upcoming = !!mass && mass.status === "scheduled" && !isLive;
+  const fmtDay = (iso: string) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "long" }).format(new Date(iso));
+  const openRecording = () => {
+    if (!recording?.recordingUrl) return;
+    // Las de YouTube se ven dentro de la app; cualquier otra URL se abre fuera.
+    if (recordingVid) setWatching((w) => !w);
+    else void Linking.openURL(recording.recordingUrl);
+  };
 
   if (isLoading) {
     return (
@@ -97,19 +112,27 @@ export default function Misa() {
       <View style={[styles.videoWrap, { paddingTop: insets.top }]}>
         {isLive && vid ? (
           <YouTubeEmbed videoId={vid} style={styles.video} />
+        ) : watching && recordingVid ? (
+          <YouTubeEmbed videoId={recordingVid} style={styles.video} />
         ) : (
           <View style={styles.video}>
             <Image source={{ uri: HERO }} style={styles.heroImg} contentFit="cover" />
             <LinearGradient colors={["rgba(0,0,0,0.2)", "rgba(28,15,14,0.92)"]} style={styles.heroOverlay} />
             <View style={styles.countdownBox}>
-              <Text style={styles.nextLabel}>{t("nextMass")}</Text>
-              <Text style={styles.massTitle}>{mass ? loc(mass.title) : ""}</Text>
-              <View style={styles.countRow}>
-                <TimeCell v={d} label={t("days")} />
-                <TimeCell v={h} label={t("hours")} />
-                <TimeCell v={m} label={t("minutes")} />
-                <TimeCell v={s} label={t("seconds")} />
-              </View>
+              {upcoming ? (
+                <>
+                  <Text style={styles.nextLabel}>{t("nextMass")}</Text>
+                  <Text style={styles.massTitle}>{mass ? loc(mass.title) : ""}</Text>
+                  <View style={styles.countRow}>
+                    <TimeCell v={d} label={t("days")} />
+                    <TimeCell v={h} label={t("hours")} />
+                    <TimeCell v={m} label={t("minutes")} />
+                    <TimeCell v={s} label={t("seconds")} />
+                  </View>
+                </>
+              ) : (
+                <Text testID="no-mass" style={styles.massTitle}>{t("noMassScheduled")}</Text>
+              )}
             </View>
           </View>
         )}
@@ -120,6 +143,26 @@ export default function Misa() {
           </View>
         )}
       </View>
+
+      {!isLive && recording?.recordingUrl && (
+        <Pressable
+          testID="mass-recording"
+          accessibilityRole="button"
+          accessibilityLabel={watching ? t("close") : t("watchRecording")}
+          onPress={openRecording}
+          style={styles.recording}
+        >
+          <Icon name={watching ? "x" : "play-circle"} size={28} color={colors.brand} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.recordingLabel}>{t("massRecording")}</Text>
+            <Text style={styles.recordingTitle} numberOfLines={2}>
+              {loc(recording.title)}
+            </Text>
+            <Text style={styles.recordingLabel}>{fmtDay(recording.scheduledAt)}</Text>
+          </View>
+          <Text style={styles.recordingAction}>{watching ? t("close") : t("watchRecording")}</Text>
+        </Pressable>
+      )}
 
       {/* Candles this week banner */}
       <View style={styles.candleBanner}>
@@ -206,6 +249,19 @@ const useStyles = makeStyles((c) => ({
   },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FFFFFF" },
   liveText: { fontFamily: fonts.bodyBold, fontSize: 14, color: c.onBrandPrimary, letterSpacing: 1 },
+  recording: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+    backgroundColor: c.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: c.divider,
+  },
+  recordingLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.muted },
+  recordingTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
+  recordingAction: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.brand },
   candleBanner: {
     flexDirection: "row",
     alignItems: "center",

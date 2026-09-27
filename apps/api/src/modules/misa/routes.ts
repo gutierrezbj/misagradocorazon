@@ -3,12 +3,17 @@ import { Router } from "express";
 import { prisma } from "../../db.ts";
 import { publicName } from "../../lib/display-name.ts";
 import { notFound, ok, pathParam } from "../../http.ts";
-import { currentOrNextMass, massDto } from "./service.ts";
+import { currentOrNextMass, latestRecording, massDto } from "./service.ts";
 
 export const misaRouter = Router();
 
 misaRouter.get("/masses/next", async (_req, res) => {
   const mass = await currentOrNextMass();
+  ok(res, mass ? massDto(mass) : null);
+});
+
+misaRouter.get("/masses/latest-recording", async (_req, res) => {
+  const mass = await latestRecording();
   ok(res, mass ? massDto(mass) : null);
 });
 

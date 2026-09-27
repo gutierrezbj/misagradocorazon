@@ -36,3 +36,13 @@ export async function currentOrNextMass(now = new Date()) {
   if (active) return active;
   return prisma.mass.findFirst({ where: { scheduledAt: { lt: now } }, orderBy: { scheduledAt: "desc" } });
 }
+
+// Grabación para quien no pudo asistir: la de la última misa ya terminada que la tenga.
+export async function latestRecording(now = new Date()) {
+  const recent = await prisma.mass.findMany({
+    where: { recordingUrl: { not: null }, scheduledAt: { lt: now } },
+    orderBy: { scheduledAt: "desc" },
+    take: 5,
+  });
+  return recent.find((m) => massStatus(m, now) === "ended") ?? null;
+}

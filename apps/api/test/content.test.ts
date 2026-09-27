@@ -33,7 +33,10 @@ describe("santoral", () => {
     expect((await request(app).post("/api/admin/saints").set(bearer(mod.token)).send(saint)).status).toBe(403);
 
     const ed = await signUpAs("editor");
-    const created = await request(app).post("/api/admin/saints").set(bearer(ed.token)).send({ ...saint, isPatronCatalog: true });
+    const created = await request(app)
+      .post("/api/admin/saints")
+      .set(bearer(ed.token))
+      .send({ ...saint, isPatronCatalog: true, prayerEs: "Santa Rosa, ruega por nosotros.", sortOrder: 7 });
     expect(created.status).toBe(201);
     expect(created.body.data.id).toBe("saint_santa_rosa_de_lima");
 
@@ -48,6 +51,9 @@ describe("santoral", () => {
 
     const pub = await request(app).get("/api/saints/saint_santa_rosa_de_lima");
     expect(pub.body.data.audioUrl).toEqual({ es: "https://media.example/rosa-es.mp3", en: null });
+    // Solo cambia lo enviado: el resto de la ficha sigue igual (regresión del 27-sep-2026).
+    const stored = await prisma.saint.findUniqueOrThrow({ where: { id: "saint_santa_rosa_de_lima" } });
+    expect(stored).toMatchObject({ isPatronCatalog: true, prayerEs: "Santa Rosa, ruega por nosotros.", sortOrder: 7 });
     expect(await prisma.adminAuditLog.count({ where: { entity: "saint", entityId: "saint_santa_rosa_de_lima" } })).toBe(2);
   });
 

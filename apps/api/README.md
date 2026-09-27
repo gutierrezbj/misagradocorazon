@@ -75,6 +75,7 @@ Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coin
 | POST | `/api/me/intentions` | ✔ | Nueva intención privada (se guarda cifrada) |
 | DELETE | `/api/me/intentions/:id` | ✔ | Borrar una intención privada propia |
 | GET | `/api/masses/next` | — | Misa en curso o próxima, con estado calculado en servidor |
+| GET | `/api/masses/latest-recording` | — | Última misa terminada con grabación, o `null` |
 | GET | `/api/masses/:id/chat` | — | Últimos 200 mensajes aprobados |
 | GET | `/api/causes/current` | opcional | Causas del mes, votos, porcentajes y mi voto |
 | POST | `/api/causes/:id/vote` | ✔ | Votar (días 1-7 UTC, un voto por mes) |
@@ -112,7 +113,7 @@ Staff = moderador, editor y superadmin. El superadmin puede con todo. La matriz 
 | DELETE | `/api/admin/moderation/words/:word` | moderador | Quitar palabra |
 | GET | `/api/admin/masses` | editor | Últimas 100 misas |
 | POST | `/api/admin/masses` | editor | Programar misa |
-| PATCH | `/api/admin/masses/:id` | editor | Editar misa (también la grabación) |
+| PATCH | `/api/admin/masses/:id` | editor | Editar misa; solo cambia los campos enviados. La grabación se quita con `recordingUrl: null` |
 | GET | `/api/admin/push/campaigns` | editor | Avisos del equipo |
 | POST | `/api/admin/push/campaigns` | editor | Nuevo aviso; lo envía el worker |
 | GET | `/api/admin/saints` | editor | Santoral, con los dados de baja |

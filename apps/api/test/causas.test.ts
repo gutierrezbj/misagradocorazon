@@ -93,6 +93,16 @@ describe("causas y votación", () => {
     expect(res.body.error.code).toBe("voting_closed");
   });
 
+  test("editar una candidata solo cambia lo enviado (no borra las fotos)", async () => {
+    const editor = await signUpAs("editor");
+    const photos = ["https://media.example/pozo-1.jpg"];
+    const created = await request(app).post("/api/admin/causes").set(bearer(editor.token)).send({ ...causeBody(1), photos }).expect(201);
+    const res = await request(app).patch(`/api/admin/causes/${created.body.data.id}`).set(bearer(editor.token)).send({ nameEs: "Pozo de agua" });
+    expect(res.status).toBe(200);
+    const stored = await prisma.cause.findUniqueOrThrow({ where: { id: created.body.data.id } });
+    expect(stored).toMatchObject({ nameEs: "Pozo de agua", nameEn: "Cause 1", photos });
+  });
+
   test("una causa en votación no se puede editar", async () => {
     const { editor, ids } = await setupVoting();
     const res = await request(app).patch(`/api/admin/causes/${ids[0]}`).set(bearer(editor.token)).send({ budgetCents: 1 });
