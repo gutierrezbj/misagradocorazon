@@ -204,3 +204,6 @@ export type DailyContentInput = z.infer<typeof dailyContentInputSchema>;
 
 // Borrado de cuenta (SDD-02, transversal): confirmación explícita desde la app.
 export const accountDeleteSchema = z.object({ confirm: z.literal(true) });
+
+// Código de autorización de Sign in with Apple, para poder revocar al borrar la cuenta.
+export const appleAuthorizationSchema = z.object({ code: z.string().min(1).max(2000) });

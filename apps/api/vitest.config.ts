@@ -1,4 +1,9 @@
+import { generateKeyPairSync } from "node:crypto";
+
 import { defineConfig } from "vitest/config";
+
+// Clave .p8 de Apple de pega, generada en cada ejecución: nunca hay una clave real en el repo.
+const appleTestKey = generateKeyPairSync("ec", { namedCurve: "P-256" }).privateKey.export({ type: "pkcs8", format: "pem" }).toString();
 
 // Tests de integración contra PostgreSQL real (msc_test). Nada de mocks de base de datos.
 export default defineConfig({
@@ -32,6 +37,10 @@ export default defineConfig({
       // Login social: los tests firman sus propios ID tokens y sirven sus claves (test/social.test.ts).
       GOOGLE_CLIENT_ID: "msc-test.apps.googleusercontent.com",
       APPLE_BUNDLE_ID: "com.misagradocorazon.app",
+      // Revocación de tokens de Apple (test/apple-revocation.test.ts): Apple se simula con fetch.
+      APPLE_TEAM_ID: "TEAMTEST01",
+      APPLE_KEY_ID: "KEYTEST001",
+      APPLE_PRIVATE_KEY: appleTestKey.replace(/\n/g, "\\n"),
     },
   },
 });

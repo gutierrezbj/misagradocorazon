@@ -37,14 +37,30 @@ Con eso, nada de lo que queda permite saber quién era la persona. El mismo emai
 - **Último superadmin:** no puede borrar su cuenta (409 `last_superadmin`). Primero tiene que nombrar a otro, igual que en el panel.
 - **Panel y KPIs:** el panel no lista las cuentas borradas. Los KPIs de usuarios (total y cohortes de retención) no las cuentan.
 
-## Pendiente antes de publicar en App Store
+## Tokens de Apple (guideline 5.1.1(v))
 
-Apple exige que, si la app usa Iniciar sesión con Apple, el borrado revoque también los tokens de Apple con su API REST (`/auth/revoke`). Para hacerlo hacen falta tres cosas:
+Apple exige que, si la app usa Iniciar sesión con Apple, el borrado revoque también los tokens de Apple con su API REST. El login nativo solo da un ID token, que no sirve para revocar. Por eso:
 
-- la clave privada de Sign in with Apple (`.p8`), con su Key ID y el Team ID, de la cuenta Apple Developer del fundador;
-- guardar el `authorizationCode` que entrega el inicio de sesión nativo y canjearlo por un refresh token;
-- llamar a la revocación dentro del borrado.
+1. **Al entrar con Apple,** la app manda aparte el código de autorización (`POST /api/me/apple-authorization`). El código es de un solo uso y dura 5 minutos. Si ese envío falla, el login sigue igual.
+2. **La API canjea el código** en `https://appleid.apple.com/auth/token`. Para ello usa un `client_secret`: un JWT ES256 firmado con la clave `.p8`.
+   - Comprueba que el token es de la misma persona de Apple vinculada a la cuenta. Si no lo es, responde 400 y no guarda nada.
+   - Guarda el refresh token en la cuenta vinculada de Apple, igual que Better Auth guarda los de OAuth. Volver a entrar sin código lo conserva; un código nuevo lo sustituye. El anterior no se revoca: según Apple, revocar anula toda la autorización de la persona con la app, también el token nuevo.
+3. **Al borrar la cuenta,** el refresh token pasa a `apple_revocation` dentro de la misma transacción: solo el token, sin nada de la persona. Justo después se revoca en `https://appleid.apple.com/auth/revoke`.
+4. **Si Apple falla,** el borrado no espera. El worker reintenta cada 15 minutos (`apple-revocations`), anota los intentos y avisa a Sentry mientras quede algo pendiente.
 
-Hoy la app solo usa el `idToken` nativo y no guarda nada de eso. Queda anotado hasta que exista la cuenta Apple Developer.
+Sin `APPLE_TEAM_ID`, `APPLE_KEY_ID` y `APPLE_PRIVATE_KEY` (ver `docs/login-social.md`), no se guarda ni se revoca nada: la ruta responde `{ stored: false }` sin llamar a Apple.
 
-La analítica de PostHog (`docs/kpis.md`) también queda pendiente de borrado en origen: hoy el móvil deja de enviar y olvida la identidad local, pero la persona en PostHog se borra con su API y una clave del fundador.
+**Probado:** `apps/api/test/apple-revocation.test.ts` simula a Apple y comprueba:
+- las peticiones según su documentación;
+- la firma, las cabeceras y los claims del `client_secret`;
+- el rechazo de un código de otra persona;
+- la revocación al borrar;
+- el reintento tras un fallo.
+
+`apps/mobile/test/components/AppleLogin.test.tsx` comprueba que el código no va al login y que un fallo no bloquea la entrada.
+
+**Pendiente con la cuenta Apple Developer:** crear la clave y probarlo en un iPhone real con un build de EAS.
+
+## Pendiente: PostHog
+
+La analítica de PostHog (`docs/kpis.md`) está pendiente de borrado en origen. Hoy el móvil deja de enviar y olvida la identidad local, pero la persona en PostHog se borra con su API y una clave del fundador. No se ha programado todavía: hay que comprobar la API de borrado de personas en la documentación de PostHog al crear la cuenta.

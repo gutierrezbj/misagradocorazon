@@ -103,6 +103,9 @@ importers:
       express-rate-limit:
         specifier: 8.7.0
         version: 8.7.0(express@5.2.1)
+      jose:
+        specifier: 6.2.12
+        version: 6.2.12
       pg:
         specifier: 8.23.0
         version: 8.23.0
@@ -134,9 +137,6 @@ importers:
       '@vitest/coverage-v8':
         specifier: 5.0.2
         version: 5.0.2(vitest@5.0.2)
-      jose:
-        specifier: 6.2.12
-        version: 6.2.12
       prisma:
         specifier: 7.10.0
         version: 7.10.0(@types/react-dom@19.3.0(@types/react@19.2.10))(@types/react@19.2.10)(magicast@0.5.5)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@6.0.3)

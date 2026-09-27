@@ -10,6 +10,7 @@ import { refreshKpiDaily } from "../modules/admin/kpi-daily.ts";
 import { closeVoting, openVoting } from "../modules/causas/service.ts";
 import { announceVotingResult, runCandleExpiryReminders, runPendingCampaigns, runReminders } from "../modules/push/reminders.ts";
 import { processReceipts } from "../modules/push/service.ts";
+import { processAppleRevocations } from "../modules/users/apple-tokens.ts";
 
 const QUEUES = {
   openVoting: "voting-open",
@@ -18,6 +19,7 @@ const QUEUES = {
   pushCampaigns: "push-campaigns",
   pushReceipts: "push-receipts",
   kpiDaily: "kpi-daily",
+  appleRevocations: "apple-revocations",
 } as const;
 
 async function main() {
@@ -39,6 +41,8 @@ async function main() {
   await boss.schedule(QUEUES.pushReceipts, "*/15 * * * *", null, { tz: "UTC" });
   // Agregados diarios de KPIs: cerrado el día UTC anterior.
   await boss.schedule(QUEUES.kpiDaily, "20 0 * * *", null, { tz: "UTC" });
+  // Tokens de Apple de cuentas borradas que no se pudieron revocar al momento.
+  await boss.schedule(QUEUES.appleRevocations, "*/15 * * * *", null, { tz: "UTC" });
 
   await boss.work(QUEUES.openVoting, async () => {
     const r = await openVoting(monthOf(new Date()));
@@ -66,6 +70,11 @@ async function main() {
 
   await boss.work(QUEUES.kpiDaily, async () => {
     console.log("agregados diarios", await refreshKpiDaily());
+  });
+
+  await boss.work(QUEUES.appleRevocations, async () => {
+    const r = await processAppleRevocations();
+    if (r.revoked + r.failed > 0) console.log("revocaciones de Apple", r);
   });
 
   console.log("Worker de tareas programadas en marcha");

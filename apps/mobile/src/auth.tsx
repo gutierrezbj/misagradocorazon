@@ -66,7 +66,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     async (provider: SocialProvider) => {
       const cred = provider === "google" ? await signInWithGoogle() : await signInWithApple();
       if (!cred) return false;
-      await authRequest("/auth/sign-in/social", cred);
+      const { authorizationCode, ...credential } = cred;
+      await authRequest("/auth/sign-in/social", credential);
+      // Apple: la API guarda con qué revocar al borrar la cuenta. Si falla, el login sigue igual.
+      if (authorizationCode) await api("/me/apple-authorization", { method: "POST", body: { code: authorizationCode } }).catch(() => undefined);
       await refresh();
       return true;
     },
