@@ -12,6 +12,7 @@ import { CandleFlame } from "@/src/components/CandleFlame";
 import { ApiError } from "@/src/api";
 import { SocialButtons } from "@/src/components/SocialButtons";
 import type { SocialProvider } from "@/src/social";
+import { errorKey } from "@/src/errors";
 
 export default function LoginScreen() {
   const styles = useStyles();
@@ -39,8 +40,13 @@ export default function LoginScreen() {
       else await register(email.trim(), password, name.trim());
     } catch (e) {
       // Better Auth responde en inglés: se traducen los casos conocidos.
+      // Credenciales incorrectas → authError; sin red o demasiados intentos → su propio mensaje.
       const code = e instanceof ApiError ? e.code : "";
-      toast(code === "USER_ALREADY_EXISTS" ? t("emailTaken") : code === "PASSWORD_TOO_SHORT" ? t("passwordTooShort") : t("authError"), "error");
+      const key = errorKey(e);
+      toast(
+        code === "USER_ALREADY_EXISTS" ? t("emailTaken") : code === "PASSWORD_TOO_SHORT" ? t("passwordTooShort") : key === "genericError" ? t("authError") : t(key),
+        "error",
+      );
     } finally {
       setBusy(false);
     }

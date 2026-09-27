@@ -62,7 +62,7 @@ export default function CandleWall() {
                 {flames.map((f, i) => (
                   <View key={`${f.litAt}-${i}`} style={styles.cell} testID="wall-flame">
                     <CandleFlame size={56} lit variant={f.type} mourning={f.category === "difuntos"} />
-                    <Text style={styles.saint} numberOfLines={2}>
+                    <Text style={styles.saint} numberOfLines={3}>
                       {saintName.get(f.saintId) ?? ""}
                     </Text>
                   </View>

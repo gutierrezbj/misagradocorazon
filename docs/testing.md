@@ -45,6 +45,23 @@ Quedan fuera los puntos de arranque (servidor, worker, consola), que solo conect
   - sin referencias prohibidas.
 - **`apps/mobile/test/components`** (Jest con `jest-expo` y React Native Testing Library): pantallas renderizadas con los proveedores reales de la app. La API, la autenticación y los módulos nativos (audio, almacenamiento) están simulados.
 
+## Checklist de SDD-07 adelantada en navegador (27-sep-2026)
+
+Dos puntos de la checklist manual se pueden probar ya en la app web con Playwright. En un teléfono real habrá que repetirlos.
+
+- **Textos que no se cortan en pantallas pequeñas.** Probado a 375 × 667 (iPhone SE), en español e inglés, en 13 pantallas y con datos largos. Se corregía:
+  - los nombres de santo en "Encender vela", que se cortaban a una línea en cualquier móvil;
+  - la línea "Por quién rezo" y el santo de las velas en el altar;
+  - el santo en el muro de velas;
+  - el historial de intenciones del perfil, ahora completo;
+  - los datos de las causas.
+
+  Se deja a propósito la vista previa de 2 líneas de la intención en las tarjetas pequeñas del altar; el texto completo está en el perfil.
+- **Sin conexión o con conexión lenta:**
+  - Aparece un aviso fijo "Sin conexión" y se ve lo último que se cargó. Al volver la red, el aviso desaparece y las consultas se recargan solas.
+  - Encender una vela sin red falla en el momento con "Sin conexión" y no se envía después. Se ha comprobado en la base de datos.
+  - Con 3 s de retardo y triple toque en "Encender", se crea una sola vela.
+
 ## Manual (antes de cada release)
 
 El checklist manual de SDD-07 en dispositivos reales sigue siendo obligatorio: audio en segundo plano, push, pagos en sandbox, Apple Sign-In y misa con chat. Nada de eso se puede automatizar sin builds nativos.

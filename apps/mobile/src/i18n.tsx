@@ -18,6 +18,7 @@ const dict = {
   pushOpenSettings: { es: "Abrir ajustes", en: "Open settings" },
   pushCommunity: { es: "Avisos de la comunidad", en: "Community notices" },
   genericError: { es: "Algo ha fallado. Inténtalo de nuevo.", en: "Something went wrong. Please try again." },
+  networkError: { es: "Sin conexión. Inténtalo de nuevo cuando vuelvas a tener red.", en: "No connection. Try again when you're back online." },
   pushCommunityHint: { es: "Causa del mes y avisos del equipo", en: "Cause of the month and team notices" },
   information: { es: "Información", en: "Information" },
   meditation: { es: "Meditación", en: "Meditation" },
@@ -195,6 +196,8 @@ const dict = {
   privacy: { es: "Política de privacidad", en: "Privacy policy" },
   terms: { es: "Términos de uso", en: "Terms of use" },
   support: { es: "Soporte", en: "Support" },
+  // sin conexión
+  offline: { es: "Sin conexión. Verás lo último que cargaste; se actualizará al volver.", en: "You're offline. You'll see what was last loaded; it will refresh when you're back." },
   // pantalla de error (fuera del proveedor de i18n)
   errorTitle: { es: "Algo ha fallado", en: "Something went wrong" },
   errorMessage: { es: "Vuelve a abrir la app para continuar.", en: "Please reload the app to continue." },

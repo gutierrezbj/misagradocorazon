@@ -75,7 +75,7 @@ export default function Profile() {
               <Icon name="feather" size={18} color={colors.brandSecondary} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.historySaint}>{c.saint.name}</Text>
-                <Text style={styles.historyIntention} numberOfLines={1}>
+                <Text style={styles.historyIntention}>
                   {c.intention}
                 </Text>
               </View>

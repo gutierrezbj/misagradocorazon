@@ -154,7 +154,7 @@ export default function Altar() {
               {candles.map((c) => (
                 <View key={c.id} style={styles.miniCandle}>
                   <CandleFlame size={54} lit variant={c.type} mourning={c.category === "difuntos"} />
-                  <Text style={styles.miniSaint} numberOfLines={1}>
+                  <Text style={styles.miniSaint} numberOfLines={3}>
                     {c.saint.name}
                   </Text>
                   <Text style={styles.miniIntention} numberOfLines={2}>
@@ -181,7 +181,7 @@ function GlassCard({ icon, title, subtitle, onPress, testID }: any) {
       <View style={{ flex: 1 }}>
         <Text style={styles.glassTitle}>{title}</Text>
         {!!subtitle && (
-          <Text style={styles.glassSub} numberOfLines={1}>
+          <Text style={styles.glassSub} numberOfLines={2}>
             {subtitle}
           </Text>
         )}
@@ -271,7 +271,7 @@ const useStyles = makeStyles((c) => ({
     borderColor: c.altarBorder,
     alignItems: "center",
   },
-  miniSaint: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.gold, marginTop: 4 },
+  miniSaint: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.gold, marginTop: 4, textAlign: "center" },
   miniIntention: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, textAlign: "center", marginTop: 2 },
 }));
 

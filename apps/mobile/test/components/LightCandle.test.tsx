@@ -11,7 +11,10 @@ const mockApi = jest.fn<ApiCall>();
 let mockUser: { patronSaintId: string | null } = { patronSaintId: "saint_guadalupe" };
 let mockParams: { saint?: string } = {};
 
-jest.mock("@/src/api", () => ({ api: (...args: Parameters<ApiCall>) => mockApi(...args) }));
+jest.mock("@/src/api", () => ({
+  ApiError: (jest.requireActual("@/src/api") as { ApiError: unknown }).ApiError,
+  api: (...args: Parameters<ApiCall>) => mockApi(...args),
+}));
 jest.mock("@/src/auth", () => ({ useAuth: () => ({ user: mockUser }) }));
 jest.mock("@/src/analytics", () => ({ track: jest.fn() }));
 jest.mock("expo-router", () => ({ useRouter: () => ({ back: jest.fn(), push: jest.fn() }), useLocalSearchParams: () => mockParams }));
@@ -84,4 +87,16 @@ test("con todo completo envía santo, intención, tipo y categoría, y muestra l
     body: { saintId: "saint_judas", intention: "Por el alma de mi abuelo", type: "solemn", category: "difuntos" },
   });
   expect(await screen.findByTestId("share-candle-button")).toBeTruthy();
+});
+
+test("sin conexión avisa de la conexión, no de un problema con la cuenta", async () => {
+  await renderScreen(<LightCandle />);
+  await screen.findByTestId("candle-saint-saint_judas");
+  mockApi.mockImplementation(async () => {
+    throw new TypeError("Network request failed");
+  });
+  await fireEvent.changeText(screen.getByTestId("candle-intention-input"), "Por mi madre");
+  await fireEvent.press(screen.getByTestId("light-now-button"));
+  expect(await screen.findByText(/Sin conexión/)).toBeTruthy();
+  expect(screen.queryByText("No pudimos verificar tus datos.")).toBeNull();
 });

@@ -15,6 +15,7 @@ import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
 import { track } from "@/src/analytics";
+import { errorKey } from "@/src/errors";
 
 export default function Causas() {
   const styles = useStyles();
@@ -39,7 +40,7 @@ export default function Causas() {
       track("vote_cast");
       toast(t("voteRegistered"), "success");
     },
-    onError: (e) => toast(e instanceof ApiError && e.code === "already_voted" ? t("alreadyVoted") : t("authError"), "error"),
+    onError: (e) => toast(e instanceof ApiError && e.code === "already_voted" ? t("alreadyVoted") : t(errorKey(e)), "error"),
   });
 
   // Meses con causa ganadora o financiada; el importe transferido sale del libro de movimientos.
@@ -168,7 +169,7 @@ function Meta({ icon, label, value }: any) {
         <Icon name={icon} size={13} color={colors.muted} />
         <Text style={styles.metaLabel}>{label}</Text>
       </View>
-      <Text style={styles.metaValue} numberOfLines={1}>
+      <Text style={styles.metaValue} numberOfLines={2}>
         {value}
       </Text>
     </View>
