@@ -27,7 +27,6 @@ const dict = {
   amenComplete: { es: "Amén · Completar", en: "Amen · Complete" },
   candlesLabel: { es: "velas", en: "candles" },
   votesLabel: { es: "votos", en: "votes" },
-  perWeek: { es: "/sem", en: "/wk" },
   audioPlay: { es: "Reproducir", en: "Play" },
   audioPause: { es: "Pausar", en: "Pause" },
   audioBack15: { es: "Retroceder 15 segundos", en: "Back 15 seconds" },
@@ -129,9 +128,9 @@ const dict = {
   candleBasic: { es: "Vela básica", en: "Basic candle" },
   candleSolemn: { es: "Vela solemne", en: "Solemn candle" },
   candlePermanent: { es: "Vela permanente", en: "Permanent candle" },
-  candleBasicDesc: { es: "Una llama por tu intención", en: "A flame for your intention" },
-  candleSolemnDesc: { es: "Llama solemne, duración extendida", en: "Solemn flame, extended duration" },
-  candlePermanentDesc: { es: "Siempre encendida, cada semana", en: "Always lit, every week" },
+  candleBasicDesc: { es: "Encendida 24 horas por tu intención", en: "Lit for 24 hours for your intention" },
+  candleSolemnDesc: { es: "Llama solemne, encendida 3 días", en: "Solemn flame, lit for 3 days" },
+  candlePermanentDesc: { es: "Encendida toda una semana", en: "Lit for a whole week" },
   lightNow: { es: "Encender vela", en: "Light candle" },
   candleLit: { es: "Tu vela está encendida", en: "Your candle is lit" },
   candleLitSub: { es: "Tu intención se eleva ahora en el altar", en: "Your intention now rises on the altar" },
@@ -202,6 +201,9 @@ const dict = {
   errorReload: { es: "Volver a abrir", en: "Reload app" },
   errorShowDetails: { es: "Ver detalles", en: "Show details" },
   errorHideDetails: { es: "Ocultar detalles", en: "Hide details" },
+  // aviso de vela permanente apagada (opt-in, Apple 4.5.4)
+  notifyCandleExpiry: { es: "Mi vela permanente se apaga", en: "My permanent candle goes out" },
+  notifyCandleExpiryHint: { es: "Te avisamos para que puedas volver a encenderla", en: "We let you know so you can light it again" },
   // analítica de uso con consentimiento (ADR-011)
   analyticsConsent: { es: "Ayúdanos a mejorar la app", en: "Help us improve the app" },
   analyticsConsentHint: {

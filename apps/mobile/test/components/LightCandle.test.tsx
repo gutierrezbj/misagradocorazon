@@ -9,11 +9,12 @@ import { renderScreen } from "./render";
 type ApiCall = (path: string, options?: { method?: string; body?: Record<string, unknown> }) => Promise<unknown>;
 const mockApi = jest.fn<ApiCall>();
 let mockUser: { patronSaintId: string | null } = { patronSaintId: "saint_guadalupe" };
+let mockParams: { saint?: string } = {};
 
 jest.mock("@/src/api", () => ({ api: (...args: Parameters<ApiCall>) => mockApi(...args) }));
 jest.mock("@/src/auth", () => ({ useAuth: () => ({ user: mockUser }) }));
 jest.mock("@/src/analytics", () => ({ track: jest.fn() }));
-jest.mock("expo-router", () => ({ useRouter: () => ({ back: jest.fn(), push: jest.fn() }) }));
+jest.mock("expo-router", () => ({ useRouter: () => ({ back: jest.fn(), push: jest.fn() }), useLocalSearchParams: () => mockParams }));
 
 const SAINTS = [
   { id: "saint_guadalupe", name: "Virgen de Guadalupe", imageUrl: "https://example.com/g.jpg" },
@@ -23,6 +24,7 @@ const SAINTS = [
 beforeEach(() => {
   jest.clearAllMocks();
   mockUser = { patronSaintId: "saint_guadalupe" };
+  mockParams = {};
   mockApi.mockImplementation(async (path: string) => (path === "/saints" ? SAINTS : { saint: { name: "Virgen de Guadalupe" } }));
 });
 
@@ -31,7 +33,20 @@ const candlePosts = () => mockApi.mock.calls.filter(([path]) => path === "/candl
 test("precios de las tres velas: 0,99 / 1,99 / 2,99 USD", async () => {
   await renderScreen(<LightCandle />);
   await screen.findByTestId("candle-saint-saint_judas");
-  for (const price of [/^\$0\.99/, /^\$1\.99/, /^\$2\.99/]) expect(screen.getByText(price)).toBeTruthy();
+  for (const price of ["$0.99", "$1.99", "$2.99"]) expect(screen.getByText(price)).toBeTruthy();
+  // La permanente dura 7 días y no se renueva sola (SDD-02, 27-sep-2026): nada de precio semanal.
+  expect(screen.queryByText(/\/sem|\/wk|cada semana/)).toBeNull();
+  expect(screen.getByText("Encendida toda una semana")).toBeTruthy();
+});
+
+test("desde el aviso de vela apagada llega elegido el santo de esa vela", async () => {
+  mockParams = { saint: "saint_judas" };
+  await renderScreen(<LightCandle />);
+  await screen.findByTestId("candle-saint-saint_judas");
+  await fireEvent.changeText(screen.getByTestId("candle-intention-input"), "Por mi familia");
+  await fireEvent.press(screen.getByTestId("light-now-button"));
+  await waitFor(() => expect(candlePosts()).toHaveLength(1));
+  expect(candlePosts()[0]![1]?.body).toMatchObject({ saintId: "saint_judas" });
 });
 
 test("sin intención no se enciende y se avisa", async () => {

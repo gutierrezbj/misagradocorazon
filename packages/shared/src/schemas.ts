@@ -8,17 +8,30 @@ const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Formato HH:MM");
 export const roleSchema = z.enum(ROLES);
 export const localeSchema = z.enum(LOCALES);
 
-export const onboardingSchema = z.object({
+// Campos del perfil devocional, sin valores por defecto. Los defectos solo valen en el alta
+// (onboarding): en PATCH /me un campo que no llega no se toca.
+const profileFields = {
   patronSaintId: z.string().min(1),
-  secondarySaintIds: z.array(z.string().min(1)).max(10).default([]),
+  secondarySaintIds: z.array(z.string().min(1)).max(10),
+  morningTime: hhmm,
+  angelusTime: hhmm,
+  nightTime: hhmm,
+  language: localeSchema,
+  // Zona horaria IANA del dispositivo (p. ej. "America/Los_Angeles"); define el "hoy" del fiel.
+  timezone: z.string().min(1).max(64),
+  // Consentimiento explícito para la analítica de uso (ADR-011). Sin él no se envía nada.
+  analyticsConsent: z.boolean(),
+};
+
+export const onboardingSchema = z.object({
+  ...profileFields,
+  secondarySaintIds: profileFields.secondarySaintIds.default([]),
   morningTime: hhmm.default("07:30"),
   angelusTime: hhmm.default("12:00"),
   nightTime: hhmm.default("21:30"),
   language: localeSchema.default("es"),
-  // Zona horaria IANA del dispositivo (p. ej. "America/Los_Angeles"); define el "hoy" del fiel.
-  timezone: z.string().min(1).max(64).optional(),
-  // Consentimiento explícito para la analítica de uso (ADR-011). Sin él no se envía nada.
-  analyticsConsent: z.boolean().optional(),
+  timezone: profileFields.timezone.optional(),
+  analyticsConsent: profileFields.analyticsConsent.optional(),
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
@@ -27,14 +40,13 @@ export const notificationPrefsSchema = z.object({
   notifyNight: z.boolean(),
   notifySaint: z.boolean(),
   notifyCommunity: z.boolean(),
+  // Aviso al apagarse la vela permanente. Invita a volver a encenderla: solo con consentimiento
+  // explícito (Apple 4.5.4), por eso empieza desactivado.
+  notifyCandleExpiry: z.boolean(),
 });
 export type NotificationPrefs = z.infer<typeof notificationPrefsSchema>;
 
-export const profileUpdateSchema = onboardingSchema
-  .omit({ patronSaintId: true })
-  .extend({ patronSaintId: z.string().min(1) })
-  .extend(notificationPrefsSchema.shape)
-  .partial();
+export const profileUpdateSchema = z.object({ ...profileFields, ...notificationPrefsSchema.shape }).partial();
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 
 export const prayerCompleteSchema = z.object({ kind: z.enum(["morning", "night"]) });

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { CANDLE_TYPES, impactCents, isVotingOpen } from "./domain.ts";
-import { lightCandleSchema } from "./schemas.ts";
+import { lightCandleSchema, onboardingSchema, profileUpdateSchema } from "./schemas.ts";
 
 test("el 20 % de cada tier de vela se calcula en céntimos", () => {
   assert.equal(impactCents(CANDLE_TYPES.basic.priceCents), 20);
@@ -24,4 +24,18 @@ test("una vela sin intención no es válida", () => {
 test("un tipo de vela desconocido no es válido", () => {
   const r = lightCandleSchema.safeParse({ saintId: "s1", intention: "Por mi madre", type: "gigante" });
   assert.equal(r.success, false);
+});
+
+// Regresión (27-sep-2026): PATCH /me con un solo campo reescribía idioma, horarios y santos
+// secundarios con los valores por defecto del onboarding.
+test("profileUpdateSchema no rellena valores por defecto", () => {
+  assert.deepEqual(profileUpdateSchema.parse({ notifyNight: false }), { notifyNight: false });
+  assert.deepEqual(profileUpdateSchema.parse({}), {});
+});
+
+test("onboardingSchema sí aplica los valores por defecto del alta", () => {
+  const v = onboardingSchema.parse({ patronSaintId: "saint_guadalupe" });
+  assert.equal(v.language, "es");
+  assert.equal(v.morningTime, "07:30");
+  assert.deepEqual(v.secondarySaintIds, []);
 });

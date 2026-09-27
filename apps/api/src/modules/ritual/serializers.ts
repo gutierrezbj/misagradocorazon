@@ -44,6 +44,7 @@ export function profileDto(u: User, streak: number) {
     notifyNight: u.notifyNight,
     notifySaint: u.notifySaint,
     notifyCommunity: u.notifyCommunity,
+    notifyCandleExpiry: u.notifyCandleExpiry,
     analyticsConsent: u.analyticsConsent,
     streak,
   };

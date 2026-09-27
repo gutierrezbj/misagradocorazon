@@ -14,7 +14,8 @@ export type Locale = (typeof LOCALES)[number];
 export const CANDLE_TYPES = {
   basic: { priceCents: 99, durationHours: 24 },
   solemn: { priceCents: 199, durationHours: 72 },
-  permanent: { priceCents: 299, durationHours: 24 * 7, renewsWeekly: true },
+  // Sin renovación automática (decisión del fundador, 27-sep-2026): al apagarse, aviso opcional.
+  permanent: { priceCents: 299, durationHours: 24 * 7 },
 } as const;
 export type CandleType = keyof typeof CANDLE_TYPES;
 export const CANDLE_TYPE_KEYS = Object.keys(CANDLE_TYPES) as CandleType[];

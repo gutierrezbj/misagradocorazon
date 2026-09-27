@@ -13,6 +13,7 @@ Alcance de SDD-05, épica 5 (US-15, US-16, US-17), SDD-05, épica 11 (anuncio de
 | Santo del día | 07:00 locales, si hay contenido del día con santo | "Hoy celebramos a [Santo]. Conoce su historia." (con imagen) | Ficha del santo, con el audio en marcha si existe | `notifySaint` |
 | Causa ganadora | Día 8, al cerrar la votación | "La comunidad ha elegido: [causa]." | Causas | `notifyCommunity` |
 | Avisos del equipo | Al enviarlos desde el panel (Notificaciones), rol editor o superior | El que escriba el equipo, en ES y EN | Altar | `notifyCommunity` |
+| Vela permanente apagada | Al cumplir sus 7 días, salvo que ya haya otra vela encendida a ese santo. Solo durante las 3 h siguientes | "Tu vela permanente a [Santo] ha ardido una semana. Vuelve a encenderla cuando quieras." | Encender vela, con ese santo elegido | `notifyCandleExpiry`, **desactivada por defecto**: invita a comprar, así que solo con consentimiento explícito (Apple 4.5.4). No menciona causas ni el 20 % (3.2.2.iv) |
 
 - **Idioma:** cada fiel recibe el aviso en su idioma (ES o EN). Los textos son los de los flujos 1 y 2 de la página Documentación de Notion.
 - **Preferencias:** todas vienen activadas por defecto y se cambian en Ajustes.
