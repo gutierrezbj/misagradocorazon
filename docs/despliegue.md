@@ -35,6 +35,7 @@ Los tres servicios de código apuntan al mismo repositorio y a la rama `main`, y
 | `TRUSTED_ORIGINS` | `https://admin.misagradocorazon.com` (o el de staging) |
 | `INTENTIONS_KEY` | `openssl rand -base64 32`. **Guárdala fuera de Railway: si se pierde, las intenciones cifradas son irrecuperables** |
 | `GOOGLE_CLIENT_ID`, `APPLE_BUNDLE_ID` | `docs/login-social.md` |
+| `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY` | `docs/login-social.md`. También en el worker (reintenta las revocaciones) |
 | `EXPO_ACCESS_TOKEN` | Opcional (`docs/push.md`) |
 | `R2_*` | `docs/contenido.md` |
 

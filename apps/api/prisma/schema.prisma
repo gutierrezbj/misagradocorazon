@@ -183,6 +183,18 @@ model Verification {
   @@map("verification")
 }
 
+// Tokens de Apple pendientes de revocar tras borrar una cuenta (guideline 5.1.1(v)).
+// Sin vínculo con la persona: solo el token. Se borra la fila en cuanto Apple confirma.
+model AppleRevocation {
+  id        String   @id @default(uuid())
+  token     String
+  attempts  Int      @default(0)
+  lastError String?
+  createdAt DateTime @default(now())
+
+  @@map("apple_revocation")
+}
+
 // ---------------------------------------------------------------------------
 // Ritual diario
 // ---------------------------------------------------------------------------

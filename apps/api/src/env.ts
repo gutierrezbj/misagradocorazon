@@ -19,6 +19,16 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   // Login con Apple nativo (iOS): bundle ID de la app, audiencia del ID token de Apple.
   APPLE_BUNDLE_ID: z.string().min(1).optional(),
+  // Revocación de tokens de Apple al borrar la cuenta (guideline 5.1.1(v)): clave de Sign in with
+  // Apple (.p8) de la cuenta Apple Developer del fundador. APPLE_PRIVATE_KEY es el contenido del
+  // .p8 (PEM); se admiten los saltos de línea escritos como \n. Sin las tres, no se revoca nada.
+  APPLE_TEAM_ID: z.string().min(1).optional(),
+  APPLE_KEY_ID: z.string().min(1).optional(),
+  APPLE_PRIVATE_KEY: z
+    .string()
+    .min(1)
+    .transform((v) => v.replace(/\\n/g, "\n"))
+    .optional(),
   // Push: token de acceso de Expo, solo si se activa "enhanced security" en la cuenta de Expo.
   EXPO_ACCESS_TOKEN: z.string().min(1).optional(),
   // Cloudflare R2 (medios: imágenes y audio). Cuenta a nombre del fundador. Sin ellas, el panel

@@ -7,11 +7,12 @@ import { env } from "../../env.ts";
 import { audit } from "../../lib/audit.ts";
 import { encryptText } from "../../lib/crypto.ts";
 import { HttpError } from "../../http.ts";
+import { processAppleRevocations } from "./apple-tokens.ts";
 
 export const deletedEmail = (userId: string) => `deleted-${userId}@users.invalid`;
 
 export async function deleteAccount(userId: string) {
-  await prisma.$transaction(async (tx) => {
+  const revocations = await prisma.$transaction(async (tx) => {
     const user = await tx.user.findUnique({ where: { id: userId } });
     if (!user || user.deletedAt) throw new HttpError(404, "not_found", "Cuenta no encontrada");
     if (user.role === "superadmin") {
@@ -20,6 +21,13 @@ export async function deleteAccount(userId: string) {
     }
 
     const byUser = { where: { userId } };
+    // Tokens de Apple: se apartan sin vínculo con la persona para revocarlos (Apple 5.1.1(v)).
+    const appleTokens = await tx.account.findMany({ where: { userId, providerId: "apple", refreshToken: { not: null } } });
+    const revocationIds: string[] = [];
+    for (const a of appleTokens) {
+      revocationIds.push((await tx.appleRevocation.create({ data: { token: a.refreshToken! } })).id);
+    }
+
     await tx.session.deleteMany(byUser);
     await tx.account.deleteMany(byUser);
     await tx.pushToken.deleteMany(byUser);
@@ -59,5 +67,8 @@ export async function deleteAccount(userId: string) {
     });
     // Sin datos personales: solo que ocurrió y cuándo.
     await audit(tx, userId, "account.delete", "user", userId);
+    return revocationIds;
   });
+  // Ya borrada la cuenta, se intenta revocar al momento; si Apple falla, reintenta el worker.
+  if (revocations.length > 0) await processAppleRevocations(revocations).catch(() => undefined);
 }

@@ -20,7 +20,7 @@ export async function resetDb() {
     `TRUNCATE "ledger_entry", "candle", "prayer_log", "daily_content", "intention_prayer", "intention",
       "private_intention", "chat_message", "mass", "vote", "cause_update", "cause", "admin_audit_log",
       "moderation_word", "push_token", "push_delivery", "push_ticket", "push_campaign", "mass_attendance", "kpi_daily",
-      "session", "account", "verification", "user", "saint" CASCADE`,
+      "session", "account", "verification", "apple_revocation", "user", "saint" CASCADE`,
   );
   await prisma.moderationWord.createMany({ data: DEFAULT_WORDS.map((word) => ({ word })) });
   resetRateLimits();

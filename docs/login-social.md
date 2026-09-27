@@ -41,7 +41,13 @@ Estado: código listo. Falta crear las credenciales, **siempre a nombre del fund
 
 1. **Cuenta:** alta en el Apple Developer Program a nombre del fundador o de la sociedad. Es de pago anual.
 2. **App ID:** crear el identificador `com.misagradocorazon.app` con la capacidad **Sign in with Apple**. EAS puede sincronizarla al generar el build.
-3. **API:** `APPLE_BUNDLE_ID=com.misagradocorazon.app`. No hace falta clave privada ni Services ID para el login nativo.
+3. **API:** `APPLE_BUNDLE_ID=com.misagradocorazon.app`. Para el login nativo no hace falta clave privada ni Services ID.
+4. **Clave para revocar tokens (obligatoria antes de publicar):** en *Certificates, Identifiers & Profiles → Keys*, crear una clave con **Sign in with Apple** asociada al App ID. Se descarga una sola vez como `.p8`. En la API y en el worker:
+   - `APPLE_TEAM_ID`: el Team ID (10 caracteres);
+   - `APPLE_KEY_ID`: el Key ID de esa clave;
+   - `APPLE_PRIVATE_KEY`: el contenido del `.p8`, con los saltos de línea escritos como `\n`.
+
+   Sirve para revocar los tokens de Apple al borrar la cuenta (`docs/borrado-cuenta.md`). El `.p8` no se sube nunca al repositorio.
 
 Por las normas de Apple (guideline 4.8), si la app ofrece Google en iOS, tiene que ofrecer también Sign in with Apple. Por eso las dos opciones se activan juntas en iOS.
 

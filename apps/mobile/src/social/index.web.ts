@@ -1,6 +1,6 @@
 // En web no hay SDK nativo de Google ni de Apple: la app web solo ofrece email y contraseña.
 export type SocialProvider = "google" | "apple";
-export type SocialCredential = { provider: SocialProvider; idToken: { token: string; nonce?: string } };
+export type SocialCredential = { provider: SocialProvider; idToken: { token: string; nonce?: string }; authorizationCode?: string };
 
 export const googleAvailable = () => false;
 export const appleAvailable = async () => false;

@@ -12,6 +12,9 @@ export type SocialCredential = {
     nonce?: string;
     user?: { name?: { firstName?: string; lastName?: string }; email?: string };
   };
+  // Solo Apple: código de un solo uso (5 minutos). No va al login; la API lo canjea aparte para
+  // poder revocar los tokens de Apple al borrar la cuenta (guideline 5.1.1(v)).
+  authorizationCode?: string;
 };
 
 const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "";
@@ -76,6 +79,7 @@ export async function signInWithApple(): Promise<SocialCredential | null> {
     return {
       provider: "apple",
       idToken: { token: cred.identityToken, nonce, ...(name && { user: { name } }) },
+      ...(cred.authorizationCode && { authorizationCode: cred.authorizationCode }),
     };
   } catch (e) {
     if ((e as { code?: string }).code === "ERR_REQUEST_CANCELED") return null;
