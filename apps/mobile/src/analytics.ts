@@ -20,6 +20,8 @@ export type AnalyticsEvents = {
   intention_prayed: Record<string, never>;
   vote_cast: Record<string, never>;
   mass_opened: { status: "scheduled" | "live" | "ended" };
+  // Grabación de la última misa (pilar 2): dentro de la app (YouTube) o fuera.
+  recording_opened: { inApp: boolean };
   chat_message_sent: Record<string, never>;
 };
 

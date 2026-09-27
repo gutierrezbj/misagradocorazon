@@ -32,6 +32,7 @@ const PANEL: Record<string, Role[]> = {
   "GET /admin/masses": EDIT,
   "POST /admin/masses": EDIT,
   "PATCH /admin/masses/:id": EDIT,
+  "DELETE /admin/masses/:id": EDIT,
   "GET /admin/push/campaigns": EDIT,
   "POST /admin/push/campaigns": EDIT,
   "GET /admin/saints": EDIT,

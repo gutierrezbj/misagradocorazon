@@ -17,7 +17,8 @@ jest.mock("@/src/api", () => ({
 // Como el hook real, devuelve siempre el mismo array mientras no llegan mensajes.
 const mockChat = { messages: [], send: jest.fn() };
 jest.mock("@/src/chat", () => ({ useMassChat: () => mockChat }));
-jest.mock("@/src/analytics", () => ({ track: jest.fn() }));
+const mockTrack = jest.fn();
+jest.mock("@/src/analytics", () => ({ track: (...args: unknown[]) => mockTrack(...args) }));
 jest.mock("expo-router", () => ({ useFocusEffect: () => undefined }));
 jest.mock("@/src/components/YouTubeEmbed", () => ({
   YouTubeEmbed: ({ videoId }: { videoId: string }) => {
@@ -62,6 +63,8 @@ test("sin próxima misa: aviso en vez de una cuenta atrás a cero, y la grabaci�
   expect(screen.getByText("Grabación de la última misa")).toBeTruthy();
   await fireEvent.press(card);
   expect(screen.getByTestId("youtube").props.children).toBe("grabacion01");
+  // KPI de producto: cuántos ven la grabación (sin datos personales).
+  expect(mockTrack).toHaveBeenCalledWith("recording_opened", { inApp: true });
   // Se puede cerrar y volver a la portada.
   await fireEvent.press(card);
   expect(screen.queryByTestId("youtube")).toBeNull();
@@ -87,6 +90,7 @@ test("una grabación fuera de YouTube se abre fuera de la app", async () => {
   await renderScreen(<Misa />);
   await fireEvent.press(await screen.findByTestId("mass-recording"));
   expect(open).toHaveBeenCalledWith("https://vimeo.com/123456");
+  expect(mockTrack).toHaveBeenCalledWith("recording_opened", { inApp: false });
   expect(screen.queryByTestId("youtube")).toBeNull();
 });
 

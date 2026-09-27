@@ -113,6 +113,7 @@ Staff = moderador, editor y superadmin. El superadmin puede con todo. La matriz 
 | DELETE | `/api/admin/moderation/words/:word` | moderador | Quitar palabra |
 | GET | `/api/admin/masses` | editor | Últimas 100 misas |
 | POST | `/api/admin/masses` | editor | Programar misa |
+| DELETE | `/api/admin/masses/:id` | editor | Eliminar una misa que aún no ha empezado; queda en la auditoría |
 | PATCH | `/api/admin/masses/:id` | editor | Editar misa; solo cambia los campos enviados. La grabación se quita con `recordingUrl: null` |
 | GET | `/api/admin/push/campaigns` | editor | Avisos del equipo |
 | POST | `/api/admin/push/campaigns` | editor | Nuevo aviso; lo envía el worker |
