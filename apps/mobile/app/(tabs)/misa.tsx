@@ -93,6 +93,7 @@ export default function Misa() {
   const openRecording = () => {
     if (!recording?.recordingUrl) return;
     // Las de YouTube se ven dentro de la app; cualquier otra URL se abre fuera.
+    if (!watching) track("recording_opened", { inApp: !!recordingVid });
     if (recordingVid) setWatching((w) => !w);
     else void Linking.openURL(recording.recordingUrl);
   };

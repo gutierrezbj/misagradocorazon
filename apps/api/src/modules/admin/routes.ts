@@ -23,7 +23,7 @@ import { requireRole } from "../../middleware/roles.ts";
 import { currentUser } from "../../middleware/require-user.ts";
 import { causeDto } from "../causas/service.ts";
 import { getIo, roomOf } from "../misa/chat.ts";
-import { massDto } from "../misa/service.ts";
+import { massDto, massStatus } from "../misa/service.ts";
 import { normalizeText } from "../moderation/filter.ts";
 import { reachable } from "../push/service.ts";
 import { computeKpis } from "./kpis.ts";
@@ -130,6 +130,20 @@ adminRouter.patch("/admin/masses/:id", ...editor, async (req, res) => {
   });
   await audit(prisma, actor.id, "mass.update", "mass", mass.id, { fields: Object.keys(input) });
   ok(res, massDto(mass));
+});
+
+// Solo se elimina una misa que aún no ha empezado (creada por error o cancelada). Una en directo o
+// celebrada tiene chat, asistencia y quizá grabación: esa se queda.
+adminRouter.delete("/admin/masses/:id", ...editor, async (req, res) => {
+  const actor = currentUser(req);
+  const mass = await prisma.mass.findUnique({ where: { id: pathParam(req, "id") } });
+  if (!mass) throw notFound("Misa");
+  if (massStatus(mass) !== "scheduled") throw new HttpError(409, "mass_started", "Solo se eliminan misas que no han empezado");
+  await prisma.$transaction(async (tx) => {
+    await tx.mass.delete({ where: { id: mass.id } });
+    await audit(tx, actor.id, "mass.delete", "mass", mass.id, { titleEs: mass.titleEs, scheduledAt: mass.scheduledAt.toISOString() });
+  });
+  ok(res, { deleted: true });
 });
 
 // --- Causas ------------------------------------------------------------------

@@ -124,6 +124,25 @@ describe("misa", () => {
     expect((await request(app).get("/api/masses/latest-recording")).body.data.id).toBe(older.id);
   });
 
+  test("eliminar: solo misas que no han empezado, y queda en la auditoría", async () => {
+    const editor = await signUpAs("editor");
+    const h = bearer(editor.token);
+    const future = await createMass(editor.token, 60 * 24);
+    const live = await createMass(editor.token, -30);
+    const past = await createMass(editor.token, -60 * 24);
+
+    for (const m of [live, past]) {
+      const res = await request(app).delete(`/api/admin/masses/${m.id}`).set(h);
+      expect(res.status).toBe(409);
+      expect(res.body.error.code).toBe("mass_started");
+    }
+    expect((await request(app).delete(`/api/admin/masses/${future.id}`).set(h)).status).toBe(200);
+    expect(await prisma.mass.count()).toBe(2);
+    expect((await request(app).delete(`/api/admin/masses/${future.id}`).set(h)).status).toBe(404);
+    const log = await prisma.adminAuditLog.findFirstOrThrow({ where: { action: "mass.delete" } });
+    expect(log).toMatchObject({ actorId: editor.userId, entityId: future.id });
+  });
+
   test("sin misas → null", async () => {
     const res = await request(app).get("/api/masses/next");
     expect(res.body.data).toBeNull();
