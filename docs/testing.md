@@ -62,6 +62,18 @@ Dos puntos de la checklist manual se pueden probar ya en la app web con Playwrig
   - Encender una vela sin red falla en el momento con "Sin conexión" y no se envía después. Se ha comprobado en la base de datos.
   - Con 3 s de retardo y triple toque en "Encender", se crea una sola vela.
 
+- **El idioma cambia correctamente (ES ↔ EN).** El 27-sep-2026 se recorrieron en inglés las 14 pantallas de la app y las 10 del panel, con datos en todos los pilares. Toda la interfaz sale en inglés. En español solo aparecen:
+  - el botón "Español" para cambiar de idioma;
+  - los textos que escriben los propios fieles, que se muestran tal como los escribieron: intenciones, mensajes, nombres, palabras filtradas;
+  - los nombres propios de los santos.
+
+## Pendiente fuera del código
+
+- **US-22, enlace directo a la app o a la tienda al compartir la vela:** hoy el dominio va impreso en la imagen, pero no se puede tocar. Para el enlace hacen falta:
+  - el dominio del fundador sirviendo los ficheros de verificación de enlaces universales (`apple-app-site-association` y `assetlinks.json`);
+  - las fichas de la app en App Store y Google Play;
+  - una página de destino que lleve a la tienda si la app no está instalada.
+
 ## Manual (antes de cada release)
 
 El checklist manual de SDD-07 en dispositivos reales sigue siendo obligatorio: audio en segundo plano, push, pagos en sandbox, Apple Sign-In y misa con chat. Nada de eso se puede automatizar sin builds nativos.
