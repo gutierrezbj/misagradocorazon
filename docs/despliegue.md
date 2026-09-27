@@ -10,7 +10,7 @@ Un proyecto de Railway con dos entornos, **staging** y **production**. Cada ento
 |---|---|---|---|
 | `postgres` | PostgreSQL de Railway | — | (privado) |
 | `api` | API + chat de misa (Socket.IO) | `/apps/api/railway.json` | `api.misagradocorazon.com` · `api-staging.misagradocorazon.com` |
-| `worker` | Tareas programadas (pg-boss): votaciones y push | `/apps/api/railway.worker.json` | — (sin HTTP) |
+| `worker` | Tareas programadas (pg-boss): votaciones, push, KPIs diarios y revocaciones de Apple | `/apps/api/railway.worker.json` | — (sin HTTP) |
 | `admin` | Panel de gestión (estático, Caddy) | `/apps/admin/railway.json` | `admin.misagradocorazon.com` · `admin-staging.misagradocorazon.com` |
 
 Los tres servicios de código apuntan al mismo repositorio y a la rama `main`, y cada uno usa su fichero de configuración:
@@ -78,6 +78,15 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
   - `production` apunta a la de producción.
 - **Variables de Google** (`EXPO_PUBLIC_GOOGLE_*`) y **de PostHog** (`EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_POSTHOG_HOST`, ver `docs/kpis.md`): se definen en EAS (*Environment variables*), no en el repositorio.
 - **Antes del primer build:** hace falta `eas init` con la cuenta de Expo del fundador (`docs/push.md`).
+- **Generar los builds** (desde `apps/mobile`, con `eas-cli` instalado y sesión iniciada con la cuenta del fundador):
+  ```bash
+  eas build --platform ios --profile development      # para probar en un iPhone (push, audio, Apple)
+  eas build --platform android --profile preview      # APK/AAB de prueba interna
+  eas build --platform all --profile production       # versiones para las tiendas
+  eas submit --platform ios --profile production      # subir a App Store Connect
+  eas submit --platform android --profile production  # subir a Google Play
+  ```
+  La primera vez, EAS pide o crea los certificados de firma (`eas credentials`). Los cambios solo de JavaScript se publican sin pasar por las tiendas con `eas update` (`docs/monitorizacion.md`).
 
 ## Decisiones pendientes (SDD-08)
 

@@ -12,7 +12,7 @@ pnpm install                         # genera el cliente Prisma (postinstall)
 pnpm --filter @msc/api db:migrate    # aplica migraciones
 pnpm --filter @msc/api db:seed       # solo desarrollo: 7 santos + contenido de hoy y ayer
 pnpm --filter @msc/api dev           # http://localhost:8001/api/health (+ chat Socket.IO)
-pnpm --filter @msc/api worker        # tareas programadas (pg-boss): votaciones y notificaciones push
+pnpm --filter @msc/api worker        # tareas programadas (pg-boss): votaciones, push, KPIs diarios y revocaciones de Apple
 ```
 
 ## Cuentas de staff
@@ -43,16 +43,24 @@ pnpm --filter @msc/api test
 
 Respuesta estándar `{ data, error }`. La sesión se envía como `Authorization: Bearer <token>`; el token llega en la cabecera `set-auth-token` al registrarse o iniciar sesión.
 
+Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coinciden con las rutas que tiene la API: si se añade o se quita una ruta sin tocar este fichero, el test falla.
+
+### App
+
 | Método | Ruta | Sesión | Descripción |
 |---|---|---|---|
 | GET | `/api/health` | — | Estado |
 | POST | `/api/auth/sign-up/email` | — | Registro (Better Auth) |
 | POST | `/api/auth/sign-in/email` | — | Login (Better Auth) |
 | POST | `/api/auth/sign-in/social` | — | Login con Google o Apple por ID token nativo (`docs/login-social.md`) |
+| POST | `/api/auth/sign-out` | ✔ | Cerrar sesión (Better Auth) |
 | GET | `/api/me` | ✔ | Perfil y racha |
-| PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria |
-| PATCH | `/api/me` | ✔ | Actualizar perfil y preferencias de notificación |
-| PUT / DELETE | `/api/me/push-tokens` | ✔ | Registrar o dar de baja el dispositivo para push (`docs/push.md`) |
+| PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria y consentimiento de analítica |
+| PATCH | `/api/me` | ✔ | Actualizar perfil, preferencias de notificación y consentimiento de analítica |
+| DELETE | `/api/me` | ✔ | Borrar la cuenta; exige `{ "confirm": true }` (`docs/borrado-cuenta.md`) |
+| POST | `/api/me/apple-authorization` | ✔ | Código de Sign in with Apple, para revocar al borrar la cuenta (`docs/borrado-cuenta.md`) |
+| PUT | `/api/me/push-tokens` | ✔ | Registrar el dispositivo para push (`docs/push.md`) |
+| DELETE | `/api/me/push-tokens` | ✔ | Dar de baja el dispositivo al cerrar sesión |
 | GET | `/api/saints` | — | Santos (`?patronOnly=true`) |
 | GET | `/api/saints/:id` | — | Ficha de santo |
 | GET | `/api/daily` | — | Contenido del día (`?date=YYYY-MM-DD` o `?tz=`); 404 si no hay |
@@ -63,14 +71,18 @@ Respuesta estándar `{ data, error }`. La sesión se envía como `Authorization:
 | GET | `/api/intentions` | opcional | Muro: intenciones aprobadas (`?category=`, `?before=`) con "Nombre I." y contador |
 | POST | `/api/intentions` | ✔ | Publicar (filtro de palabras → cola si procede); 1 cada 30 s |
 | POST | `/api/intentions/:id/pray` | ✔ | "Rezo por ti" (una vez por persona) |
-| GET/POST | `/api/me/intentions` | ✔ | Intenciones privadas cifradas |
+| GET | `/api/me/intentions` | ✔ | Mis intenciones privadas, descifradas |
+| POST | `/api/me/intentions` | ✔ | Nueva intención privada (se guarda cifrada) |
 | DELETE | `/api/me/intentions/:id` | ✔ | Borrar una intención privada propia |
 | GET | `/api/masses/next` | — | Misa en curso o próxima, con estado calculado en servidor |
 | GET | `/api/masses/:id/chat` | — | Últimos 200 mensajes aprobados |
 | GET | `/api/causes/current` | opcional | Causas del mes, votos, porcentajes y mi voto |
 | POST | `/api/causes/:id/vote` | ✔ | Votar (días 1-7 UTC, un voto por mes) |
+| GET | `/api/votes/me` | ✔ | Mi historial de votos, del más reciente al más antiguo |
 | GET | `/api/causes/history` | — | Causas ganadoras y financiadas con avances |
 | GET | `/api/transparency` | — | Ingresos, 20% y transferencias por mes, calculados desde el libro |
+
+Better Auth atiende el resto de `/api/auth/*`. La app y el panel solo usan las cuatro rutas de arriba.
 
 ### Chat de misa (Socket.IO)
 
@@ -83,23 +95,45 @@ Conexión con `auth: { token }` (el mismo token de sesión); sin token solo se l
 | `chat:message` | servidor → sala | `{ id, author, text, createdAt }` |
 | `chat:removed` | servidor → sala | `{ id }` cuando un moderador oculta un mensaje |
 
-### Gestión (roles)
+### Gestión (panel)
 
-| Método | Ruta | Rol |
-|---|---|---|
-| GET | `/api/admin/moderation/queue` | moderador |
-| POST | `/api/admin/moderation/intentions/:id` · `/api/admin/moderation/chat/:id` | moderador |
-| GET/POST/DELETE | `/api/admin/moderation/words` | moderador |
-| POST/PATCH | `/api/admin/masses` | editor |
-| GET/POST | `/api/admin/push/campaigns` (avisos del equipo; los envía el worker) | editor |
-| GET/POST/PATCH/DELETE | `/api/admin/saints` (+ `/:id/restore`; baja lógica, no si está en uso) | editor |
-| GET/PUT | `/api/admin/daily` (calendario) · `/api/admin/daily/:date` | editor |
-| POST | `/api/admin/uploads` (URL firmada de subida a R2; `docs/contenido.md`) | editor |
-| GET/POST/PATCH | `/api/admin/causes` (solo se edita mientras es candidata) | editor |
-| POST | `/api/admin/causes/:id/updates` (solo ganadoras) | editor |
-| POST | `/api/admin/causes/:id/transfers` (solo ganadoras; escribe en el libro) | superadmin |
+Staff = moderador, editor y superadmin. El superadmin puede con todo. La matriz completa de permisos se comprueba en `test/matrix.test.ts`.
 
-El superadmin tiene acceso a todo. Cada acción de gestión queda en `admin_audit_log` con el autor, la acción y la entidad.
+| Método | Ruta | Rol | Descripción |
+|---|---|---|---|
+| GET | `/api/admin/kpis` | staff | KPIs (`?days=`, 1 a 365; `docs/kpis.md`) |
+| GET | `/api/admin/transparency` | staff | Resumen del libro: ingresos, 20 %, transferido y pendiente |
+| GET | `/api/admin/ledger` | staff | Movimientos de un mes (`?month=`, `?type=`, `?cursor=`), sin datos de personas |
+| GET | `/api/admin/moderation/queue` | moderador | Intenciones y mensajes pendientes |
+| POST | `/api/admin/moderation/intentions/:id` | moderador | Aprobar u ocultar una intención |
+| POST | `/api/admin/moderation/chat/:id` | moderador | Aprobar u ocultar un mensaje del chat |
+| GET | `/api/admin/moderation/words` | moderador | Lista de palabras filtradas |
+| POST | `/api/admin/moderation/words` | moderador | Añadir palabra |
+| DELETE | `/api/admin/moderation/words/:word` | moderador | Quitar palabra |
+| GET | `/api/admin/masses` | editor | Últimas 100 misas |
+| POST | `/api/admin/masses` | editor | Programar misa |
+| PATCH | `/api/admin/masses/:id` | editor | Editar misa (también la grabación) |
+| GET | `/api/admin/push/campaigns` | editor | Avisos del equipo |
+| POST | `/api/admin/push/campaigns` | editor | Nuevo aviso; lo envía el worker |
+| GET | `/api/admin/saints` | editor | Santoral, con los dados de baja |
+| POST | `/api/admin/saints` | editor | Alta de santo |
+| PATCH | `/api/admin/saints/:id` | editor | Editar santo |
+| DELETE | `/api/admin/saints/:id` | editor | Baja lógica; no si está en uso |
+| POST | `/api/admin/saints/:id/restore` | editor | Recuperar un santo dado de baja |
+| GET | `/api/admin/daily` | editor | Calendario de los próximos días: qué está listo y qué falta |
+| GET | `/api/admin/daily/:date` | editor | Contenido de un día |
+| PUT | `/api/admin/daily/:date` | editor | Guardar el contenido de un día |
+| POST | `/api/admin/uploads` | editor | URL firmada de subida a R2 (`docs/contenido.md`) |
+| GET | `/api/admin/causes` | editor | Todas las causas, del mes más reciente al más antiguo |
+| POST | `/api/admin/causes` | editor | Alta de causa candidata |
+| PATCH | `/api/admin/causes/:id` | editor | Editar; solo mientras es candidata |
+| POST | `/api/admin/causes/:id/updates` | editor | Avance de una causa ganadora |
+| POST | `/api/admin/causes/:id/transfers` | superadmin | Transferencia a la causa ganadora; escribe en el libro |
+| GET | `/api/admin/users` | superadmin | Usuarios (`?search=`), sin las cuentas borradas |
+| PATCH | `/api/admin/users/:id` | superadmin | Cambiar rol o bloquear; nunca deja el sistema sin superadmin |
+| GET | `/api/admin/audit` | superadmin | Registro de cambios (`?entity=`, `?actorId=`, `?cursor=`) |
+
+Cada acción de gestión queda en `admin_audit_log` con el autor, la acción y la entidad.
 
 ## Reglas que el código garantiza
 

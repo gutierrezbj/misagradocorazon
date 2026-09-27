@@ -15,23 +15,19 @@ pnpm --filter @msc/admin build   # producción en apps/admin/dist
 
 ## Secciones y roles
 
-| Sección | Roles |
-|---|---|
-| Resumen (KPIs) | moderador, editor, superadmin |
-| Moderación (cola, palabras) | moderador, superadmin |
-| Causas (alta, avances; transferencias solo superadmin) | editor, superadmin |
-| Misas | editor, superadmin |
-| Usuarios y roles | superadmin |
+| Sección | Ruta | Roles |
+|---|---|---|
+| Resumen (KPIs) | `/` | moderador, editor, superadmin |
+| Moderación (cola, palabras) | `/moderacion` | moderador, superadmin |
+| Contenido diario | `/contenido` | editor, superadmin |
+| Santoral | `/santoral` | editor, superadmin |
+| Causas (alta, avances; transferencias solo superadmin) | `/causas` | editor, superadmin |
+| Misas | `/misas` | editor, superadmin |
+| Notificaciones (avisos del equipo) | `/notificaciones` | editor, superadmin |
+| Transparencia (resumen y libro de movimientos) | `/transparencia` | moderador, editor, superadmin |
+| Usuarios y roles | `/usuarios` | superadmin |
+| Registro de cambios | `/registro` | superadmin |
 
-El panel oculta lo que el rol no puede usar. La API vuelve a comprobar cada permiso.
+El panel oculta lo que el rol no puede usar. La API vuelve a comprobar cada permiso (`apps/api/test/matrix.test.ts`).
 
-## KPIs
-
-`GET /api/admin/kpis?days=7|30|90`, calculados en vivo sobre PostgreSQL:
-
-- **Fieles:** registrados y nuevos.
-- **Actividad:** activos DAU, WAU y MAU. Cuenta como actividad rezar, encender una vela, publicar o rezar por una intención, escribir en el chat o votar; el staff no cuenta.
-- **Retención D7 y D30:** de los fieles registrados hace entre N y N+30 días, porcentaje con actividad entre el día N y el N+7 desde su alta.
-- **Velas:** conversión a vela, velas por día, por tipo y por santo.
-- **Dinero:** ingresos, el 20% y transferencias, sacados del libro de movimientos. Hoy es dinero simulado.
-- **Comunidad:** participación en la votación del mes, participación en la última misa (quién escribió en el chat; es un mínimo) y pendientes de moderar.
+Qué mide cada KPI y de dónde sale: `docs/kpis.md`. Contenido y subida de ficheros: `docs/contenido.md`.
