@@ -33,12 +33,12 @@ Condiciones de la medición:
 | 200 | 10/s, 30 s | 394 ms | 60.000 | 0 | 7 · 11 · 64 ms | — | — |
 | 500 | 10/s, 30 s | 317 ms | 150.000 | 0 | 9 · 16 · 35 ms | — | 309 MB |
 | 1.000 | 10/s, 60 s | 264 ms | 600.000 | 0 | 17 · 33 · 50 ms | 132 % · 25 % de un núcleo | 330 MB |
-| 1.000 | 30/s, 30 s | RESULTADO_CONEXION | RESULTADO_ENTREGAS | RESULTADO_PERDIDAS | RESULTADO_LLEGADA | RESULTADO_CPU | RESULTADO_RAM |
+| 1.000 | 30/s, 30 s | 397 ms | 900.000 | 0 | 15 · 29 · 59 ms | 153 % · 61 % de un núcleo | 329 MB |
 
-El pico de CPU es de la entrada de los 1.000 fieles; durante la misa el servidor va holgado.
+El pico de CPU es de la entrada de los 1.000 fieles. Con 30 mensajes por segundo, que es el triple de un chat muy animado, la media sube al 61 % de un núcleo y la llegada sigue por debajo de 60 ms.
 
 ## Conclusión
 
-- **Meta del mes 6 (1.000 asistentes):** una sola instancia la cumple con margen. No se pierde ningún mensaje y todos llegan en menos de 50 ms.
+- **Meta del mes 6 (1.000 asistentes):** una sola instancia la cumple con margen, incluso con el triple de mensajes. No se pierde ningún mensaje y todos llegan en menos de 60 ms.
 - **Escalar más allá:** si algún día hiciera falta más de una instancia, el adaptador de Redis de Socket.IO lo permite sin reescribir el chat (ADR-014). Hoy no hace falta.
 - **En producción:** repetir la prueba contra staging en Railway antes del lanzamiento, desde fuera de Railway, para medir también la red.
