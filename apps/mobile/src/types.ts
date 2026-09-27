@@ -24,6 +24,7 @@ export type User = {
   notifyNight: boolean;
   notifySaint: boolean;
   notifyCommunity: boolean;
+  notifyCandleExpiry: boolean;
   analyticsConsent: boolean;
   streak: number;
 };

@@ -16,6 +16,11 @@ export const pushCopy = {
     l === "en"
       ? { title: "Saint of the day", body: `Today we celebrate ${saint}. Discover their story.` }
       : { title: "Santo del día", body: `Hoy celebramos a ${saint}. Conoce su historia.` },
+  // Flujo de compra (Apple 3.2.2.iv): nunca menciona causas, donativos ni el 20 %.
+  candleExpired: (l: Locale, saint: string): Text =>
+    l === "en"
+      ? { title: "Your candle has gone out", body: `Your permanent candle to ${saint} has burned for a week. Light it again whenever you wish.` }
+      : { title: "Tu vela se ha apagado", body: `Tu vela permanente a ${saint} ha ardido una semana. Vuelve a encenderla cuando quieras.` },
   votingResult: (l: Locale, cause: string): Text =>
     l === "en"
       ? { title: "This month's cause", body: `The community has chosen: ${cause}.` }

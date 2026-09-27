@@ -6,7 +6,7 @@ import { env } from "../env.ts";
 import { monthOf } from "../lib/dates.ts";
 import { refreshKpiDaily } from "../modules/admin/kpi-daily.ts";
 import { closeVoting, openVoting } from "../modules/causas/service.ts";
-import { announceVotingResult, runPendingCampaigns, runReminders } from "../modules/push/reminders.ts";
+import { announceVotingResult, runCandleExpiryReminders, runPendingCampaigns, runReminders } from "../modules/push/reminders.ts";
 import { processReceipts } from "../modules/push/service.ts";
 
 const QUEUES = {
@@ -47,6 +47,8 @@ async function main() {
   await boss.work(QUEUES.pushReminders, async () => {
     const r = await runReminders();
     if (r.morning + r.night + r.saint > 0) console.log("recordatorios enviados", r);
+    const expired = await runCandleExpiryReminders();
+    if (expired > 0) console.log("avisos de vela apagada", expired);
   });
   await boss.work(QUEUES.pushCampaigns, async () => {
     const n = await runPendingCampaigns();

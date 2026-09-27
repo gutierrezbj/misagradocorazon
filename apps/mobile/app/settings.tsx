@@ -35,7 +35,7 @@ export default function Settings() {
   };
 
   const setPref = useCallback(
-    async (key: "notifyMorning" | "notifyNight" | "notifySaint" | "notifyCommunity" | "analyticsConsent", value: boolean) => {
+    async (key: "notifyMorning" | "notifyNight" | "notifySaint" | "notifyCommunity" | "notifyCandleExpiry" | "analyticsConsent", value: boolean) => {
       if (!user) return;
       setUser({ ...user, [key]: value });
       try {
@@ -95,6 +95,13 @@ export default function Settings() {
         <Toggle testID="notify-night" label={t("nightPrayer")} hint={user?.nightTime} value={!!user?.notifyNight} onChange={(v) => setPref("notifyNight", v)} />
         <Toggle testID="notify-saint" label={t("saintOfDay")} hint="07:00" value={!!user?.notifySaint} onChange={(v) => setPref("notifySaint", v)} />
         <Toggle testID="notify-community" label={t("pushCommunity")} hint={t("pushCommunityHint")} value={!!user?.notifyCommunity} onChange={(v) => setPref("notifyCommunity", v)} />
+        <Toggle
+          testID="notify-candle-expiry"
+          label={t("notifyCandleExpiry")}
+          hint={t("notifyCandleExpiryHint")}
+          value={!!user?.notifyCandleExpiry}
+          onChange={(v) => setPref("notifyCandleExpiry", v)}
+        />
         {permission === "unavailable" && <Text style={styles.note}>{t("pushNote")}</Text>}
 
         <Text style={styles.sectionTitle}>{t("privacySection")}</Text>

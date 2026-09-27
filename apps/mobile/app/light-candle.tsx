@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as Haptics from "expo-haptics";
@@ -36,11 +36,13 @@ export default function LightCandle() {
   const { t } = useI18n();
   const toast = useToast();
   const { user } = useAuth();
+  // Desde el aviso de vela apagada llega el santo de esa vela (?saint=...).
+  const { saint: saintParam } = useLocalSearchParams<{ saint?: string }>();
 
   const { data } = useQuery({ queryKey: ["saints", "all"], queryFn: () => api<Saint[]>("/saints") });
   const saints = data ?? [];
 
-  const [saintId, setSaintId] = useState<string | null>(user?.patronSaintId ?? null);
+  const [saintId, setSaintId] = useState<string | null>(saintParam ?? user?.patronSaintId ?? null);
   const [intention, setIntention] = useState("");
   const [type, setType] = useState<Exclude<CandleVariant, "pillar">>("basic");
   const [forDeceased, setForDeceased] = useState(false);
@@ -168,7 +170,7 @@ export default function LightCandle() {
               <Text style={styles.typeName}>{t(ty.label)}</Text>
               <Text style={styles.typeDesc}>{t(ty.desc)}</Text>
             </View>
-            <Text style={styles.typePrice}>{priceLabel(ty.key)}{ty.key === "permanent" ? t("perWeek") : ""}</Text>
+            <Text style={styles.typePrice}>{priceLabel(ty.key)}</Text>
             <View style={[styles.radio, type === ty.key && styles.radioActive]}>
               {type === ty.key && <View style={styles.radioDot} />}
             </View>

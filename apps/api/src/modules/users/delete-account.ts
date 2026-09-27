@@ -53,6 +53,7 @@ export async function deleteAccount(userId: string) {
         notifyNight: false,
         notifySaint: false,
         notifyCommunity: false,
+        notifyCandleExpiry: false,
         analyticsConsent: false,
       },
     });

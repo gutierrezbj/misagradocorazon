@@ -63,6 +63,32 @@ async function saintOfDay(tz: string, date: string) {
   }));
 }
 
+// Vela permanente apagada (SDD-02, 27-sep-2026): un aviso por vela, solo a quien lo ha activado.
+// Mira las últimas horas por si el worker se retrasa. No se avisa si ya hay otra vela encendida
+// al mismo santo: esa persona ya la ha vuelto a encender.
+const EXPIRY_LOOKBACK_MS = 3 * 60 * 60 * 1000;
+
+export async function runCandleExpiryReminders(now = new Date()) {
+  const candles = await prisma.candle.findMany({
+    where: {
+      type: "permanent",
+      expiresAt: { lte: now, gt: new Date(now.getTime() - EXPIRY_LOOKBACK_MS) },
+      user: { ...reachable, notifyCandleExpiry: true },
+    },
+    include: { saint: { select: { id: true, name: true } }, user: { select } },
+  });
+  let sent = 0;
+  for (const c of candles) {
+    const relit = await prisma.candle.count({ where: { userId: c.userId, saintId: c.saintId, expiresAt: { gt: now } } });
+    if (relit > 0) continue;
+    sent += await deliver("candle_expired", c.id, [c.user], (r) => ({
+      ...pushCopy.candleExpired(r.language, c.saint.name),
+      url: `/light-candle?saint=${c.saint.id}`,
+    }));
+  }
+  return sent;
+}
+
 // Día 8: anuncio de la causa ganadora a toda la comunidad (SDD-05, épica 11).
 export async function announceVotingResult(month: string, winnerId: string) {
   const cause = await prisma.cause.findUnique({ where: { id: winnerId } });

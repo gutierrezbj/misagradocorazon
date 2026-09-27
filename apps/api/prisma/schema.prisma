@@ -69,6 +69,7 @@ enum PushKind {
   saint_of_day
   voting_result
   campaign
+  candle_expired
 }
 
 enum LedgerEntryType {
@@ -110,6 +111,7 @@ model User {
   notifyNight     Boolean @default(true)
   notifySaint     Boolean @default(true) // santo del día, 07:00 local
   notifyCommunity Boolean @default(true) // causa ganadora y avisos del equipo
+  notifyCandleExpiry Boolean @default(false) // vela permanente apagada: opt-in (Apple 4.5.4)
 
   // Analítica de uso (ADR-011): solo con consentimiento explícito. Se guarda cuándo se dio o retiró.
   analyticsConsent   Boolean   @default(false)

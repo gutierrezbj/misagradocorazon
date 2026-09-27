@@ -3,7 +3,7 @@ import request from "supertest";
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { prisma } from "../src/db.ts";
-import { announceVotingResult, runPendingCampaigns, runReminders } from "../src/modules/push/reminders.ts";
+import { announceVotingResult, runCandleExpiryReminders, runPendingCampaigns, runReminders } from "../src/modules/push/reminders.ts";
 import { processReceipts } from "../src/modules/push/service.ts";
 import { setPushTransport, type PushTransport } from "../src/modules/push/transport.ts";
 import { app, bearer, resetDb, signUp, signUpAs } from "./helpers.ts";
@@ -261,5 +261,54 @@ describe("avisos del equipo (panel)", () => {
     const editor = await signUpAs("editor");
     const res = await request(app).post("/api/admin/push/campaigns").set(bearer(editor.token)).send({ ...campaign, titleEs: "x".repeat(61) });
     expect(res.status).toBe(400);
+  });
+});
+
+describe("vela permanente apagada (SDD-02, 27-sep-2026)", () => {
+  // Enciende una vela y la da por apagada hace 10 minutos.
+  async function expiredCandle(u: { token: string; userId: string }, type = "permanent", saintId = "saint_guadalupe") {
+    const res = await request(app).post("/api/candles").set(bearer(u.token)).send({ saintId, intention: "Por mi familia", type }).expect(201);
+    const id = res.body.data.id as string;
+    await prisma.candle.update({ where: { id }, data: { expiresAt: new Date(Date.now() - 10 * 60_000) } });
+    return id;
+  }
+  const optIn = (userId: string) => prisma.user.update({ where: { id: userId }, data: { notifyCandleExpiry: true } });
+
+  it("el aviso empieza desactivado: sin activarlo no se envía nada", async () => {
+    const u = await faithful();
+    expect((await request(app).get("/api/me").set(bearer(u.token))).body.data.notifyCandleExpiry).toBe(false);
+    await expiredCandle(u);
+    expect(await runCandleExpiryReminders()).toBe(0);
+    expect(fake.sent).toHaveLength(0);
+  });
+
+  it("con el aviso activado llega una vez, en su idioma, abre la vela de ese santo y no habla de causas", async () => {
+    const u = await faithful({ language: "en" });
+    await request(app).patch("/api/me").set(bearer(u.token)).send({ notifyCandleExpiry: true }).expect(200);
+    await expiredCandle(u);
+    expect(await runCandleExpiryReminders()).toBe(1);
+    expect(await runCandleExpiryReminders()).toBe(0); // como mucho una vez
+    expect(fake.sent).toHaveLength(1);
+    const m = fake.sent[0]!;
+    expect(m).toMatchObject({ to: u.pushToken, title: "Your candle has gone out", data: { url: "/light-candle?saint=saint_guadalupe" } });
+    expect(m.body).toContain("Virgen de Guadalupe");
+    expect(`${m.title} ${m.body}`).not.toMatch(/caus|20\s?%|don(a|ó|o)ci|donat|charit|impact|intenci|familia/i);
+  });
+
+  it("solo la permanente; y no si ya hay otra vela encendida a ese santo", async () => {
+    const u = await faithful();
+    await optIn(u.userId);
+    await expiredCandle(u, "basic");
+    await expiredCandle(u, "permanent", "saint_judas");
+    await request(app).post("/api/candles").set(bearer(u.token)).send({ saintId: "saint_judas", intention: "Otra vez", type: "basic" }).expect(201);
+    expect(await runCandleExpiryReminders()).toBe(0);
+  });
+
+  it("una vela apagada hace días no genera avisos atrasados", async () => {
+    const u = await faithful();
+    await optIn(u.userId);
+    const id = await expiredCandle(u);
+    await prisma.candle.update({ where: { id }, data: { expiresAt: new Date(Date.now() - 2 * 86_400_000) } });
+    expect(await runCandleExpiryReminders()).toBe(0);
   });
 });

@@ -254,3 +254,26 @@ describe("velas", () => {
     await expect(prisma.ledgerEntry.delete({ where: { id: entry.id } })).rejects.toThrow();
   });
 });
+
+describe("perfil: PATCH /me solo cambia lo que se envía", () => {
+  // Regresión (27-sep-2026): activar un aviso en Ajustes devolvía idioma, horarios y santos
+  // secundarios a los valores por defecto del onboarding.
+  test("un interruptor de avisos no toca idioma, horarios ni santos", async () => {
+    const { token } = await signUp();
+    const h = bearer(token);
+    await request(app)
+      .put("/api/me/onboarding")
+      .set(h)
+      .send({ patronSaintId: "saint_guadalupe", secondarySaintIds: ["saint_judas"], morningTime: "06:00", nightTime: "22:00", language: "en" })
+      .expect(200);
+    const res = await request(app).patch("/api/me").set(h).send({ notifyNight: false });
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({
+      language: "en",
+      morningTime: "06:00",
+      nightTime: "22:00",
+      secondarySaintIds: ["saint_judas"],
+      notifyNight: false,
+    });
+  });
+});
