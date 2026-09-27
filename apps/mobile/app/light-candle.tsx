@@ -19,6 +19,7 @@ import { Icon, useToast } from "@/src/components/ui";
 import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
 import { ShareCandlePanel } from "@/src/components/ShareCandlePanel";
 import { track } from "@/src/analytics";
+import { errorKey } from "@/src/errors";
 
 // Precios de @msc/shared (céntimos): 0,99 / 1,99 / 2,99 USD, los tiers de las stores.
 const TYPES = [
@@ -59,7 +60,7 @@ export default function LightCandle() {
       track("candle_lit", { type, forDeceased });
       setDone(true);
     },
-    onError: () => toast(t("authError"), "error"),
+    onError: (e) => toast(t(errorKey(e)), "error"),
   });
 
   const submit = () => {
@@ -133,7 +134,7 @@ export default function LightCandle() {
               style={[styles.saintChip, saintId === s.id && styles.saintChipActive]}
             >
               <Image source={{ uri: s.imageUrl }} style={styles.saintChipImg} contentFit="cover" />
-              <Text style={styles.saintChipName} numberOfLines={1}>
+              <Text style={styles.saintChipName} numberOfLines={3}>
                 {s.name}
               </Text>
             </Pressable>
@@ -199,10 +200,10 @@ const useStyles = makeStyles((c) => ({
   deceasedRow: { flexDirection: "row", alignItems: "center", gap: spacing.sm, marginTop: spacing.md },
   checkbox: { width: 26, height: 26, borderRadius: 6, borderWidth: 2, borderColor: c.altarBorder, alignItems: "center", justifyContent: "center" },
   deceasedText: { fontFamily: fonts.body, fontSize: 16, color: c.onAltar, flex: 1 },
-  saintChip: { width: 92, borderRadius: radius.md, overflow: "hidden", borderWidth: 2, borderColor: "transparent", backgroundColor: c.altarCard },
+  saintChip: { width: 108, borderRadius: radius.md, overflow: "hidden", borderWidth: 2, borderColor: "transparent", backgroundColor: c.altarCard },
   saintChipActive: { borderColor: c.gold },
   saintChipImg: { width: "100%", height: 80, backgroundColor: c.altarCardSoft },
-  saintChipName: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onAltar, padding: 6, textAlign: "center" },
+  saintChipName: { fontFamily: fonts.bodyMedium, fontSize: 14, lineHeight: 18, color: c.onAltar, padding: 6, textAlign: "center" },
   input: {
     minHeight: 90,
     borderWidth: 1,

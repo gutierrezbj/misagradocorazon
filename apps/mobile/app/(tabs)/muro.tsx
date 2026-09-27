@@ -6,7 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import * as Haptics from "expo-haptics";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
-import { api, ApiError } from "@/src/api";
+import { api } from "@/src/api";
 import type { IntentionCategory } from "@msc/shared";
 import type { Intention } from "@/src/types";
 import { queryClient } from "@/src/query-client";
@@ -14,6 +14,7 @@ import { useI18n } from "@/src/i18n";
 import { Chip, Icon, AppButton, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
 import { track } from "@/src/analytics";
+import { errorKey } from "@/src/errors";
 
 const CATS = [
   { key: "all", label: "catAll" },
@@ -60,7 +61,7 @@ export default function Muro() {
       queryClient.invalidateQueries({ queryKey: ["intentions"] });
       toast(res.status === "pending" ? t("intentionFlagged") : t("intentionSent"), res.status === "pending" ? "info" : "success");
     },
-    onError: (e) => toast(e instanceof ApiError && e.code === "rate_limited" ? t("tooFast") : t("authError"), "error"),
+    onError: (e) => toast(t(errorKey(e)), "error"),
   });
 
   const catLabel = (k: string) => t(CATS.find((c) => c.key === k)?.label ?? "catAll");

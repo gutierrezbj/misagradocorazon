@@ -4,4 +4,7 @@
 // handlers; inside components useQueryClient() returns this same instance.
 import { QueryClient } from "@tanstack/react-query";
 
-export const queryClient = new QueryClient();
+// Envíos (encender una vela, votar, publicar): sin red fallan al momento y se avisa. Por defecto
+// React Query los dejaría en pausa y los enviaría solos al volver la conexión, quizá mucho después:
+// inaceptable para una compra.
+export const queryClient = new QueryClient({ defaultOptions: { mutations: { networkMode: "always" } } });

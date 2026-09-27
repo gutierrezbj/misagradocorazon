@@ -11,6 +11,7 @@ import { ErrorBoundary } from "@/src/components/error-boundary";
 import { queryClient } from "@/src/query-client";
 import { AuthProvider, useAuth } from "@/src/auth";
 import { registerForPush, usePushNavigation } from "@/src/push";
+import { OfflineBanner, useQueryOnlineSync } from "@/src/network";
 import { trackScreen } from "@/src/analytics";
 import { I18nProvider } from "@/src/i18n";
 import { ToastProvider } from "@/src/components/ui";
@@ -75,6 +76,7 @@ function Gate() {
 }
 
 export default function RootLayout() {
+  useQueryOnlineSync();
   const [fontsLoaded] = useFonts({
     PlayfairDisplay: require("../assets/fonts/PlayfairDisplay.ttf"),
     "PlayfairDisplay-SemiBold": require("../assets/fonts/PlayfairDisplay.ttf"),
@@ -103,6 +105,7 @@ export default function RootLayout() {
                 <ToastProvider>
                   <KeyboardProvider>
                     <Gate />
+                    <OfflineBanner />
                   </KeyboardProvider>
                 </ToastProvider>
               </AuthProvider>

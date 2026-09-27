@@ -61,7 +61,7 @@ export default function Misa() {
       setMsg("");
       if (res.status === "pending") toast(t("intentionFlagged"), "info");
     } else {
-      toast(res.error === "unauthenticated" ? t("chatLoginNote") : res.error === "rate_limited" ? t("tooFast") : t("authError"), "error");
+      toast(res.error === "unauthenticated" ? t("chatLoginNote") : res.error === "rate_limited" ? t("tooFast") : res.error === "timeout" || res.error === "not_connected" ? t("networkError") : t("genericError"), "error");
     }
   };
 

@@ -14,6 +14,7 @@ import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
 
 import type { Saint, User } from "@/src/types";
+import { errorKey } from "@/src/errors";
 const TIMES = ["06:00", "06:30", "07:00", "07:30", "08:00", "12:00", "18:00", "20:00", "21:00", "21:30", "22:00"];
 
 export default function Onboarding() {
@@ -68,8 +69,8 @@ export default function Onboarding() {
       // SDD-05 US-03: los horarios elegidos son para recibir los recordatorios. Se pide permiso aquí.
       await registerForPush({ ask: true }).catch(() => undefined);
       setUser(updated);
-    } catch {
-      toast(t("authError"), "error");
+    } catch (e) {
+      toast(t(errorKey(e)), "error");
     } finally {
       setBusy(false);
     }

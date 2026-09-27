@@ -10,6 +10,7 @@ const mockApi = jest.fn<ApiCall>();
 const mockSetUser = jest.fn();
 
 jest.mock("@/src/api", () => ({
+  ApiError: (jest.requireActual("@/src/api") as { ApiError: unknown }).ApiError,
   api: (...args: Parameters<ApiCall>) => mockApi(...args),
   deviceTimeZone: () => "America/Los_Angeles",
 }));
