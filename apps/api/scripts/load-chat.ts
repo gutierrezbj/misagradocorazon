@@ -27,13 +27,13 @@ if (!/(_dev|_test)$/.test(dbName)) throw new Error(`load-chat se niega a escribi
 // Cliente propio: el script solo necesita DATABASE_URL, no el resto de variables de la API.
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: DATABASE_URL }) });
 
-const percentile = (xs: number[], p: number) => {
-  if (xs.length === 0) return NaN;
-  const s = [...xs].sort((a, b) => a - b);
-  return s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))]!;
+// Ordena una vez y lee los percentiles (con cientos de miles de valores, sin Math.max(...xs)).
+const summary = (xs: number[]) => {
+  if (xs.length === 0) return "sin datos";
+  const s = Float64Array.from(xs).sort();
+  const at = (p: number) => s[Math.min(s.length - 1, Math.floor((p / 100) * s.length))]!.toFixed(0);
+  return `p50 ${at(50)} ms · p95 ${at(95)} ms · p99 ${at(99)} ms · máx ${s[s.length - 1]!.toFixed(0)} ms`;
 };
-const summary = (xs: number[]) =>
-  `p50 ${percentile(xs, 50).toFixed(0)} ms · p95 ${percentile(xs, 95).toFixed(0)} ms · p99 ${percentile(xs, 99).toFixed(0)} ms · máx ${Math.max(...xs).toFixed(0)} ms`;
 
 async function seed() {
   const mass = await prisma.mass.create({
