@@ -21,6 +21,15 @@ export type Kpis = {
   mass: { massId: string; scheduledAt: string; attendees: number; chatParticipants: number } | null;
   daily: { day: string; newUsers: number; activeUsers: number; candles: number; revenueCents: number }[];
   moderation: { pending: number };
+  goals: Goal[];
+};
+
+// Métricas de éxito del MVP (especificación §10), siempre sobre los últimos 30 días.
+export type Goal = {
+  key: string;
+  value: number | null;
+  unit: "count" | "pct" | "usdCents";
+  target: { m3: number; m6: number };
 };
 
 export type Localized = { es: string; en: string };

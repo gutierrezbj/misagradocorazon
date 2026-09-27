@@ -1,6 +1,8 @@
 // KPIs del panel (SDD-02: MAU, retención D7/D30, conversión a vela, velas, ingresos, 20 %,
 // participación en votación, asistencia a misa). Las cifras de la ventana se consultan en vivo;
 // la serie por día sale de los agregados diarios (kpi_daily) más el día de hoy en vivo.
+import { MVP_TARGETS, type MvpGoalKey } from "@msc/shared";
+
 import { prisma } from "../../db.ts";
 import { monthOf } from "../../lib/dates.ts";
 import { ACTIVITY_SQL, dailySeries, isoDay } from "./kpi-daily.ts";
@@ -96,12 +98,39 @@ export async function computeKpis(days: number, now = new Date()) {
     (await prisma.chatMessage.count({ where: { status: "pending" } }));
 
   const mau = n(active?.mau);
+  const retentionD7 = await retention(7);
+  const retentionD30 = await retention(30);
+
+  // Objetivos del MVP (especificación §10): son mensuales, así que se miden siempre sobre los últimos
+  // 30 días, sea cual sea la ventana elegida en el panel.
+  const [month30] = await prisma.$queryRawUnsafe<{ candles: bigint; buyers: bigint }[]>(
+    `SELECT count(*) AS candles, count(DISTINCT c."userId") FILTER (WHERE u.role = 'user') AS buyers
+       FROM candle c JOIN "user" u ON u.id = c."userId" WHERE c."litAt" >= $1`,
+    since30,
+  );
+  const money30 = await prisma.ledgerEntry.groupBy({ by: ["type"], where: { createdAt: { gte: since30 } }, _sum: { amountCents: true } });
+  const sum30 = (t: string) => n(money30.find((m) => m.type === t)?._sum.amountCents);
+  const goal = (key: MvpGoalKey, value: number | null, unit: "count" | "pct" | "usdCents") => ({ key, value, unit, target: MVP_TARGETS[key] });
+  const goals = [
+    // Las descargas no están en la base de datos: se leen en App Store Connect y Google Play Console.
+    goal("downloads", null, "count"),
+    goal("mau", mau, "count"),
+    goal("candleConversionPct", pct(n(month30?.buyers), mau), "pct"),
+    goal("candlesPerMonth", n(month30?.candles), "count"),
+    goal("retentionD7Pct", retentionD7.rate, "pct"),
+    goal("retentionD30Pct", retentionD30.rate, "pct"),
+    goal("massAttendance", lastMass ? massAttendees : null, "count"),
+    goal("votingParticipationPct", pct(votesThisMonth, mau), "pct"),
+    goal("revenueCentsPerMonth", sum30("purchase"), "usdCents"),
+    goal("impactTransferredCentsPerMonth", sum30("transfer"), "usdCents"),
+  ];
+
   return {
     generatedAt: now,
     windowDays: days,
     users: { total: n(users?.total), new: n(users?.new_users), onboarded: n(users?.onboarded) },
     active: { dau: n(active?.dau), wau: n(active?.wau), mau },
-    retention: { d7: await retention(7), d30: await retention(30) },
+    retention: { d7: retentionD7, d30: retentionD30 },
     candles: {
       total: n(candleTotals?.candles),
       buyers: n(candleTotals?.buyers),
@@ -127,5 +156,6 @@ export async function computeKpis(days: number, now = new Date()) {
       : null,
     daily: daily.map((d) => ({ day: d.day, newUsers: d.newUsers, activeUsers: d.activeUsers, candles: d.candles, revenueCents: d.revenueCents })),
     moderation: { pending: pendingModeration },
+    goals,
   };
 }
