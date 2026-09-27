@@ -1,5 +1,7 @@
 // Tareas programadas (ADR-013) con pg-boss sobre el mismo PostgreSQL.
 // Se ejecuta como proceso aparte: `pnpm --filter @msc/api worker`.
+import "../instrument.ts";
+import * as Sentry from "@sentry/node";
 import { PgBoss } from "pg-boss";
 
 import { env } from "../env.ts";
@@ -20,7 +22,10 @@ const QUEUES = {
 
 async function main() {
   const boss = new PgBoss(env.DATABASE_URL);
-  boss.on("error", (err) => console.error("pg-boss", err));
+  boss.on("error", (err) => {
+    console.error("pg-boss", err);
+    Sentry.captureException(err);
+  });
   await boss.start();
 
   for (const q of Object.values(QUEUES)) await boss.createQueue(q);

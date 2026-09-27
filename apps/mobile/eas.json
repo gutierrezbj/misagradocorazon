@@ -7,15 +7,24 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_BACKEND_URL": "https://api-staging.misagradocorazon.com" }
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://api-staging.misagradocorazon.com"
+      },
+      "channel": "development"
     },
     "preview": {
       "distribution": "internal",
-      "env": { "EXPO_PUBLIC_BACKEND_URL": "https://api-staging.misagradocorazon.com" }
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://api-staging.misagradocorazon.com"
+      },
+      "channel": "preview"
     },
     "production": {
       "autoIncrement": true,
-      "env": { "EXPO_PUBLIC_BACKEND_URL": "https://api.misagradocorazon.com" }
+      "env": {
+        "EXPO_PUBLIC_BACKEND_URL": "https://api.misagradocorazon.com"
+      },
+      "channel": "production"
     }
   },
   "submit": {

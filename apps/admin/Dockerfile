@@ -13,6 +13,8 @@ RUN pnpm install --frozen-lockfile --config.node-linker=isolated --filter @msc/a
 COPY packages/shared packages/shared
 COPY apps/admin apps/admin
 ARG VITE_API_URL
+# Opcional: sin DSN, el panel no envía errores a Sentry.
+ARG VITE_SENTRY_DSN
 RUN test -n "$VITE_API_URL" || (echo "Falta VITE_API_URL" && exit 1)
 RUN pnpm --filter @msc/admin build
 

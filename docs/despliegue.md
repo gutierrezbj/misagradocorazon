@@ -80,9 +80,9 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
 
 ## Decisiones pendientes (SDD-08)
 
-- **Copias de seguridad de PostgreSQL:** activar los backups de Railway en producción. Recomendación: diarios, con retención de 7 días como mínimo.
-- **Monitorización de errores:** Sentry u otro.
-- **Actualizaciones de la app:** por aire (OTA, Expo Updates) o solo por las tiendas.
+- **Copias de seguridad de PostgreSQL** (27-sep-2026: se deja para cuando se salga de pruebas): activarlas en Railway antes del lanzamiento. Recomendación: diarias, con retención de 7 días como mínimo. Se cambian cuando se quiera desde el panel de Railway, sin tocar código.
+- **Monitorización de errores:** decidido Sentry, plan gratuito (27-sep-2026). Ver `docs/monitorizacion.md`.
+- **Actualizaciones de la app:** decidido EAS Update más tiendas (27-sep-2026). Ver `docs/monitorizacion.md`.
 - **Coste mensual:** recalcularlo con los cuatro servicios por entorno.
 
 ## Verificado antes de subir esto
