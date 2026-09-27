@@ -4,7 +4,7 @@ import { useState } from "react";
 import { api, formatNumber, formatUsd } from "../api.ts";
 import { BarList, ColumnChart, DataTable } from "../components/charts.tsx";
 import { useI18n, type I18nKey } from "../i18n.tsx";
-import type { Kpis } from "../types.ts";
+import type { Goal, Kpis } from "../types.ts";
 
 const RANGES = [7, 30, 90] as const;
 
@@ -68,6 +68,8 @@ export function Dashboard() {
             <Tile label={t("kpiPending")} value={formatNumber(k.moderation.pending, lang)} highlight={k.moderation.pending > 0} />
           </div>
 
+          <Goals goals={k.goals} simulated={k.money.simulated} />
+
           <div className="grid two-col">
             <section className="card">
               <div className="card-head">
@@ -128,5 +130,60 @@ export function Dashboard() {
         </div>
       )}
     </>
+  );
+}
+
+// Objetivos del MVP (especificación §10) frente a los últimos 30 días.
+function Goals({ goals, simulated }: { goals: Goal[]; simulated: boolean }) {
+  const { t, lang } = useI18n();
+  const fmt = (v: number, unit: Goal["unit"]) =>
+    unit === "pct" ? `${v} %` : unit === "usdCents" ? formatUsd(v, lang) : formatNumber(v, lang);
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2>{t("goalsTitle")}</h2>
+          <div className="muted">{t("goalsSub")}</div>
+        </div>
+      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>{t("colMetric")}</th>
+            <th className="num">{t("colLast30")}</th>
+            <th className="num">{t("colTarget3")}</th>
+            <th className="num">{t("colTarget6")}</th>
+            <th>{t("colProgress")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {goals.map((g) => {
+            const progress = g.value === null ? null : Math.min(100, Math.round((g.value / g.target.m3) * 100));
+            return (
+              <tr key={g.key}>
+                <td>
+                  {t(`goal_${g.key}` as I18nKey)}
+                  {g.unit === "usdCents" && simulated && <div className="muted">{t("kpiSimulated")}</div>}
+                  {g.key === "downloads" && <div className="muted">{t("goalInStoresHint")}</div>}
+                </td>
+                <td className="num">{g.value === null ? (g.key === "downloads" ? t("goalInStores") : "—") : fmt(g.value, g.unit)}</td>
+                <td className="num">{fmt(g.target.m3, g.unit)}</td>
+                <td className="num">{fmt(g.target.m6, g.unit)}</td>
+                <td style={{ minWidth: 160 }}>
+                  {progress !== null && (
+                    <div className="hbar-row" style={{ gridTemplateColumns: "1fr auto", padding: 0 }}>
+                      <div className="hbar-track" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
+                        <div className="hbar-fill" style={{ width: `${progress}%` }} />
+                      </div>
+                      <span className="hbar-value">{progress} %</span>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </section>
   );
 }

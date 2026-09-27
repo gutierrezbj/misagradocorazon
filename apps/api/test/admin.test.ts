@@ -53,6 +53,43 @@ describe("KPIs", () => {
     const res = await request(app).get("/api/admin/kpis").set(bearer(editor.token));
     expect(res.body.data.retention.d7).toEqual({ cohort: 2, rate: 50 });
   });
+
+  test("objetivos del MVP (§10): siempre sobre los últimos 30 días, con sus metas", async () => {
+    const editor = await signUpAs("editor");
+    const a = await signUp();
+    const b = await signUp();
+    const light = (token: string, type = "basic") =>
+      request(app).post("/api/candles").set(bearer(token)).send({ saintId: "saint_guadalupe", intention: "x", type }).expect(201);
+    await light(a.token);
+    await light(b.token, "solemn");
+    await light(editor.token); // el staff no cuenta como comprador
+    // La vela de b es de hace 20 días: fuera de la ventana de 7, dentro del mes de los objetivos.
+    await prisma.candle.updateMany({ where: { userId: b.userId }, data: { litAt: new Date(Date.now() - 20 * 86_400_000) } });
+
+    const k = (await request(app).get("/api/admin/kpis?days=7").set(bearer(editor.token))).body.data;
+    expect(k.candles.total).toBe(2);
+    const g = Object.fromEntries(k.goals.map((x: { key: string }) => [x.key, x]));
+    expect(Object.keys(g)).toEqual([
+      "downloads",
+      "mau",
+      "candleConversionPct",
+      "candlesPerMonth",
+      "retentionD7Pct",
+      "retentionD30Pct",
+      "massAttendance",
+      "votingParticipationPct",
+      "revenueCentsPerMonth",
+      "impactTransferredCentsPerMonth",
+    ]);
+    expect(g.downloads).toEqual({ key: "downloads", value: null, unit: "count", target: { m3: 5000, m6: 25000 } });
+    expect(g.candlesPerMonth).toMatchObject({ value: 3, target: { m3: 400, m6: 3000 } });
+    // Compradores del mes: a y b (el editor no). MAU: a y b.
+    expect(g.mau.value).toBe(2);
+    expect(g.candleConversionPct.value).toBe(100);
+    expect(g.revenueCentsPerMonth).toMatchObject({ value: 99 + 199 + 99, unit: "usdCents", target: { m3: 200_000, m6: 1_500_000 } });
+    expect(g.impactTransferredCentsPerMonth.value).toBe(0);
+    expect(g.massAttendance.value).toBeNull();
+  });
 });
 
 describe("usuarios y roles", () => {

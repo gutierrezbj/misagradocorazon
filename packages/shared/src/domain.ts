@@ -43,3 +43,19 @@ export function isVotingOpen(date: Date): boolean {
   const day = date.getUTCDate();
   return day >= VOTING_WINDOW.firstDay && day <= VOTING_WINDOW.lastDay;
 }
+
+// Métricas de éxito del MVP (especificación funcional §10): objetivo a los meses 1-3 y al mes 6.
+// Todas son mensuales; el panel las compara con los últimos 30 días. Dinero en céntimos de USD.
+export const MVP_TARGETS = {
+  downloads: { m3: 5_000, m6: 25_000 },
+  mau: { m3: 2_000, m6: 10_000 },
+  candleConversionPct: { m3: 10, m6: 15 },
+  candlesPerMonth: { m3: 400, m6: 3_000 },
+  retentionD7Pct: { m3: 30, m6: 40 },
+  retentionD30Pct: { m3: 15, m6: 25 },
+  massAttendance: { m3: 200, m6: 1_000 },
+  votingParticipationPct: { m3: 50, m6: 60 },
+  revenueCentsPerMonth: { m3: 200_000, m6: 1_500_000 },
+  impactTransferredCentsPerMonth: { m3: 40_000, m6: 300_000 },
+} as const;
+export type MvpGoalKey = keyof typeof MVP_TARGETS;

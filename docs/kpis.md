@@ -34,6 +34,24 @@ Cuenta como asistente quien tiene abierta la pantalla de la misa mientras está 
 
 El panel muestra los asistentes a la última misa empezada y, aparte, cuántos de ellos escribieron en el chat.
 
+## Objetivos del MVP
+
+El resumen del panel compara las métricas de éxito de la especificación funcional (§10) con sus metas a los meses 1-3 y al mes 6. Son mensuales, así que se miden siempre sobre los **últimos 30 días**, sea cual sea la ventana elegida arriba. Las metas están en un solo sitio: `MVP_TARGETS` en `packages/shared/src/domain.ts`.
+
+| Métrica | Cómo se mide | Meta 1-3 | Meta 6 |
+|---|---|---|---|
+| Descargas acumuladas | No está en la base de datos: se lee en App Store Connect y Google Play Console | 5.000 | 25.000 |
+| Usuarios activos (MAU) | Fieles con actividad en 30 días (el staff no cuenta) | 2.000 | 10.000 |
+| Conversión a vela | Fieles que encendieron una vela en 30 días, sobre el MAU | 10 % | 15 % |
+| Velas encendidas al mes | Velas de los últimos 30 días | 400 | 3.000 |
+| Retención D7 y D30 | Las mismas cohortes de arriba | 30 % y 15 % | 40 % y 25 % |
+| Asistencia a misa | Fieles que tuvieron abierta en directo la última misa | 200 | 1.000 |
+| Participación en la votación | Votos del mes sobre el MAU | 50 % | 60 % |
+| Ingresos al mes | Compras del libro en 30 días (hoy simuladas) | 2.000 USD | 15.000 USD |
+| Impacto transferido al mes | Transferencias del libro en 30 días | 400 USD | 3.000 USD |
+
+La columna de progreso mide cuánto falta para la meta de los meses 1-3.
+
 ## Analítica de producto (PostHog)
 
 Solo con consentimiento explícito. Al final del onboarding la opción aparece **desactivada**, y se puede cambiar en Ajustes → Privacidad. El servidor guarda el consentimiento (`analyticsConsent`) y la fecha de su último cambio (`analyticsConsentAt`), para poder demostrarlo.
