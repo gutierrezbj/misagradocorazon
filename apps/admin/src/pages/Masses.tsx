@@ -51,6 +51,7 @@ export function Masses() {
                     <td>
                       <strong>{m.title[lang]}</strong>
                       <div className="muted">{fmt(m.scheduledAt)}</div>
+                      {m.status === "ended" && <RecordingField mass={m} />}
                     </td>
                     <td className="num">
                       <span className={`badge ${m.status}`}>{t(`status_${m.status}` as I18nKey)}</span>
@@ -84,5 +85,38 @@ export function Masses() {
         </form>
       </div>
     </>
+  );
+}
+
+// Grabación para quien no pudo asistir (pilar 2). Solo en misas ya celebradas: la app muestra la
+// de la última que la tenga. Vacío = sin grabación.
+function RecordingField({ mass }: { mass: Mass }) {
+  const { t } = useI18n();
+  const qc = useQueryClient();
+  const [url, setUrl] = useState(mass.recordingUrl ?? "");
+  const save = useMutation({
+    mutationFn: () => api(`/admin/masses/${mass.id}`, { method: "PATCH", body: { recordingUrl: url.trim() || null } }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ["masses"] }),
+  });
+  const changed = url.trim() !== (mass.recordingUrl ?? "");
+  return (
+    <form
+      className="row"
+      style={{ marginTop: 8 }}
+      onSubmit={(e: FormEvent) => {
+        e.preventDefault();
+        save.mutate();
+      }}
+    >
+      <label className="field" style={{ flex: 1, minWidth: 220 }}>
+        {t("recordingUrl")}
+        <input type="url" value={url} placeholder="https://www.youtube.com/watch?v=…" onChange={(e) => setUrl(e.target.value)} />
+      </label>
+      <button className="btn" type="submit" disabled={!changed || save.isPending} style={{ alignSelf: "flex-end" }}>
+        {t("save")}
+      </button>
+      {save.isSuccess && !changed && <span className="muted" style={{ alignSelf: "flex-end" }}>{t("saved")}</span>}
+      {save.isError && <span className="error" style={{ alignSelf: "flex-end" }}>{t("genericError")}</span>}
+    </form>
   );
 }

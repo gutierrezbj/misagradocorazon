@@ -5,6 +5,17 @@ import { CANDLE_CATEGORIES, CANDLE_TYPE_KEYS, INTENTION_CATEGORIES, LOCALES, ROL
 
 const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Formato HH:MM");
 
+// Esquema de edición (PATCH) a partir del de alta: todo opcional y sin valores por defecto.
+// En Zod 4, .partial() conserva los .default(): un PATCH con un solo campo rellenaría los demás
+// con su valor por defecto y pisaría lo guardado.
+type Editable<S extends z.ZodRawShape> = { [K in keyof S]: z.ZodOptional<S[K] extends z.ZodDefault<infer I> ? I : S[K]> };
+export function updateSchemaOf<S extends z.ZodRawShape>(schema: z.ZodObject<S>): z.ZodObject<Editable<S>> {
+  const shape = Object.fromEntries(
+    Object.entries(schema.shape).map(([k, v]) => [k, z.optional(v instanceof z.ZodDefault ? (v.unwrap() as z.ZodType) : v)]),
+  );
+  return z.object(shape) as unknown as z.ZodObject<Editable<S>>;
+}
+
 export const roleSchema = z.enum(ROLES);
 export const localeSchema = z.enum(LOCALES);
 
@@ -101,6 +112,7 @@ export const causeInputSchema = z.object({
   timeline: z.string().trim().min(1).max(120),
 });
 export type CauseInput = z.infer<typeof causeInputSchema>;
+export const causeUpdateSchema = updateSchemaOf(causeInputSchema);
 
 export const causeUpdateInputSchema = z.object({
   textEs: z.string().trim().min(1).max(2000),
@@ -119,6 +131,8 @@ export const massInputSchema = z.object({
   recordingUrl: z.url().optional(),
 });
 export type MassInput = z.infer<typeof massInputSchema>;
+// Al editar, la grabación también se puede quitar (null).
+export const massUpdateSchema = updateSchemaOf(massInputSchema).extend({ recordingUrl: z.url().nullable().optional() });
 
 // Notificaciones push: token de Expo del dispositivo.
 export const pushTokenSchema = z.object({
@@ -180,7 +194,7 @@ export const saintInputSchema = z.object({
   sortOrder: z.number().int().min(0).max(10000).default(100),
 });
 export type SaintInput = z.infer<typeof saintInputSchema>;
-export const saintUpdateSchema = saintInputSchema.partial();
+export const saintUpdateSchema = updateSchemaOf(saintInputSchema);
 
 export const dailyContentInputSchema = z.object({
   saintOfDayId: z.string().min(1).nullable().optional(),

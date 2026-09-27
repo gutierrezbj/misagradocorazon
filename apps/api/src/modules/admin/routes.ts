@@ -3,8 +3,10 @@
 import { Router } from "express";
 import {
   causeInputSchema,
+  causeUpdateSchema,
   causeUpdateInputSchema,
   massInputSchema,
+  massUpdateSchema,
   moderationDecisionSchema,
   moderationWordSchema,
   pushCampaignSchema,
@@ -119,7 +121,7 @@ adminRouter.post("/admin/masses", ...editor, async (req, res) => {
 
 adminRouter.patch("/admin/masses/:id", ...editor, async (req, res) => {
   const actor = currentUser(req);
-  const input = massInputSchema.partial().parse(req.body);
+  const input = massUpdateSchema.parse(req.body);
   const exists = await prisma.mass.findUnique({ where: { id: pathParam(req, "id") } });
   if (!exists) throw notFound("Misa");
   const mass = await prisma.mass.update({
@@ -150,7 +152,7 @@ adminRouter.post("/admin/causes", ...editor, async (req, res) => {
 // Solo se edita mientras es candidata: una vez en votación, la ficha que se votó no cambia.
 adminRouter.patch("/admin/causes/:id", ...editor, async (req, res) => {
   const actor = currentUser(req);
-  const input = causeInputSchema.partial().parse(req.body);
+  const input = causeUpdateSchema.parse(req.body);
   const cause = await prisma.cause.findUnique({ where: { id: pathParam(req, "id") } });
   if (!cause) throw notFound("Causa");
   if (cause.status !== "candidate") throw new HttpError(409, "cause_locked", "La causa ya está en votación o cerrada");

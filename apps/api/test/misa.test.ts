@@ -80,6 +80,50 @@ describe("misa", () => {
     expect(now.body.data).toMatchObject({ id: live.id, status: "live" });
   });
 
+  test("editar solo la grabación no toca el resto de la misa", async () => {
+    const editor = await signUpAs("editor");
+    const created = await request(app)
+      .post("/api/admin/masses")
+      .set(bearer(editor.token))
+      .send({
+        titleEs: "Misa de Navidad",
+        titleEn: "Christmas Mass",
+        youtubeUrl: "https://www.youtube.com/watch?v=abcdefghijk",
+        scheduledAt: new Date(Date.now() - 3 * 3_600_000).toISOString(),
+        durationMin: 90,
+        isSpecial: true,
+      })
+      .expect(201);
+    const res = await request(app)
+      .patch(`/api/admin/masses/${created.body.data.id}`)
+      .set(bearer(editor.token))
+      .send({ recordingUrl: "https://www.youtube.com/watch?v=grabacion01" });
+    expect(res.status).toBe(200);
+    expect(res.body.data).toMatchObject({ durationMin: 90, isSpecial: true, recordingUrl: "https://www.youtube.com/watch?v=grabacion01" });
+  });
+
+  test("grabación: la de la última misa terminada que la tenga; se puede quitar", async () => {
+    const editor = await signUpAs("editor");
+    const h = bearer(editor.token);
+    expect((await request(app).get("/api/masses/latest-recording")).body.data).toBeNull();
+
+    const older = await createMass(editor.token, -60 * 24 * 7 - 180);
+    const last = await createMass(editor.token, -180);
+    const live = await createMass(editor.token, -30);
+    await createMass(editor.token, 60 * 24);
+    await request(app).patch(`/api/admin/masses/${older.id}`).set(h).send({ recordingUrl: "https://www.youtube.com/watch?v=antigua0001" }).expect(200);
+    // Una misa en directo aún no cuenta como grabación, aunque tenga URL.
+    await request(app).patch(`/api/admin/masses/${live.id}`).set(h).send({ recordingUrl: "https://www.youtube.com/watch?v=endirecto01" }).expect(200);
+    expect((await request(app).get("/api/masses/latest-recording")).body.data.id).toBe(older.id);
+
+    await request(app).patch(`/api/admin/masses/${last.id}`).set(h).send({ recordingUrl: "https://www.youtube.com/watch?v=ultima00001" }).expect(200);
+    const res = await request(app).get("/api/masses/latest-recording");
+    expect(res.body.data).toMatchObject({ id: last.id, status: "ended", recordingUrl: "https://www.youtube.com/watch?v=ultima00001" });
+
+    await request(app).patch(`/api/admin/masses/${last.id}`).set(h).send({ recordingUrl: null }).expect(200);
+    expect((await request(app).get("/api/masses/latest-recording")).body.data.id).toBe(older.id);
+  });
+
   test("sin misas → null", async () => {
     const res = await request(app).get("/api/masses/next");
     expect(res.body.data).toBeNull();

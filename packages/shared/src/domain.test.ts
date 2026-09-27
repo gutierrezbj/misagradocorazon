@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { CANDLE_TYPES, impactCents, isVotingOpen } from "./domain.ts";
-import { lightCandleSchema, onboardingSchema, profileUpdateSchema } from "./schemas.ts";
+import { causeUpdateSchema, lightCandleSchema, massUpdateSchema, onboardingSchema, profileUpdateSchema, saintUpdateSchema } from "./schemas.ts";
 import { scrubEvent } from "./sentry.ts";
 
 test("el 20 % de cada tier de vela se calcula en céntimos", () => {
@@ -66,4 +66,16 @@ test("scrubEvent: ningún dato personal ni intención sale en un error", () => {
   assert.equal(ev.request?.url, "https://api.misagradocorazon.com/api/candles");
   assert.equal(ev.breadcrumbs?.length, 2);
   assert.deepEqual(ev.breadcrumbs?.[0]?.data, { url: "https://api/x", method: "POST", status_code: 500 });
+});
+
+// Regresión (27-sep-2026): editar una misa, una causa o un santo con un solo campo rellenaba los
+// demás con su valor por defecto (duración 120, sin fotos, oración vacía...).
+test("los esquemas de edición no inventan campos que no llegan", () => {
+  assert.deepEqual(massUpdateSchema.parse({ recordingUrl: "https://youtu.be/abcdefghijk" }), { recordingUrl: "https://youtu.be/abcdefghijk" });
+  assert.deepEqual(massUpdateSchema.parse({ recordingUrl: null }), { recordingUrl: null });
+  assert.deepEqual(causeUpdateSchema.parse({ nameEs: "Pozo" }), { nameEs: "Pozo" });
+  assert.deepEqual(saintUpdateSchema.parse({ name: "San José" }), { name: "San José" });
+  // Las reglas de cada campo se mantienen.
+  assert.equal(massUpdateSchema.safeParse({ durationMin: 5 }).success, false);
+  assert.equal(saintUpdateSchema.safeParse({ sortOrder: -1 }).success, false);
 });
