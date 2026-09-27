@@ -6,25 +6,9 @@ import request from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { prisma } from "../src/db.ts";
-import { app, bearer, resetDb, signUp, signUpAs } from "./helpers.ts";
+import { app, bearer, discoverRoutes, resetDb, signUp, signUpAs } from "./helpers.ts";
 
 type Role = "user" | "moderator" | "editor" | "superadmin";
-
-function discoverRoutes(): { method: string; path: string }[] {
-  const out: { method: string; path: string }[] = [];
-  // Estructura interna de Express 5: capas del router principal y de cada router montado en /api.
-  const stack = (app as unknown as { router: { stack: Layer[] } }).router.stack;
-  type Layer = { route?: { path: string; methods: Record<string, boolean> }; handle?: { stack?: Layer[] } };
-  const add = (l: Layer) => {
-    if (!l.route) return;
-    for (const m of Object.keys(l.route.methods)) out.push({ method: m.toUpperCase(), path: l.route.path });
-  };
-  for (const l of stack) {
-    add(l);
-    for (const s of l.handle?.stack ?? []) add(s);
-  }
-  return out;
-}
 
 // Quién puede usar cada endpoint del panel. El superadmin puede con todo.
 const MOD: Role[] = ["moderator", "superadmin"];

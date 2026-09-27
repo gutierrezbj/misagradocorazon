@@ -49,3 +49,20 @@ export async function signUpAs(role: "user" | "moderator" | "editor" | "superadm
   if (role !== "user") await prisma.user.update({ where: { id: u.userId }, data: { role } });
   return u;
 }
+
+// Rutas que tiene la API, leídas del router de Express 5 (matriz de permisos y documentación).
+export function discoverRoutes(): { method: string; path: string }[] {
+  const out: { method: string; path: string }[] = [];
+  // Estructura interna de Express 5: capas del router principal y de cada router montado en /api.
+  const stack = (app as unknown as { router: { stack: Layer[] } }).router.stack;
+  type Layer = { route?: { path: string; methods: Record<string, boolean> }; handle?: { stack?: Layer[] } };
+  const add = (l: Layer) => {
+    if (!l.route) return;
+    for (const m of Object.keys(l.route.methods)) out.push({ method: m.toUpperCase(), path: l.route.path });
+  };
+  for (const l of stack) {
+    add(l);
+    for (const s of l.handle?.stack ?? []) add(s);
+  }
+  return out;
+}
