@@ -1,3 +1,4 @@
+import "@/src/sentry";
 import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";

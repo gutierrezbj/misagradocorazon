@@ -1,3 +1,4 @@
+import "./instrument.ts";
 import { createServer } from "node:http";
 
 import { createApp } from "./app.ts";

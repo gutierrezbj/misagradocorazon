@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import { CANDLE_TYPES, impactCents, isVotingOpen } from "./domain.ts";
 import { lightCandleSchema, onboardingSchema, profileUpdateSchema } from "./schemas.ts";
+import { scrubEvent } from "./sentry.ts";
 
 test("el 20 % de cada tier de vela se calcula en céntimos", () => {
   assert.equal(impactCents(CANDLE_TYPES.basic.priceCents), 20);
@@ -38,4 +39,31 @@ test("onboardingSchema sí aplica los valores por defecto del alta", () => {
   assert.equal(v.language, "es");
   assert.equal(v.morningTime, "07:30");
   assert.deepEqual(v.secondarySaintIds, []);
+});
+
+test("scrubEvent: ningún dato personal ni intención sale en un error", () => {
+  const ev = scrubEvent({
+    request: {
+      url: "https://api.misagradocorazon.com/api/candles?email=x@y.com",
+      data: '{"intention":"Por la salud de mi madre"}',
+      cookies: "a=b",
+      headers: { authorization: "Bearer secreto", "user-agent": "okhttp" },
+      query_string: "email=x@y.com",
+    },
+    user: { id: "u1", email: "x@y.com", ip_address: "1.2.3.4" },
+    breadcrumbs: [
+      { category: "console", message: "Por la salud de mi madre" },
+      { category: "ui.click", message: "Encender vela" },
+      { category: "fetch", data: { url: "https://api/x?token=abc", method: "POST", status_code: 500, body: "Por la salud" } },
+      { category: "navigation", data: { from: "/", to: "/light-candle" } },
+    ],
+    extra: { intention: "Por la salud de mi madre" },
+  });
+  const raw = JSON.stringify(ev);
+  for (const bad of ["salud", "x@y.com", "1.2.3.4", "secreto", "u1", "a=b", "token=abc", "Encender vela"]) assert.ok(!raw.includes(bad), bad);
+  assert.deepEqual(ev.user, { ip_address: null });
+  assert.deepEqual(ev.request?.headers, { "user-agent": "okhttp" });
+  assert.equal(ev.request?.url, "https://api.misagradocorazon.com/api/candles");
+  assert.equal(ev.breadcrumbs?.length, 2);
+  assert.deepEqual(ev.breadcrumbs?.[0]?.data, { url: "https://api/x", method: "POST", status_code: 500 });
 });

@@ -9,7 +9,7 @@
 
 	header {
 		# Las subidas van directo a R2 con URL firmada; las imágenes y audios pueden venir de otros dominios HTTPS.
-		Content-Security-Policy "default-src 'self'; connect-src 'self' {$API_ORIGIN} https://*.r2.cloudflarestorage.com; img-src 'self' https: data:; media-src 'self' https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		Content-Security-Policy "default-src 'self'; connect-src 'self' {$API_ORIGIN} https://*.r2.cloudflarestorage.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; img-src 'self' https: data:; media-src 'self' https:; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 		Referrer-Policy "strict-origin-when-cross-origin"

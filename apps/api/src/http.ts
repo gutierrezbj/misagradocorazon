@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/node";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 
@@ -28,7 +29,9 @@ export function errorHandler(err: unknown, _req: Request, res: Response, _next: 
   if (err instanceof HttpError) {
     return res.status(err.status).json({ data: null, error: { code: err.code, message: err.message } });
   }
+  // Solo los errores internos van a Sentry (si está configurado); los 4xx son respuestas normales.
   console.error(err);
+  Sentry.captureException(err);
   return res.status(500).json({ data: null, error: { code: "internal", message: "Error interno" } });
 }
 

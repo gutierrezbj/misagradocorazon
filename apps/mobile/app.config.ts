@@ -12,5 +12,26 @@ export default ({ config }: ConfigContext): ExpoConfig => {
   }
   // Sin opciones, el plugin asume Firebase: por eso no se añade si falta el cliente iOS.
   // Android no necesita plugin (el módulo se enlaza solo; el SHA-1 se registra en Google Cloud).
-  return { ...config, name: config.name ?? "Mi Sagrado Corazón", slug: config.slug ?? "mi-sagrado-corazon", plugins };
+
+  // Sentry: el plugin sube los mapas de código en los builds de EAS (necesita SENTRY_AUTH_TOKEN).
+  // Solo si la cuenta existe; sin él, los errores llegan igual pero sin mapear al código fuente.
+  if (process.env.SENTRY_ORG && process.env.SENTRY_PROJECT) {
+    plugins.push(["@sentry/react-native/expo", { organization: process.env.SENTRY_ORG, project: process.env.SENTRY_PROJECT }]);
+  }
+
+  // EAS Update (SDD-08, 27-sep-2026): arreglos de JS sin pasar por las tiendas. Una actualización
+  // solo llega a builds con la misma versión de la app (runtimeVersion = versión). La URL sale del
+  // proyecto de EAS del fundador (`eas init`), que aún no existe: sin él no hay actualizaciones.
+  const easProjectId = process.env.EAS_PROJECT_ID;
+  return {
+    ...config,
+    name: config.name ?? "Mi Sagrado Corazón",
+    slug: config.slug ?? "mi-sagrado-corazon",
+    plugins,
+    runtimeVersion: { policy: "appVersion" },
+    ...(easProjectId && {
+      updates: { url: `https://u.expo.dev/${easProjectId}` },
+      extra: { ...config.extra, eas: { projectId: easProjectId } },
+    }),
+  };
 };
