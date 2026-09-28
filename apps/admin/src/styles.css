@@ -173,3 +173,7 @@ button, input, select, textarea { font: inherit; }
 /* Oraciones por tiempo litúrgico */
 .badge.current { background: #fbf4e6; color: var(--warning); border-color: var(--gold-soft); }
 .prayer-preview { font-family: var(--font-display); font-style: italic; font-size: 16px; line-height: 1.5; margin: 0 0 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Presupuesto desglosado de una causa */
+.budget-row { display: grid; grid-template-columns: 1fr 1fr 160px auto; gap: 10px; align-items: end; }
+@media (max-width: 720px) { .budget-row { grid-template-columns: 1fr; } }

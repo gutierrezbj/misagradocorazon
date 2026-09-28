@@ -2,6 +2,7 @@
 // Toda acción queda en admin_audit_log.
 import { Router } from "express";
 import {
+  budgetTotalCents,
   causeInputSchema,
   causeUpdateSchema,
   causeUpdateInputSchema,
@@ -21,7 +22,7 @@ import { publicName } from "../../lib/display-name.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { requireRole } from "../../middleware/roles.ts";
 import { currentUser } from "../../middleware/require-user.ts";
-import { causeDto } from "../causas/service.ts";
+import { causeDto, withBudget } from "../causas/service.ts";
 import { getIo, roomOf } from "../misa/chat.ts";
 import { massDto, massStatus } from "../misa/service.ts";
 import { normalizeText } from "../moderation/filter.ts";
@@ -149,7 +150,7 @@ adminRouter.delete("/admin/masses/:id", ...editor, async (req, res) => {
 // --- Causas ------------------------------------------------------------------
 
 adminRouter.get("/admin/causes", ...editor, async (_req, res) => {
-  const causes = await prisma.cause.findMany({ orderBy: [{ month: "desc" }, { createdAt: "asc" }] });
+  const causes = await prisma.cause.findMany({ orderBy: [{ month: "desc" }, { createdAt: "asc" }], include: withBudget });
   ok(res, causes.map((c) => causeDto(c)));
 });
 
@@ -158,7 +159,11 @@ adminRouter.post("/admin/causes", ...editor, async (req, res) => {
   const input = causeInputSchema.parse(req.body);
   // Solo se preparan causas para el mes en curso o futuros.
   if (input.month < monthOf(new Date())) throw new HttpError(400, "past_month", "No se crean causas para meses pasados");
-  const cause = await prisma.cause.create({ data: input });
+  const { budgetItems, ...data } = input;
+  const cause = await prisma.cause.create({
+    data: { ...data, budgetCents: budgetTotalCents(budgetItems), budgetItems: { create: budgetItems.map((i, position) => ({ ...i, position })) } },
+    include: withBudget,
+  });
   await audit(prisma, actor.id, "cause.create", "cause", cause.id);
   ok(res, causeDto(cause), 201);
 });
@@ -170,8 +175,24 @@ adminRouter.patch("/admin/causes/:id", ...editor, async (req, res) => {
   const cause = await prisma.cause.findUnique({ where: { id: pathParam(req, "id") } });
   if (!cause) throw notFound("Causa");
   if (cause.status !== "candidate") throw new HttpError(409, "cause_locked", "La causa ya está en votación o cerrada");
-  const updated = await prisma.cause.update({ where: { id: cause.id }, data: input });
-  await audit(prisma, actor.id, "cause.update", "cause", cause.id, { fields: Object.keys(input) });
+  const { budgetItems, ...data } = input;
+  // Las partidas se sustituyen enteras y el total se recalcula con ellas.
+  const updated = await prisma.$transaction(async (tx) => {
+    if (budgetItems) await tx.causeBudgetItem.deleteMany({ where: { causeId: cause.id } });
+    const u = await tx.cause.update({
+      where: { id: cause.id },
+      data: {
+        ...data,
+        ...(budgetItems && {
+          budgetCents: budgetTotalCents(budgetItems),
+          budgetItems: { create: budgetItems.map((i, position) => ({ ...i, position })) },
+        }),
+      },
+      include: withBudget,
+    });
+    await audit(tx, actor.id, "cause.update", "cause", cause.id, { fields: Object.keys(input) });
+    return u;
+  });
   ok(res, causeDto(updated));
 });
 

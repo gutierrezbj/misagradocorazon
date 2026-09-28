@@ -81,6 +81,7 @@ Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coin
 | POST | `/api/causes/:id/vote` | ✔ | Votar (días 1-7 UTC, un voto por mes) |
 | GET | `/api/votes/me` | ✔ | Mi historial de votos, del más reciente al más antiguo |
 | GET | `/api/causes/history` | — | Causas ganadoras y financiadas con avances |
+| GET | `/api/causes/:id` | — | Ficha completa de una causa publicada: destino del dinero, presupuesto desglosado y avances |
 | GET | `/api/transparency` | — | Ingresos, 20% y transferencias por mes, calculados desde el libro |
 
 Better Auth atiende el resto de `/api/auth/*`. La app y el panel solo usan las cuatro rutas de arriba.

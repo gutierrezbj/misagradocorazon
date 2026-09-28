@@ -65,3 +65,16 @@ R2 admite peticiones `Range`, que el reproductor necesita para saltar dentro del
 
 - **Las del seed de desarrollo** siguen apuntando a Wikimedia y Pexels, con licencias sin verificar (`docs/fuentes-imagenes.md`).
 - **Antes de publicar:** hay que subirlas a R2 desde el panel, una vez verificada la licencia de cada una.
+
+## Causas: ficha completa
+
+Alcance de SDD-02 (Pilar 3) y de la especificación funcional (§2.3). Rol necesario: **editor**.
+
+- **Qué lleva la ficha:**
+  - nombre y descripción (ES/EN), ubicación, responsable, fotos y plazo;
+  - **qué se hará con el dinero** (ES/EN), obligatorio;
+  - **presupuesto desglosado**: una partida por concepto (ES/EN) con su importe, hasta 20.
+- **El total no se escribe:** es la suma de las partidas, calculada en el servidor al guardar.
+- **Edición:** solo mientras la causa es candidata. En cuanto entra en votación, la ficha que se vota ya no cambia.
+- **Causas anteriores a la ficha completa:** su presupuesto pasó a ser una partida única ("Presupuesto total") y no tienen destino del dinero. El panel lo marca en las candidatas para completarlo antes de la votación.
+- **En la app:** la pestaña Causas enlaza a la ficha completa de cada causa. Las candidatas no son públicas.

@@ -21,27 +21,43 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function CauseForm({ onDone }: { onDone: () => void }) {
-  const { t } = useI18n();
-  const [f, setF] = useState({ month: nextMonth(), nameEs: "", nameEn: "", location: "", responsible: "", descriptionEs: "", descriptionEn: "", budgetUsd: "", timeline: "", photos: "" });
+type Item = { conceptEs: string; conceptEn: string; amountUsd: string };
+const emptyItem = (): Item => ({ conceptEs: "", conceptEn: "", amountUsd: "" });
+const toCents = (usd: string) => Math.round(Number(usd) * 100);
+
+// Alta y edición (solo candidatas: la API bloquea la ficha en cuanto entra en votación).
+function CauseForm({ cause, onDone }: { cause: Cause | null; onDone: () => void }) {
+  const { t, lang } = useI18n();
+  const [f, setF] = useState({
+    month: cause?.month ?? nextMonth(),
+    nameEs: cause?.name.es ?? "",
+    nameEn: cause?.name.en ?? "",
+    location: cause?.location ?? "",
+    responsible: cause?.responsible ?? "",
+    descriptionEs: cause?.description.es ?? "",
+    descriptionEn: cause?.description.en ?? "",
+    fundsUseEs: cause?.fundsUse?.es ?? "",
+    fundsUseEn: cause?.fundsUse?.en ?? "",
+    timeline: cause?.timeline ?? "",
+    photos: cause?.photos.join("\n") ?? "",
+  });
+  const [items, setItems] = useState<Item[]>(
+    cause?.budgetItems.length
+      ? cause.budgetItems.map((i) => ({ conceptEs: i.concept.es, conceptEn: i.concept.en, amountUsd: String(i.amountCents / 100) }))
+      : [emptyItem()],
+  );
   const set = (k: keyof typeof f) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
-  const create = useMutation({
-    mutationFn: () =>
-      api("/admin/causes", {
-        method: "POST",
-        body: {
-          month: f.month,
-          nameEs: f.nameEs,
-          nameEn: f.nameEn,
-          location: f.location,
-          responsible: f.responsible,
-          descriptionEs: f.descriptionEs,
-          descriptionEn: f.descriptionEn,
-          budgetCents: Math.round(Number(f.budgetUsd) * 100),
-          timeline: f.timeline,
-          photos: f.photos.split("\n").map((p) => p.trim()).filter(Boolean),
-        },
-      }),
+  const setItem = (n: number, k: keyof Item, v: string) => setItems(items.map((it, i) => (i === n ? { ...it, [k]: v } : it)));
+  const totalCents = items.reduce((sum, i) => sum + (toCents(i.amountUsd) || 0), 0);
+  const save = useMutation({
+    mutationFn: () => {
+      const body = {
+        ...f,
+        photos: f.photos.split("\n").map((p) => p.trim()).filter(Boolean),
+        budgetItems: items.map((i) => ({ conceptEs: i.conceptEs, conceptEn: i.conceptEn, amountCents: toCents(i.amountUsd) })),
+      };
+      return cause ? api(`/admin/causes/${cause.id}`, { method: "PATCH", body }) : api("/admin/causes", { method: "POST", body });
+    },
     onSuccess: onDone,
   });
   return (
@@ -49,10 +65,10 @@ function CauseForm({ onDone }: { onDone: () => void }) {
       className="card"
       onSubmit={(e: FormEvent) => {
         e.preventDefault();
-        create.mutate();
+        save.mutate();
       }}
     >
-      <h2 style={{ marginBottom: 14 }}>{t("newCause")}</h2>
+      <h2 style={{ marginBottom: 14 }}>{cause ? t("editCause") : t("newCause")}</h2>
       <div className="form-grid">
         <Field label={t("month")}>
           <input type="month" required value={f.month} onChange={set("month")} />
@@ -69,9 +85,6 @@ function CauseForm({ onDone }: { onDone: () => void }) {
         <Field label={t("responsible")}>
           <input required value={f.responsible} onChange={set("responsible")} />
         </Field>
-        <Field label={t("budget")}>
-          <input type="number" min="1" step="0.01" required value={f.budgetUsd} onChange={set("budgetUsd")} />
-        </Field>
         <Field label={t("timeline")}>
           <input required value={f.timeline} onChange={set("timeline")} />
         </Field>
@@ -83,13 +96,53 @@ function CauseForm({ onDone }: { onDone: () => void }) {
         <Field label={t("descEn")}>
           <textarea required value={f.descriptionEn} onChange={set("descriptionEn")} />
         </Field>
+        <Field label={t("fundsUseEs")}>
+          <textarea required value={f.fundsUseEs} onChange={set("fundsUseEs")} />
+        </Field>
+        <Field label={t("fundsUseEn")}>
+          <textarea required value={f.fundsUseEn} onChange={set("fundsUseEn")} />
+        </Field>
         <Field label={t("photos")}>
           <textarea value={f.photos} onChange={set("photos")} />
         </Field>
       </div>
-      {create.isError && <p className="error">{t("genericError")}</p>}
+
+      <h3 className="section-label">{t("budgetItems")}</h3>
+      <p className="muted" style={{ marginTop: 0 }}>{t("budgetItemsHint")}</p>
+      <div className="stack" data-testid="budget-items">
+        {items.map((it, n) => (
+          <div key={n} className="budget-row">
+            <Field label={t("conceptEs")}>
+              <input required value={it.conceptEs} onChange={(e) => setItem(n, "conceptEs", e.target.value)} />
+            </Field>
+            <Field label={t("conceptEn")}>
+              <input required value={it.conceptEn} onChange={(e) => setItem(n, "conceptEn", e.target.value)} />
+            </Field>
+            <Field label={t("amountUsdShort")}>
+              <input type="number" min="0.01" step="0.01" required value={it.amountUsd} onChange={(e) => setItem(n, "amountUsd", e.target.value)} />
+            </Field>
+            <button
+              className="btn btn-quiet"
+              type="button"
+              aria-label={t("removeBudgetItem")}
+              disabled={items.length === 1}
+              onClick={() => setItems(items.filter((_, i) => i !== n))}
+            >
+              {t("remove")}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="row" style={{ justifyContent: "space-between", marginTop: 10 }}>
+        <button className="btn" type="button" disabled={items.length >= 20} onClick={() => setItems([...items, emptyItem()])}>
+          {t("addBudgetItem")}
+        </button>
+        <strong data-testid="budget-total">{t("budgetTotal", { total: formatUsd(totalCents, lang) })}</strong>
+      </div>
+
+      {save.isError && <p className="error">{t("genericError")}</p>}
       <div className="form-actions">
-        <button className="btn btn-primary" type="submit" disabled={create.isPending}>
+        <button className="btn btn-primary" type="submit" disabled={save.isPending}>
           {t("save")}
         </button>
         <button className="btn" type="button" onClick={onDone}>
@@ -144,6 +197,7 @@ export function Causes() {
   const { t, lang } = useI18n();
   const qc = useQueryClient();
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState<Cause | null>(null);
   const { data, isLoading } = useQuery({ queryKey: ["causes"], queryFn: () => api<Cause[]>("/admin/causes") });
 
   return (
@@ -162,6 +216,7 @@ export function Causes() {
       {creating && (
         <div style={{ marginBottom: 20 }}>
           <CauseForm
+            cause={null}
             onDone={() => {
               setCreating(false);
               void qc.invalidateQueries({ queryKey: ["causes"] });
@@ -172,8 +227,18 @@ export function Causes() {
       {isLoading && <p className="muted">{t("loading")}</p>}
       {data?.length === 0 && <div className="notice">{t("noCauses")}</div>}
       <div className="stack" style={{ gap: 14 }}>
-        {data?.map((c) => (
-          <article key={c.id} className="card">
+        {data?.map((c) =>
+          editing?.id === c.id ? (
+            <CauseForm
+              key={c.id}
+              cause={c}
+              onDone={() => {
+                setEditing(null);
+                void qc.invalidateQueries({ queryKey: ["causes"] });
+              }}
+            />
+          ) : (
+          <article key={c.id} className="card" data-testid={`admin-cause-${c.id}`}>
             <div className="card-head">
               <div>
                 <h2>{c.name[lang]}</h2>
@@ -184,9 +249,34 @@ export function Causes() {
               <span className={`badge ${c.status}`}>{t(`status_${c.status}` as I18nKey)}</span>
             </div>
             <p style={{ margin: 0 }}>{c.description[lang]}</p>
+            {c.fundsUse ? (
+              <p style={{ margin: "8px 0 0" }}>
+                <strong>{t("fundsUse")}</strong> {c.fundsUse[lang]}
+              </p>
+            ) : (
+              c.status === "candidate" && <p className="error" style={{ margin: "8px 0 0" }}>{t("noFundsUse")}</p>
+            )}
+            {c.budgetItems.length > 0 && (
+              <table className="table" style={{ marginTop: 8 }}>
+                <tbody>
+                  {c.budgetItems.map((i, n) => (
+                    <tr key={n}>
+                      <td>{i.concept[lang]}</td>
+                      <td className="num">{formatUsd(i.amountCents, lang)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {c.status === "candidate" && (
+              <div className="row" style={{ marginTop: 8 }}>
+                <button className="btn" type="button" onClick={() => setEditing(c)}>{t("edit")}</button>
+              </div>
+            )}
             {(c.status === "won" || c.status === "funded") && <WinnerActions cause={c} />}
           </article>
-        ))}
+          ),
+        )}
       </div>
     </>
   );

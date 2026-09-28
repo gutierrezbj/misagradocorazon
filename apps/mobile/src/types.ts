@@ -104,13 +104,18 @@ export type Cause = {
   location: string;
   responsible: string;
   description: Localized;
+  // Qué se hará con el dinero; null en causas anteriores a la ficha completa.
+  fundsUse: Localized | null;
   budgetCents: number;
+  budgetItems: { concept: Localized; amountCents: number }[];
   photos: string[];
   timeline: string;
   status: "candidate" | "voting" | "won" | "funded" | "archived";
   votes?: number;
   percentage?: number;
 };
+
+export type CauseDetail = Cause & { updates: { id: string; text: Localized; photoUrl: string | null; createdAt: string }[] };
 
 export type CurrentCauses = {
   month: string;
