@@ -21,6 +21,9 @@ export type AnalyticsEvents = {
   intention_posted: { category: IntentionCategory; moderated: boolean };
   intention_prayed: Record<string, never>;
   vote_cast: Record<string, never>;
+  // Recuperar contraseña (US-24): embudo de código pedido → contraseña cambiada.
+  password_reset_requested: Record<string, never>;
+  password_reset_completed: Record<string, never>;
   cause_opened: Record<string, never>;
   mass_opened: { status: "scheduled" | "live" | "ended" };
   // Grabación de la última misa (pilar 2): dentro de la app (YouTube) o fuera.

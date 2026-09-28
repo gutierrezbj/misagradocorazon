@@ -102,6 +102,24 @@ const dict = {
   haveAccount: { es: "¿Ya tienes cuenta? Inicia sesión", en: "Already have an account? Sign in" },
   logout: { es: "Cerrar sesión", en: "Log out" },
   authError: { es: "No pudimos verificar tus datos.", en: "We could not verify your details." },
+  // recuperar contraseña (US-24)
+  forgotPassword: { es: "¿Olvidaste tu contraseña?", en: "Forgot your password?" },
+  resetTitle: { es: "Cambiar la contraseña", en: "Change your password" },
+  resetIntro: { es: "Escribe tu correo y te enviaremos un código de 6 dígitos.", en: "Enter your email and we will send you a 6-digit code." },
+  sendCode: { es: "Enviar código", en: "Send code" },
+  codeSentHint: {
+    es: "Si hay una cuenta con ese correo, te llegará un código en unos minutos. Caduca en 10 minutos.",
+    en: "If there is an account with that email, a code will arrive in a few minutes. It expires in 10 minutes.",
+  },
+  codeLabel: { es: "Código", en: "Code" },
+  newPassword: { es: "Nueva contraseña", en: "New password" },
+  changePassword: { es: "Cambiar contraseña", en: "Change password" },
+  resendCode: { es: "Pedir otro código", en: "Get another code" },
+  invalidCode: { es: "El código no es correcto.", en: "The code is not correct." },
+  codeExpired: { es: "El código ha caducado. Pide otro.", en: "The code has expired. Get another one." },
+  tooManyAttempts: { es: "Demasiados intentos. Pide otro código.", en: "Too many attempts. Get another code." },
+  passwordChanged: { es: "Contraseña cambiada. Ya puedes entrar.", en: "Password changed. You can sign in now." },
+  backToLogin: { es: "Volver a entrar", en: "Back to sign in" },
   // onboarding
   chooseSaint: { es: "Elige tu santo patrón", en: "Choose your patron saint" },
   chooseSaintSub: { es: "Toda tu experiencia girará en torno a él", en: "Your whole experience will center on them" },
@@ -271,7 +289,7 @@ const dict = {
   // admin
 };
 
-type Key = keyof typeof dict;
+export type Key = keyof typeof dict;
 
 type I18nCtx = { lang: Lang; setLang: (l: Lang) => void; t: (k: Key) => string; loc: (obj: any) => string };
 const Ctx = createContext<I18nCtx | null>(null);

@@ -4,6 +4,7 @@ import { accountDeleteSchema, appleAuthorizationSchema, onboardingSchema, profil
 import { prisma } from "../../db.ts";
 import { isValidTimeZone } from "../../lib/dates.ts";
 import { HttpError, ok } from "../../http.ts";
+import { mailConfigured } from "../../lib/mail.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
 import { profileDto } from "../ritual/serializers.ts";
 import { currentStreak } from "../ritual/streak.ts";
@@ -26,6 +27,11 @@ function consentStamp(user: { analyticsConsent: boolean }, consent: boolean | un
 function assertTimeZone(tz: string | undefined) {
   if (tz !== undefined && !isValidTimeZone(tz)) throw new HttpError(400, "invalid_timezone", "Zona horaria no válida");
 }
+
+// Qué opciones de acceso ofrece la app según lo configurado en el servidor (sin sesión).
+usersRouter.get("/features", (_req, res) => {
+  ok(res, { passwordReset: mailConfigured() });
+});
 
 usersRouter.get("/me", requireUser, async (req, res) => {
   const user = currentUser(req);

@@ -36,6 +36,13 @@ const envSchema = z.object({
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET: z.string().min(1).optional(),
   R2_PUBLIC_BASE_URL: z.url().optional(),
+  // Email (SDD-05 US-24: recuperar contraseña). SMTP de cualquier proveedor, con cuenta a nombre del
+  // fundador, p. ej. smtps://usuario:clave@smtp.proveedor.com:465. Sin las dos, la opción no aparece.
+  SMTP_URL: z
+    .string()
+    .regex(/^smtps?:\/\//, "Debe empezar por smtp:// o smtps://")
+    .optional(),
+  MAIL_FROM: z.string().min(3).optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -78,6 +78,7 @@ Solo con consentimiento explícito. Al final del onboarding la opción aparece *
   | `intention_posted` | categoría, retenida por moderación o no |
   | `intention_prayed` | ninguna |
   | `vote_cast` | ninguna |
+  | `password_reset_requested`, `password_reset_completed` | ninguna. Embudo de recuperar la contraseña (`docs/recuperar-contrasena.md`) |
   | `cause_opened` | ninguna (se abre la ficha completa de una causa). Junto con `vote_cast`, dice cuántos leen la ficha antes de votar |
   | `mass_opened` | estado de la misa |
   | `recording_opened` | grabación vista dentro de la app o fuera |

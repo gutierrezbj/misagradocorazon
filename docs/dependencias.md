@@ -16,6 +16,7 @@ Todas las cuentas van a nombre del fundador o de la futura sociedad, nunca del c
 | Firebase | Push en Android (FCM v1, clave subida a EAS) | `docs/push.md` | No hay push en Android |
 | Cloudflare R2 | Imágenes y audio subidos desde el panel | `R2_*` (`docs/contenido.md`) | El panel no sube ficheros; se pueden pegar URLs |
 | PostHog | Analítica de producto, solo con consentimiento | `EXPO_PUBLIC_POSTHOG_*` (`docs/kpis.md`) | La analítica está apagada |
+| Proveedor de email (SMTP) | Código para recuperar la contraseña (US-24) | `SMTP_URL`, `MAIL_FROM` (`docs/recuperar-contrasena.md`) | La opción "¿Olvidaste tu contraseña?" no aparece |
 | Sentry | Errores de la app, el panel, la API y el worker, sin datos personales | `SENTRY_DSN`, `EXPO_PUBLIC_SENTRY_DSN`, `VITE_SENTRY_DSN` (`docs/monitorizacion.md`) | No se envía nada |
 | YouTube | Emisión de la misa en vivo (vídeo incrustado) | URL de cada misa en el panel | — |
 | RevenueCat | Compras dentro de la app, cuando exista la sociedad (ADR-003) | Aún no integrado: la capa de pagos es simulada (`apps/api/src/modules/payments/provider.ts`) | Pagos simulados |
@@ -37,6 +38,7 @@ Todas las cuentas van a nombre del fundador o de la futura sociedad, nunca del c
 | @sentry/node | 10.37.0 | Errores de la API y el worker |
 | express-rate-limit | 8.7.0 | Límites de uso (`docs/seguridad.md`) |
 | cors | 2.8.6 | Orígenes permitidos (panel y web) |
+| nodemailer | 10.0.12 | Envío por SMTP del código para recuperar la contraseña (sin dependencias propias) |
 
 Desarrollo: prisma 7.10.0 (migraciones), typescript 6.0.3, tsx 4.23.15, vitest 5.0.2 con @vitest/coverage-v8, supertest 7.3.0, socket.io-client 4.8.4 (tests del chat) y los paquetes `@types/*`.
 

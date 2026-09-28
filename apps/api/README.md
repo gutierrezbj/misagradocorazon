@@ -71,6 +71,9 @@ Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coin
 | POST | `/api/auth/sign-in/email` | — | Login (Better Auth) |
 | POST | `/api/auth/sign-in/social` | — | Login con Google o Apple por ID token nativo (`docs/login-social.md`) |
 | POST | `/api/auth/sign-out` | ✔ | Cerrar sesión (Better Auth) |
+| POST | `/api/auth/email-otp/request-password-reset` | — | Pedir el código para cambiar la contraseña; misma respuesta exista o no la cuenta (US-24, `docs/recuperar-contrasena.md`) |
+| POST | `/api/auth/email-otp/reset-password` | — | Cambiar la contraseña con el código; cierra las sesiones abiertas (US-24) |
+| GET | `/api/features` | — | Qué opciones de acceso ofrece el servidor (hoy: `passwordReset`) |
 | GET | `/api/me` | ✔ | Perfil y racha |
 | PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria y consentimiento de analítica |
 | PATCH | `/api/me` | ✔ | Actualizar perfil, preferencias de notificación y consentimiento de analítica |
