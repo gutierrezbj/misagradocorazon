@@ -57,6 +57,29 @@ describe("santoral", () => {
     expect(await prisma.adminAuditLog.count({ where: { entity: "saint", entityId: "saint_santa_rosa_de_lima" } })).toBe(2);
   });
 
+  it("iconografía opcional (US-26): se guarda, se sirve en la ficha y editarla no toca lo demás", async () => {
+    const ed = await signUpAs("editor");
+    const created = await request(app).post("/api/admin/saints").set(bearer(ed.token)).send(saint);
+    expect((await request(app).get(`/api/saints/${created.body.data.id}`)).body.data.iconography).toEqual({ es: "", en: "" });
+
+    await request(app)
+      .patch(`/api/admin/saints/${created.body.data.id}`)
+      .set(bearer(ed.token))
+      .send({ iconographyEs: "Hábito dominico y corona de rosas", iconographyEn: "Dominican habit and a crown of roses" })
+      .expect(200);
+    const pub = (await request(app).get(`/api/saints/${created.body.data.id}`)).body.data;
+    expect(pub.iconography).toEqual({ es: "Hábito dominico y corona de rosas", en: "Dominican habit and a crown of roses" });
+    expect(pub.history.es).toBe(saint.historyEs);
+    expect(
+      (
+        await request(app)
+          .patch(`/api/admin/saints/${created.body.data.id}`)
+          .set(bearer(ed.token))
+          .send({ iconographyEs: "x".repeat(1001) })
+      ).status,
+    ).toBe(400);
+  });
+
   it("valida fecha y URLs", async () => {
     const ed = await signUpAs("editor");
     expect(

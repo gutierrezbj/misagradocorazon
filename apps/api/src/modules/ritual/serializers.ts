@@ -10,6 +10,7 @@ export function saintDto(s: Saint) {
     audioUrl: { es: s.audioUrlEs, en: s.audioUrlEn },
     history: { es: s.historyEs, en: s.historyEn },
     patronages: { es: s.patronagesEs, en: s.patronagesEn },
+    iconography: { es: s.iconographyEs, en: s.iconographyEn },
     prayer: { es: s.prayerEs, en: s.prayerEn },
     isPatronCatalog: s.isPatronCatalog,
   };

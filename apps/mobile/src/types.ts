@@ -37,6 +37,8 @@ export type Saint = {
   audioUrl: LocalizedAudio;
   history: Localized;
   patronages: Localized;
+  // Cómo se le representa (US-26); vacía si no está escrita.
+  iconography: Localized;
   prayer: Localized;
   isPatronCatalog: boolean;
 };

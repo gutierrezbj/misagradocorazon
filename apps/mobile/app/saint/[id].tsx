@@ -68,6 +68,7 @@ export default function SaintDetail() {
             )}
             <Section title={t("history")} text={loc(saint.history)} />
             {!!loc(saint.patronages) && <Section title={t("patronages")} text={loc(saint.patronages)} />}
+            {!!loc(saint.iconography) && <Section title={t("iconography")} text={loc(saint.iconography)} />}
             {!!loc(saint.prayer) && (
               <View style={styles.prayerBox}>
                 <Text style={styles.prayerLabel}>{t("prayerLabel")}</Text>

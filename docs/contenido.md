@@ -31,7 +31,7 @@ Página **Oraciones por tiempo** del panel. Para cada tiempo, una oración de ma
 
 ## Santoral
 
-- **Qué incluye cada ficha:** nombre, fiesta (MM-DD), imagen, audio ES/EN, historia, advocaciones y oración (ES/EN), si es elegible como patrón en el onboarding y el orden en la lista.
+- **Qué incluye cada ficha:** nombre, fiesta (MM-DD), imagen, audio ES/EN, historia, advocaciones, iconografía (opcional, US-26: cómo se le representa; la app la muestra solo si está escrita) y oración (ES/EN), si es elegible como patrón en el onboarding y el orden en la lista.
 - **Ocultar un santo:** es una baja lógica; se puede **recuperar**.
 - **Cuándo no se puede ocultar:** si es el patrón de algún fiel o el santo de un día próximo. Su altar o ese día se quedarían sin santo.
 
