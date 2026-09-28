@@ -60,12 +60,12 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 
 | Qué | Situación | Recomendación |
 |---|---|---|
-| **Zustand** (SDD-06: "Zustand + TanStack Query") | La app nunca lo ha usado: el estado global (sesión, idioma, audio) va con Context de React, desde la entrega del constructor | Mantener Context y actualizar SDD-06. Migrar no aporta nada al fiel |
-| **Controllers por módulo** (SDD-06: "routes, controllers, services y esquemas") | Los módulos de la API tienen rutas y servicios; los esquemas están en `packages/shared`. No hay capa de controllers aparte | Mantenerlo así y ajustar SDD-06: separar controllers añade ficheros sin ganar claridad |
 | **Recuperación de contraseña** | No está en ningún SDD. La auditoría de la entrega señala que falta | Añadirla a SDD-05 (Épica 1) y elegir un proveedor de email a nombre del fundador |
 | **Decisiones de SDD-08** (Sentry, EAS Update, backups) | Hechas en el código y documentadas en `docs/monitorizacion.md` y `docs/despliegue.md` | Registrarlas en Notion (Claude no edita Notion sin visto bueno) |
 | **Etiqueta del tiempo litúrgico** en la pantalla de oración (US-10) | Texto pequeño ("Tiempo ordinario"), sin cambio de tema. SDD-02 deja para v1.1 un "calendario litúrgico visual" | Mantenerla: es parte de US-10, no el calendario visual |
 | **Mensajes de commit** | SDD-06 los pide en inglés. Hasta el 28-sep-2026 se escribieron en español; desde el PR #36, en inglés | Sin acción |
+
+Resuelto el 28-sep-2026: el estado global de la app sigue con Context de React (no Zustand) y los módulos de la API sin capa de controllers. SDD-06 actualizado en Notion con visto bueno del fundador (`docs/propuesta-cambios-sdd.md`).
 
 ## Fuera del MVP
 

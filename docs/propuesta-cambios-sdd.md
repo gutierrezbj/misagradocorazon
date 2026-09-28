@@ -153,6 +153,10 @@ Los pendientes de abril (caché de audio, duración de la vela) siguen abiertos.
   - Prohibido mencionar causas o el 20% en el flujo de compra.
   - Los esquemas Zod de `packages/shared` son la única definición de los contratos.
 - Pendiente de abril que se resuelve: se usa **Prisma** como ORM.
+- **Cambio del 28-sep-2026** (decisión del fundador, aplicado en Notion ese día):
+  - El estado global de la app va con **Context de React + TanStack Query**, no con Zustand. La app nunca usó Zustand y migrar no aporta nada al usuario.
+  - Cada módulo de la API agrupa **rutas y servicios**; los contratos están en `packages/shared`. No hay capa de controllers aparte.
+  - Queda registrada la estructura aplicada (módulos de la API y `src/` de la app por pilar) y Prettier en el CI.
 
 ---
 
