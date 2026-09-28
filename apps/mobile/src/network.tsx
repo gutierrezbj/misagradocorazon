@@ -12,8 +12,7 @@ import { useI18n } from "@/src/i18n";
 import { fonts, makeStyles, spacing } from "@/src/theme";
 import { Icon } from "@/src/components/ui";
 
-export const isOnline = (s: Pick<Network.NetworkState, "isConnected" | "isInternetReachable">) =>
-  s.isConnected !== false && s.isInternetReachable !== false;
+export const isOnline = (s: Pick<Network.NetworkState, "isConnected" | "isInternetReachable">) => s.isConnected !== false && s.isInternetReachable !== false;
 
 export function useQueryOnlineSync() {
   useEffect(() => {
@@ -31,12 +30,7 @@ export function OfflineBanner() {
   const styles = useStyles();
   if (isOnline(state)) return null;
   return (
-    <View
-      testID="offline-banner"
-      accessibilityRole="alert"
-      style={[styles.banner, { paddingTop: insets.top + spacing.xs }]}
-      pointerEvents="none"
-    >
+    <View testID="offline-banner" accessibilityRole="alert" style={[styles.banner, { paddingTop: insets.top + spacing.xs }]} pointerEvents="none">
       <Icon name="wifi-off" size={16} color={styles.text.color as string} />
       <Text style={styles.text}>{t("offline")}</Text>
     </View>

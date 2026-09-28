@@ -113,8 +113,7 @@ export async function computeKpis(days: number, now = new Date()) {
   });
 
   const pendingModeration =
-    (await prisma.intention.count({ where: { status: "pending" } })) +
-    (await prisma.chatMessage.count({ where: { status: "pending" } }));
+    (await prisma.intention.count({ where: { status: "pending" } })) + (await prisma.chatMessage.count({ where: { status: "pending" } }));
 
   const mau = n(active?.mau);
   const retentionD7 = await retention(7);
@@ -170,9 +169,7 @@ export async function computeKpis(days: number, now = new Date()) {
       transferredCents: sumOf("transfer"),
     },
     voting: { month, votes: votesThisMonth, participationRate: pct(votesThisMonth, mau) },
-    mass: lastMass
-      ? { massId: lastMass.id, scheduledAt: lastMass.scheduledAt, attendees: massAttendees, chatParticipants: massParticipants }
-      : null,
+    mass: lastMass ? { massId: lastMass.id, scheduledAt: lastMass.scheduledAt, attendees: massAttendees, chatParticipants: massParticipants } : null,
     daily: daily.map((d) => ({ day: d.day, newUsers: d.newUsers, activeUsers: d.activeUsers, candles: d.candles, revenueCents: d.revenueCents })),
     moderation: { pending: pendingModeration },
     prayers: { current: liturgicalSeason(isoDay(now)), bySeason: prayersBySeason },

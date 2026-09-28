@@ -39,9 +39,7 @@ let googleConfigured = false;
 
 /** Devuelve null si la persona cancela. */
 export async function signInWithGoogle(): Promise<SocialCredential | null> {
-  const { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } = await import(
-    "@react-native-google-signin/google-signin"
-  );
+  const { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } = await import("@react-native-google-signin/google-signin");
   if (!googleConfigured) {
     // webClientId: el ID token sale emitido para el cliente web, que es la audiencia que verifica la API.
     GoogleSignin.configure({ webClientId: GOOGLE_WEB_CLIENT_ID, ...(GOOGLE_IOS_CLIENT_ID && { iosClientId: GOOGLE_IOS_CLIENT_ID }) });
@@ -73,9 +71,10 @@ export async function signInWithApple(): Promise<SocialCredential | null> {
     });
     if (!cred.identityToken) throw new Error("Apple no devolvió ID token");
     // Apple solo envía el nombre la primera vez que se autoriza la app.
-    const name = cred.fullName?.givenName || cred.fullName?.familyName
-      ? { firstName: cred.fullName.givenName ?? undefined, lastName: cred.fullName.familyName ?? undefined }
-      : undefined;
+    const name =
+      cred.fullName?.givenName || cred.fullName?.familyName
+        ? { firstName: cred.fullName.givenName ?? undefined, lastName: cred.fullName.familyName ?? undefined }
+        : undefined;
     return {
       provider: "apple",
       idToken: { token: cred.identityToken, nonce, ...(name && { user: { name } }) },

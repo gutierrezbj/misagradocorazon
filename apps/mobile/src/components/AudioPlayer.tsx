@@ -137,11 +137,7 @@ export function AudioPlayer({ url, title, artworkUrl, route, autoPlay = false, t
           accessibilityLabel={status.playing ? t("audioPause") : t("audioPlay")}
           style={[styles.main, { backgroundColor: accent, opacity: status.isLoaded ? 1 : 0.6 }]}
         >
-          {loading && !status.playing ? (
-            <ActivityIndicator color={onAccent} />
-          ) : (
-            <Icon name={status.playing ? "pause" : "play"} size={28} color={onAccent} />
-          )}
+          {loading && !status.playing ? <ActivityIndicator color={onAccent} /> : <Icon name={status.playing ? "pause" : "play"} size={28} color={onAccent} />}
         </Pressable>
 
         <Pressable
@@ -170,7 +166,9 @@ export function AudioPlayer({ url, title, artworkUrl, route, autoPlay = false, t
         </View>
       </Pressable>
       <View style={styles.times}>
-        <Text testID={`${testID}-elapsed`} style={[styles.time, { color: muted }]}>{mmss(status.currentTime)}</Text>
+        <Text testID={`${testID}-elapsed`} style={[styles.time, { color: muted }]}>
+          {mmss(status.currentTime)}
+        </Text>
         <Text style={[styles.time, { color: muted }]}>{status.duration > 0 ? mmss(status.duration) : "–:––"}</Text>
       </View>
     </View>

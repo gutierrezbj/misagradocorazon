@@ -10,7 +10,7 @@ type Datum = { label: string; value: number; tooltip?: string };
 function niceMax(v: number) {
   if (v <= 4) return 4;
   const pow = 10 ** Math.floor(Math.log10(v));
-  const step = [1, 2, 2.5, 5, 10].find((s) => (s * pow * 4) >= v) ?? 10;
+  const step = [1, 2, 2.5, 5, 10].find((s) => s * pow * 4 >= v) ?? 10;
   return step * pow * 4;
 }
 

@@ -36,7 +36,10 @@ describe("límites de uso", () => {
     const a = await signUp();
     const b = await signUp();
     for (let i = 0; i < 30; i++) {
-      const r = await request(app).patch("/api/me").set(bearer(a.token)).send({ notifyNight: i % 2 === 0 });
+      const r = await request(app)
+        .patch("/api/me")
+        .set(bearer(a.token))
+        .send({ notifyNight: i % 2 === 0 });
       expect(r.status).toBe(200);
     }
     const blocked = await request(app).patch("/api/me").set(bearer(a.token)).send({ notifyNight: true });

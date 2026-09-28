@@ -53,7 +53,10 @@ function CauseForm({ cause, onDone }: { cause: Cause | null; onDone: () => void 
     mutationFn: () => {
       const body = {
         ...f,
-        photos: f.photos.split("\n").map((p) => p.trim()).filter(Boolean),
+        photos: f.photos
+          .split("\n")
+          .map((p) => p.trim())
+          .filter(Boolean),
         budgetItems: items.map((i) => ({ conceptEs: i.conceptEs, conceptEn: i.conceptEn, amountCents: toCents(i.amountUsd) })),
       };
       return cause ? api(`/admin/causes/${cause.id}`, { method: "PATCH", body }) : api("/admin/causes", { method: "POST", body });
@@ -108,7 +111,9 @@ function CauseForm({ cause, onDone }: { cause: Cause | null; onDone: () => void 
       </div>
 
       <h3 className="section-label">{t("budgetItems")}</h3>
-      <p className="muted" style={{ marginTop: 0 }}>{t("budgetItemsHint")}</p>
+      <p className="muted" style={{ marginTop: 0 }}>
+        {t("budgetItemsHint")}
+      </p>
       <div className="stack" data-testid="budget-items">
         {items.map((it, n) => (
           <div key={n} className="budget-row">
@@ -160,11 +165,13 @@ function WinnerActions({ cause }: { cause: Cause }) {
   const [p, setP] = useState({ textEs: "", textEn: "", photoUrl: "" });
   const [tr, setTr] = useState({ amountUsd: "", note: "" });
   const progress = useMutation({
-    mutationFn: () => api(`/admin/causes/${cause.id}/updates`, { method: "POST", body: { textEs: p.textEs, textEn: p.textEn, photoUrl: p.photoUrl || undefined } }),
+    mutationFn: () =>
+      api(`/admin/causes/${cause.id}/updates`, { method: "POST", body: { textEs: p.textEs, textEn: p.textEn, photoUrl: p.photoUrl || undefined } }),
     onSuccess: () => setP({ textEs: "", textEn: "", photoUrl: "" }),
   });
   const transfer = useMutation({
-    mutationFn: () => api(`/admin/causes/${cause.id}/transfers`, { method: "POST", body: { amountCents: Math.round(Number(tr.amountUsd) * 100), note: tr.note || undefined } }),
+    mutationFn: () =>
+      api(`/admin/causes/${cause.id}/transfers`, { method: "POST", body: { amountCents: Math.round(Number(tr.amountUsd) * 100), note: tr.note || undefined } }),
     onSuccess: () => {
       setTr({ amountUsd: "", note: "" });
       void qc.invalidateQueries({ queryKey: ["causes"] });
@@ -172,20 +179,51 @@ function WinnerActions({ cause }: { cause: Cause }) {
   });
   return (
     <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", marginTop: 12 }}>
-      <form className="stack" onSubmit={(e) => { e.preventDefault(); progress.mutate(); }}>
+      <form
+        className="stack"
+        onSubmit={(e) => {
+          e.preventDefault();
+          progress.mutate();
+        }}
+      >
         <strong>{t("addProgress")}</strong>
-        <Field label={t("progressEs")}><textarea required value={p.textEs} onChange={(e) => setP({ ...p, textEs: e.target.value })} /></Field>
-        <Field label={t("progressEn")}><textarea required value={p.textEn} onChange={(e) => setP({ ...p, textEn: e.target.value })} /></Field>
-        <Field label={t("photoUrl")}><input type="url" value={p.photoUrl} onChange={(e) => setP({ ...p, photoUrl: e.target.value })} /></Field>
-        <div><button className="btn" type="submit" disabled={progress.isPending}>{t("addProgress")}</button> {progress.isSuccess && <span className="muted">{t("saved")}</span>}</div>
+        <Field label={t("progressEs")}>
+          <textarea required value={p.textEs} onChange={(e) => setP({ ...p, textEs: e.target.value })} />
+        </Field>
+        <Field label={t("progressEn")}>
+          <textarea required value={p.textEn} onChange={(e) => setP({ ...p, textEn: e.target.value })} />
+        </Field>
+        <Field label={t("photoUrl")}>
+          <input type="url" value={p.photoUrl} onChange={(e) => setP({ ...p, photoUrl: e.target.value })} />
+        </Field>
+        <div>
+          <button className="btn" type="submit" disabled={progress.isPending}>
+            {t("addProgress")}
+          </button>{" "}
+          {progress.isSuccess && <span className="muted">{t("saved")}</span>}
+        </div>
       </form>
       {can(me) && (
-        <form className="stack" onSubmit={(e) => { e.preventDefault(); transfer.mutate(); }}>
+        <form
+          className="stack"
+          onSubmit={(e) => {
+            e.preventDefault();
+            transfer.mutate();
+          }}
+        >
           <strong>{t("registerTransfer")}</strong>
           <p className="muted">{t("transferHint")}</p>
-          <Field label={t("amountUsd")}><input type="number" min="0.01" step="0.01" required value={tr.amountUsd} onChange={(e) => setTr({ ...tr, amountUsd: e.target.value })} /></Field>
-          <Field label={t("note")}><input value={tr.note} onChange={(e) => setTr({ ...tr, note: e.target.value })} /></Field>
-          <div><button className="btn btn-primary" type="submit" disabled={transfer.isPending}>{t("registerTransfer")}</button></div>
+          <Field label={t("amountUsd")}>
+            <input type="number" min="0.01" step="0.01" required value={tr.amountUsd} onChange={(e) => setTr({ ...tr, amountUsd: e.target.value })} />
+          </Field>
+          <Field label={t("note")}>
+            <input value={tr.note} onChange={(e) => setTr({ ...tr, note: e.target.value })} />
+          </Field>
+          <div>
+            <button className="btn btn-primary" type="submit" disabled={transfer.isPending}>
+              {t("registerTransfer")}
+            </button>
+          </div>
           {transfer.isError && <p className="error">{t("genericError")}</p>}
         </form>
       )}
@@ -238,43 +276,49 @@ export function Causes() {
               }}
             />
           ) : (
-          <article key={c.id} className="card" data-testid={`admin-cause-${c.id}`}>
-            <div className="card-head">
-              <div>
-                <h2>{c.name[lang]}</h2>
-                <div className="muted">
-                  {c.month} · {c.location} · {c.responsible} · {formatUsd(c.budgetCents, lang)}
+            <article key={c.id} className="card" data-testid={`admin-cause-${c.id}`}>
+              <div className="card-head">
+                <div>
+                  <h2>{c.name[lang]}</h2>
+                  <div className="muted">
+                    {c.month} · {c.location} · {c.responsible} · {formatUsd(c.budgetCents, lang)}
+                  </div>
                 </div>
+                <span className={`badge ${c.status}`}>{t(`status_${c.status}` as I18nKey)}</span>
               </div>
-              <span className={`badge ${c.status}`}>{t(`status_${c.status}` as I18nKey)}</span>
-            </div>
-            <p style={{ margin: 0 }}>{c.description[lang]}</p>
-            {c.fundsUse ? (
-              <p style={{ margin: "8px 0 0" }}>
-                <strong>{t("fundsUse")}</strong> {c.fundsUse[lang]}
-              </p>
-            ) : (
-              c.status === "candidate" && <p className="error" style={{ margin: "8px 0 0" }}>{t("noFundsUse")}</p>
-            )}
-            {c.budgetItems.length > 0 && (
-              <table className="table" style={{ marginTop: 8 }}>
-                <tbody>
-                  {c.budgetItems.map((i, n) => (
-                    <tr key={n}>
-                      <td>{i.concept[lang]}</td>
-                      <td className="num">{formatUsd(i.amountCents, lang)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-            {c.status === "candidate" && (
-              <div className="row" style={{ marginTop: 8 }}>
-                <button className="btn" type="button" onClick={() => setEditing(c)}>{t("edit")}</button>
-              </div>
-            )}
-            {(c.status === "won" || c.status === "funded") && <WinnerActions cause={c} />}
-          </article>
+              <p style={{ margin: 0 }}>{c.description[lang]}</p>
+              {c.fundsUse ? (
+                <p style={{ margin: "8px 0 0" }}>
+                  <strong>{t("fundsUse")}</strong> {c.fundsUse[lang]}
+                </p>
+              ) : (
+                c.status === "candidate" && (
+                  <p className="error" style={{ margin: "8px 0 0" }}>
+                    {t("noFundsUse")}
+                  </p>
+                )
+              )}
+              {c.budgetItems.length > 0 && (
+                <table className="table" style={{ marginTop: 8 }}>
+                  <tbody>
+                    {c.budgetItems.map((i, n) => (
+                      <tr key={n}>
+                        <td>{i.concept[lang]}</td>
+                        <td className="num">{formatUsd(i.amountCents, lang)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {c.status === "candidate" && (
+                <div className="row" style={{ marginTop: 8 }}>
+                  <button className="btn" type="button" onClick={() => setEditing(c)}>
+                    {t("edit")}
+                  </button>
+                </div>
+              )}
+              {(c.status === "won" || c.status === "funded") && <WinnerActions cause={c} />}
+            </article>
           ),
         )}
       </div>

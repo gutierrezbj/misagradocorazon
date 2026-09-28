@@ -30,8 +30,7 @@ function Movements({ month }: { month: string }) {
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
   const entries = q.data?.pages.flatMap((p) => p.entries) ?? [];
-  const fmt = (iso: string) =>
-    new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
+  const fmt = (iso: string) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
 
   return (
     <section className="card" style={{ marginTop: 20 }}>

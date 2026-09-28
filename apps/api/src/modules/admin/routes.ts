@@ -90,7 +90,10 @@ adminRouter.post("/admin/moderation/chat/:id", ...moderator, async (req, res) =>
 
 adminRouter.get("/admin/moderation/words", ...moderator, async (_req, res) => {
   const words = await prisma.moderationWord.findMany({ orderBy: { word: "asc" } });
-  ok(res, words.map((w) => w.word));
+  ok(
+    res,
+    words.map((w) => w.word),
+  );
 });
 
 adminRouter.post("/admin/moderation/words", ...moderator, async (req, res) => {
@@ -151,7 +154,10 @@ adminRouter.delete("/admin/masses/:id", ...editor, async (req, res) => {
 
 adminRouter.get("/admin/causes", ...editor, async (_req, res) => {
   const causes = await prisma.cause.findMany({ orderBy: [{ month: "desc" }, { createdAt: "asc" }], include: withBudget });
-  ok(res, causes.map((c) => causeDto(c)));
+  ok(
+    res,
+    causes.map((c) => causeDto(c)),
+  );
 });
 
 adminRouter.post("/admin/causes", ...editor, async (req, res) => {
@@ -241,7 +247,10 @@ adminRouter.get("/admin/kpis", ...requireRole("moderator", "editor"), async (req
 
 adminRouter.get("/admin/masses", ...editor, async (_req, res) => {
   const masses = await prisma.mass.findMany({ orderBy: { scheduledAt: "desc" }, take: 100 });
-  ok(res, masses.map((m) => massDto(m)));
+  ok(
+    res,
+    masses.map((m) => massDto(m)),
+  );
 });
 
 // --- Usuarios y roles (solo superadmin) ------------------------------------------
@@ -275,7 +284,7 @@ adminRouter.patch("/admin/users/:id", ...superadmin, async (req, res) => {
     const target = await tx.user.findUnique({ where: { id: targetId } });
     if (!target) throw notFound("Usuario");
     // Nunca dejar el sistema sin superadmin activo.
-    const losesSuperadmin = target.role === "superadmin" && (input.role !== undefined && input.role !== "superadmin" || input.blocked === true);
+    const losesSuperadmin = target.role === "superadmin" && ((input.role !== undefined && input.role !== "superadmin") || input.blocked === true);
     if (losesSuperadmin) {
       const others = await tx.user.count({ where: { role: "superadmin", blocked: false, id: { not: target.id } } });
       if (others === 0) throw new HttpError(409, "last_superadmin", "Debe quedar al menos un superadmin activo");

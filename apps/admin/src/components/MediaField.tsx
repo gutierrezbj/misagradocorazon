@@ -44,7 +44,14 @@ export function MediaField({
     <div className="field media-field" data-testid={testId}>
       {label}
       <div className="row">
-        <input type="url" required={required} value={value} placeholder="https://" onChange={(e) => onChange(e.target.value)} style={{ flex: 1, minWidth: 180 }} />
+        <input
+          type="url"
+          required={required}
+          value={value}
+          placeholder="https://"
+          onChange={(e) => onChange(e.target.value)}
+          style={{ flex: 1, minWidth: 180 }}
+        />
         <button className="btn" type="button" disabled={state === "uploading"} onClick={() => input.current?.click()}>
           {state === "uploading" ? t("uploading") : t("uploadFile")}
         </button>

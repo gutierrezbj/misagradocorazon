@@ -28,9 +28,7 @@ export function useMassChat(massId: string | undefined) {
       socket.emit("chat:join", { massId });
     });
     socket.on("disconnect", () => setConnected(false));
-    socket.on("chat:message", (m: ChatMessage) =>
-      setMessages((prev) => (prev.some((p) => p.id === m.id) ? prev : [...prev, m].slice(-200))),
-    );
+    socket.on("chat:message", (m: ChatMessage) => setMessages((prev) => (prev.some((p) => p.id === m.id) ? prev : [...prev, m].slice(-200))));
     socket.on("chat:removed", ({ id }: { id: string }) => setMessages((prev) => prev.filter((p) => p.id !== id)));
 
     return () => {
@@ -45,9 +43,7 @@ export function useMassChat(massId: string | undefined) {
       new Promise<SendResult>((resolve) => {
         const socket = socketRef.current;
         if (!socket || !massId) return resolve({ ok: false, error: "not_connected" });
-        socket.timeout(5000).emit("chat:send", { massId, text }, (err: Error | null, res: SendResult) =>
-          resolve(err ? { ok: false, error: "timeout" } : res),
-        );
+        socket.timeout(5000).emit("chat:send", { massId, text }, (err: Error | null, res: SendResult) => resolve(err ? { ok: false, error: "timeout" } : res));
       }),
     [massId],
   );

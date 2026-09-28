@@ -35,8 +35,7 @@ function client(token?: string): Promise<Socket> {
   });
 }
 
-const emit = <T>(s: Socket, event: string, payload: unknown) =>
-  new Promise<T>((resolve) => s.emit(event, payload, (res: T) => resolve(res)));
+const emit = <T>(s: Socket, event: string, payload: unknown) => new Promise<T>((resolve) => s.emit(event, payload, (res: T) => resolve(res)));
 
 const nextEvent = <T>(s: Socket, event: string, timeoutMs = 1500) =>
   new Promise<T | null>((resolve) => {

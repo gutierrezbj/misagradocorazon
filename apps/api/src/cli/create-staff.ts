@@ -69,9 +69,7 @@ async function main() {
       console.log(`Cuenta creada con rol ${result.role} (id ${result.userId}).`);
       break;
     case "promoted":
-      console.log(
-        `Cuenta existente: ${result.from} → ${result.role}${result.unblocked ? ", desbloqueada" : ""}. La contraseña no se ha tocado.`,
-      );
+      console.log(`Cuenta existente: ${result.from} → ${result.role}${result.unblocked ? ", desbloqueada" : ""}. La contraseña no se ha tocado.`);
       break;
     case "unchanged":
       console.log(`La cuenta ya tenía el rol ${result.role}. Sin cambios.`);
@@ -81,8 +79,7 @@ async function main() {
 
 main()
   .catch((err: unknown) => {
-    const message =
-      err instanceof z.ZodError ? z.prettifyError(err) : err instanceof Error ? err.message : String(err);
+    const message = err instanceof z.ZodError ? z.prettifyError(err) : err instanceof Error ? err.message : String(err);
     console.error(`Error: ${message}`);
     process.exitCode = 1;
   })

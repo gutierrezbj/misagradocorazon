@@ -50,7 +50,13 @@ export function Seasons() {
                     ) : (
                       <p className="muted">{s.season !== "ordinary" && ordinary?.[kind] ? t("seasonUsesOrdinary") : t("seasonNoPrayer")}</p>
                     )}
-                    <button className="btn" type="button" style={{ marginTop: 8 }} onClick={() => setEditing({ season: s.season, kind })} data-testid={`edit-${s.season}-${kind}`}>
+                    <button
+                      className="btn"
+                      type="button"
+                      style={{ marginTop: 8 }}
+                      onClick={() => setEditing({ season: s.season, kind })}
+                      data-testid={`edit-${s.season}-${kind}`}
+                    >
                       {s[kind] ? t("editPrayer") : t("addPrayer")}
                     </button>
                   </div>
@@ -94,14 +100,36 @@ function PrayerForm({ season, kind, initial, onDone }: { season: SeasonRow["seas
       }}
     >
       <h3 className="section-label">{kind === "morning" ? t("morningPrayerLabel") : t("nightPrayerLabel")}</h3>
-      <label className="field">{t("textEs")}<textarea required value={f.textEs} onChange={(e) => setF({ ...f, textEs: e.target.value })} /></label>
-      <label className="field">{t("textEn")}<textarea required value={f.textEn} onChange={(e) => setF({ ...f, textEn: e.target.value })} /></label>
-      <MediaField label={t("audioEs")} kind="audio" value={f.audioUrlEs} onChange={(v) => setF({ ...f, audioUrlEs: v })} testId={`season-${season}-${kind}-es`} />
-      <MediaField label={t("audioEn")} kind="audio" value={f.audioUrlEn} onChange={(v) => setF({ ...f, audioUrlEn: v })} testId={`season-${season}-${kind}-en`} />
+      <label className="field">
+        {t("textEs")}
+        <textarea required value={f.textEs} onChange={(e) => setF({ ...f, textEs: e.target.value })} />
+      </label>
+      <label className="field">
+        {t("textEn")}
+        <textarea required value={f.textEn} onChange={(e) => setF({ ...f, textEn: e.target.value })} />
+      </label>
+      <MediaField
+        label={t("audioEs")}
+        kind="audio"
+        value={f.audioUrlEs}
+        onChange={(v) => setF({ ...f, audioUrlEs: v })}
+        testId={`season-${season}-${kind}-es`}
+      />
+      <MediaField
+        label={t("audioEn")}
+        kind="audio"
+        value={f.audioUrlEn}
+        onChange={(v) => setF({ ...f, audioUrlEn: v })}
+        testId={`season-${season}-${kind}-en`}
+      />
       {save.isError && <p className="error">{t("genericError")}</p>}
       <div className="row">
-        <button className="btn btn-primary" type="submit" disabled={save.isPending}>{t("save")}</button>
-        <button className="btn" type="button" onClick={onDone}>{t("cancel")}</button>
+        <button className="btn btn-primary" type="submit" disabled={save.isPending}>
+          {t("save")}
+        </button>
+        <button className="btn" type="button" onClick={onDone}>
+          {t("cancel")}
+        </button>
       </div>
     </form>
   );

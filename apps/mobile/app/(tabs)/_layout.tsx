@@ -53,9 +53,7 @@ export default function TabsLayout() {
   }
 
   const icon = (name: any) => {
-    const TabIcon = ({ color, size }: { color: ColorValue; size: number }) => (
-      <Feather name={name} size={size} color={color} />
-    );
+    const TabIcon = ({ color, size }: { color: ColorValue; size: number }) => <Feather name={name} size={size} color={color} />;
     return TabIcon;
   };
 

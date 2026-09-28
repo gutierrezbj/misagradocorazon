@@ -22,7 +22,15 @@ export async function seasonalPrayers(seasons: LiturgicalSeason[]) {
 
 type DayPrayers = Pick<
   DailyContent,
-  "date" | "morningPrayerEs" | "morningPrayerEn" | "nightPrayerEs" | "nightPrayerEn" | "morningAudioUrlEs" | "morningAudioUrlEn" | "nightAudioUrlEs" | "nightAudioUrlEn"
+  | "date"
+  | "morningPrayerEs"
+  | "morningPrayerEn"
+  | "nightPrayerEs"
+  | "nightPrayerEn"
+  | "morningAudioUrlEs"
+  | "morningAudioUrlEn"
+  | "nightAudioUrlEs"
+  | "nightAudioUrlEn"
 >;
 
 export function resolvePrayers(day: DayPrayers, sets: Map<string, SeasonalPrayer>) {

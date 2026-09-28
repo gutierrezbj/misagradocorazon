@@ -53,7 +53,10 @@ describe("causas y votación", () => {
 
   test("no se crean causas para meses pasados", async () => {
     const editor = await signUpAs("editor");
-    const res = await request(app).post("/api/admin/causes").set(bearer(editor.token)).send({ ...causeBody(1), month: "2026-09" });
+    const res = await request(app)
+      .post("/api/admin/causes")
+      .set(bearer(editor.token))
+      .send({ ...causeBody(1), month: "2026-09" });
     expect(res.status).toBe(400);
   });
 
@@ -98,7 +101,11 @@ describe("causas y votación", () => {
   test("editar una candidata solo cambia lo enviado (no borra las fotos)", async () => {
     const editor = await signUpAs("editor");
     const photos = ["https://media.example/pozo-1.jpg"];
-    const created = await request(app).post("/api/admin/causes").set(bearer(editor.token)).send({ ...causeBody(1), photos }).expect(201);
+    const created = await request(app)
+      .post("/api/admin/causes")
+      .set(bearer(editor.token))
+      .send({ ...causeBody(1), photos })
+      .expect(201);
     const res = await request(app).patch(`/api/admin/causes/${created.body.data.id}`).set(bearer(editor.token)).send({ nameEs: "Pozo de agua" });
     expect(res.status).toBe(200);
     const stored = await prisma.cause.findUniqueOrThrow({ where: { id: created.body.data.id } });
@@ -144,7 +151,12 @@ describe("causas y votación", () => {
     const res = await request(app)
       .patch(`/api/admin/causes/${id}`)
       .set(bearer(editor.token))
-      .send({ budgetItems: [{ conceptEs: "Techo", conceptEn: "Roof", amountCents: 300_000 }, { conceptEs: "Mano de obra", conceptEn: "Labour", amountCents: 100_000 }] });
+      .send({
+        budgetItems: [
+          { conceptEs: "Techo", conceptEn: "Roof", amountCents: 300_000 },
+          { conceptEs: "Mano de obra", conceptEn: "Labour", amountCents: 100_000 },
+        ],
+      });
     expect(res.status).toBe(200);
     expect(res.body.data.budgetCents).toBe(400_000);
     expect(res.body.data.budgetItems.map((i: { concept: { es: string } }) => i.concept.es)).toEqual(["Techo", "Mano de obra"]);
@@ -159,7 +171,14 @@ describe("causas y votación", () => {
     const editor = await signUpAs("editor");
     const { fundsUseEs: _f, ...noFunds } = causeBody(1);
     expect((await request(app).post("/api/admin/causes").set(bearer(editor.token)).send(noFunds)).status).toBe(400);
-    expect((await request(app).post("/api/admin/causes").set(bearer(editor.token)).send({ ...causeBody(1), budgetItems: [] })).status).toBe(400);
+    expect(
+      (
+        await request(app)
+          .post("/api/admin/causes")
+          .set(bearer(editor.token))
+          .send({ ...causeBody(1), budgetItems: [] })
+      ).status,
+    ).toBe(400);
   });
 
   test("una causa inexistente o de otro estado desconocido da 404", async () => {
@@ -231,10 +250,7 @@ describe("transparencia", () => {
     const { ids } = await setupVoting();
     await closeVoting("2026-10");
     const editor = await signUpAs("editor");
-    await request(app)
-      .post(`/api/admin/causes/${ids[0]}/updates`)
-      .set(bearer(editor.token))
-      .send({ textEs: "Techo reparado", textEn: "Roof repaired" });
+    await request(app).post(`/api/admin/causes/${ids[0]}/updates`).set(bearer(editor.token)).send({ textEs: "Techo reparado", textEn: "Roof repaired" });
     const res = await request(app).get("/api/causes/history");
     expect(res.body.data).toHaveLength(1);
     expect(res.body.data[0].updates[0].text).toEqual({ es: "Techo reparado", en: "Roof repaired" });

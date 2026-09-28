@@ -115,10 +115,7 @@ export function Dashboard() {
                 <div className="card-head">
                   <h2>{t("chartByType")}</h2>
                 </div>
-                <BarList
-                  ariaLabel={t("chartByType")}
-                  data={k.candles.byType.map((b) => ({ label: t(`type_${b.type}` as I18nKey), value: b.candles }))}
-                />
+                <BarList ariaLabel={t("chartByType")} data={k.candles.byType.map((b) => ({ label: t(`type_${b.type}` as I18nKey), value: b.candles }))} />
               </section>
               <section className="card">
                 <div className="card-head">
@@ -174,8 +171,7 @@ function PrayersBySeason({ prayers }: { prayers: Kpis["prayers"] }) {
 // Objetivos del MVP (especificación §10) frente a los últimos 30 días.
 function Goals({ goals, simulated }: { goals: Goal[]; simulated: boolean }) {
   const { t, lang } = useI18n();
-  const fmt = (v: number, unit: Goal["unit"]) =>
-    unit === "pct" ? `${v} %` : unit === "usdCents" ? formatUsd(v, lang) : formatNumber(v, lang);
+  const fmt = (v: number, unit: Goal["unit"]) => (unit === "pct" ? `${v} %` : unit === "usdCents" ? formatUsd(v, lang) : formatNumber(v, lang));
   return (
     <section className="card">
       <div className="card-head">

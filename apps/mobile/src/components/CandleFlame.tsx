@@ -1,15 +1,7 @@
 import React, { useEffect, useId } from "react";
 import { View, StyleSheet } from "react-native";
 import Svg, { Path, Rect, Ellipse, G, Defs, RadialGradient, LinearGradient, Stop } from "react-native-svg";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withTiming,
-  withSequence,
-  Easing,
-  interpolate,
-} from "react-native-reanimated";
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withSequence, Easing, interpolate } from "react-native-reanimated";
 
 export type CandleVariant = "pillar" | "basic" | "solemn" | "permanent";
 type Props = { size?: number; lit?: boolean; variant?: CandleVariant; mourning?: boolean };
@@ -80,10 +72,7 @@ export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourni
   }));
   const glowStyle = useAnimatedStyle(() => ({
     opacity: interpolate(flicker.value, [0, 1], [0.55, 0.9]),
-    transform: [
-      { translateX: interpolate(sway.value, [0, 1], [-2, 2]) },
-      { scale: interpolate(glow.value, [0, 1], [0.92, 1.06]) },
-    ],
+    transform: [{ translateX: interpolate(sway.value, [0, 1], [-2, 2]) }, { scale: interpolate(glow.value, [0, 1], [0.92, 1.06]) }],
   }));
 
   const innerFlameW = flameW * 0.5;
@@ -275,7 +264,15 @@ function GlassVotive({
       {variant === "permanent" && <Rect x={0} y={rimY + 6} width={w} height={5} fill={gold} opacity={0.9} />}
 
       <Ellipse cx={w / 2} cy={rimY} rx={w / 2} ry={rimY} fill={mourning ? "#8A6A2E" : "#4A0000"} />
-      <Ellipse cx={w / 2} cy={rimY} rx={w / 2} ry={rimY} fill="none" stroke={hasBands ? gold : mourning ? goldDeep : "#B71C1C"} strokeWidth={hasBands ? 2.5 : 1.5} />
+      <Ellipse
+        cx={w / 2}
+        cy={rimY}
+        rx={w / 2}
+        ry={rimY}
+        fill="none"
+        stroke={hasBands ? gold : mourning ? goldDeep : "#B71C1C"}
+        strokeWidth={hasBands ? 2.5 : 1.5}
+      />
       <Ellipse cx={w / 2} cy={rimY} rx={w / 2 - 6} ry={rimY - 4} fill={`url(#waxpool${uid})`} />
       <Rect x={w / 2 - 1.2} y={rimY - 8} width={2.4} height={9} rx={1} fill="#3B2415" />
     </Svg>

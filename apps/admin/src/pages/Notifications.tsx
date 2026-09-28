@@ -81,10 +81,22 @@ export function Notifications() {
         >
           <h2>{t("newCampaign")}</h2>
           <p className="muted">{t("campaignHint")}</p>
-          <label className="field">{t("titleEs")}<input required maxLength={60} value={f.titleEs} onChange={set("titleEs")} /></label>
-          <label className="field">{t("messageEs")}<textarea required maxLength={180} value={f.bodyEs} onChange={set("bodyEs")} /></label>
-          <label className="field">{t("titleEn")}<input required maxLength={60} value={f.titleEn} onChange={set("titleEn")} /></label>
-          <label className="field">{t("messageEn")}<textarea required maxLength={180} value={f.bodyEn} onChange={set("bodyEn")} /></label>
+          <label className="field">
+            {t("titleEs")}
+            <input required maxLength={60} value={f.titleEs} onChange={set("titleEs")} />
+          </label>
+          <label className="field">
+            {t("messageEs")}
+            <textarea required maxLength={180} value={f.bodyEs} onChange={set("bodyEs")} />
+          </label>
+          <label className="field">
+            {t("titleEn")}
+            <input required maxLength={60} value={f.titleEn} onChange={set("titleEn")} />
+          </label>
+          <label className="field">
+            {t("messageEn")}
+            <textarea required maxLength={180} value={f.bodyEn} onChange={set("bodyEn")} />
+          </label>
           {confirming && <p className="error">{t("campaignConfirm", { n: audience })}</p>}
           {create.isError && <p className="error">{t("genericError")}</p>}
           <div className="row">

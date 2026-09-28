@@ -44,7 +44,13 @@ export default function LoginScreen() {
       const code = e instanceof ApiError ? e.code : "";
       const key = errorKey(e);
       toast(
-        code === "USER_ALREADY_EXISTS" ? t("emailTaken") : code === "PASSWORD_TOO_SHORT" ? t("passwordTooShort") : key === "genericError" ? t("authError") : t(key),
+        code === "USER_ALREADY_EXISTS"
+          ? t("emailTaken")
+          : code === "PASSWORD_TOO_SHORT"
+            ? t("passwordTooShort")
+            : key === "genericError"
+              ? t("authError")
+              : t(key),
         "error",
       );
     } finally {
@@ -68,11 +74,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }}
-        bottomOffset={20}
-        showsVerticalScrollIndicator={false}
-      >
+      <KeyboardAwareScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }} bottomOffset={20} showsVerticalScrollIndicator={false}>
         <View style={[styles.hero, { paddingTop: insets.top + spacing.lg }]}>
           <View style={styles.flameWrap}>
             <CandleFlame size={110} />
@@ -126,21 +128,12 @@ export default function LoginScreen() {
           </View>
 
           <View style={{ height: spacing.sm }} />
-          <AppButton
-            testID="submit-auth-button"
-            label={mode === "login" ? t("signIn") : t("signUp")}
-            onPress={submit}
-            loading={busy}
-          />
+          <AppButton testID="submit-auth-button" label={mode === "login" ? t("signIn") : t("signUp")} onPress={submit} loading={busy} />
 
           {/* Solo aparecen en iOS/Android y con las credenciales configuradas (src/social). */}
           <SocialButtons onPress={social} busy={socialBusy} />
 
-          <Pressable
-            testID="toggle-auth-mode"
-            onPress={() => setMode(mode === "login" ? "register" : "login")}
-            style={styles.toggle}
-          >
+          <Pressable testID="toggle-auth-mode" onPress={() => setMode(mode === "login" ? "register" : "login")} style={styles.toggle}>
             <Text style={styles.toggleText}>{mode === "login" ? t("noAccount") : t("haveAccount")}</Text>
           </Pressable>
         </View>

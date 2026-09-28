@@ -116,7 +116,9 @@ export default function Causas() {
                 <View style={styles.progressTrack}>
                   <View style={[styles.progressFill, { width: `${cause.percentage ?? 0}%` }]} />
                 </View>
-                <Text style={styles.percentage}>{cause.percentage ?? 0}% · {cause.votes ?? 0} {t("votesLabel")}</Text>
+                <Text style={styles.percentage}>
+                  {cause.percentage ?? 0}% · {cause.votes ?? 0} {t("votesLabel")}
+                </Text>
 
                 <Pressable
                   testID={`vote-${cause.id}`}
@@ -132,12 +134,7 @@ export default function Causas() {
                     size={18}
                     color={voted ? colors.onSuccess : !myVote && votingOpen ? colors.onBrandPrimary : colors.muted}
                   />
-                  <Text
-                    style={[
-                      styles.voteBtnText,
-                      { color: voted ? colors.onSuccess : !myVote && votingOpen ? colors.onBrandPrimary : colors.muted },
-                    ]}
-                  >
+                  <Text style={[styles.voteBtnText, { color: voted ? colors.onSuccess : !myVote && votingOpen ? colors.onBrandPrimary : colors.muted }]}>
                     {voted ? t("voted") : !votingOpen ? t("votingClosed") : t("vote")}
                   </Text>
                 </Pressable>

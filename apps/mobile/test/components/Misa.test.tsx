@@ -93,4 +93,3 @@ test("una grabación fuera de YouTube se abre fuera de la app", async () => {
   expect(mockTrack).toHaveBeenCalledWith("recording_opened", { inApp: false });
   expect(screen.queryByTestId("youtube")).toBeNull();
 });
-

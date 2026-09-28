@@ -5,7 +5,9 @@ import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, test } from "vitest";
 
 const root = new URL("../src/", import.meta.url);
-const files = readdirSync(root, { recursive: true }).map(String).filter((f) => /\.(tsx?|css)$/.test(f));
+const files = readdirSync(root, { recursive: true })
+  .map(String)
+  .filter((f) => /\.(tsx?|css)$/.test(f));
 const read = (f: string) => readFileSync(new URL(f, root), "utf8");
 const lineOf = (src: string, i: number) => src.slice(0, i).split("\n").length;
 const stripComments = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");

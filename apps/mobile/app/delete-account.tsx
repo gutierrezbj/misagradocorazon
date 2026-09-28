@@ -98,7 +98,15 @@ export default function DeleteAccount() {
 
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: spacing.md, paddingBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: c.divider,
+  },
   back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onSurface },
   lead: { fontFamily: fonts.display, fontSize: 20, lineHeight: 28, color: c.onSurface, marginBottom: spacing.md },
@@ -107,5 +115,17 @@ const useStyles = makeStyles((c) => ({
   blockTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
   blockText: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: c.onSurfaceSecondary },
   label: { fontFamily: fonts.bodyMedium, fontSize: 16, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.xs },
-  input: { height: 52, borderWidth: 1, borderColor: c.border, borderRadius: radius.md, paddingHorizontal: spacing.md, fontFamily: fonts.bodySemibold, fontSize: 16, letterSpacing: 2, color: c.onSurface, backgroundColor: c.surfaceSecondary, marginBottom: spacing.md },
+  input: {
+    height: 52,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    fontFamily: fonts.bodySemibold,
+    fontSize: 16,
+    letterSpacing: 2,
+    color: c.onSurface,
+    backgroundColor: c.surfaceSecondary,
+    marginBottom: spacing.md,
+  },
 }));

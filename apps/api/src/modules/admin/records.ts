@@ -22,9 +22,7 @@ recordsRouter.get("/admin/transparency", ...requireRole("moderator", "editor"), 
 
 // Movimientos de un mes. Sin datos de personas: la compra enlaza a la vela, no a quien la encendió.
 recordsRouter.get("/admin/ledger", ...requireRole("moderator", "editor"), async (req, res) => {
-  const q = z
-    .object({ month, type: z.enum(["purchase", "impact_allocation", "transfer"]).optional(), cursor: z.string().uuid().optional() })
-    .parse(req.query);
+  const q = z.object({ month, type: z.enum(["purchase", "impact_allocation", "transfer"]).optional(), cursor: z.string().uuid().optional() }).parse(req.query);
   const where: Prisma.LedgerEntryWhereInput = { month: q.month, ...(q.type && { type: q.type }) };
   const rows = await prisma.ledgerEntry.findMany({
     where,
@@ -50,17 +48,7 @@ recordsRouter.get("/admin/ledger", ...requireRole("moderator", "editor"), async 
 
 // --- Registro de auditoría (solo superadmin) -------------------------------------------
 
-export const AUDIT_ENTITIES = [
-  "cause",
-  "mass",
-  "saint",
-  "daily_content",
-  "intention",
-  "chat_message",
-  "moderation_word",
-  "push_campaign",
-  "user",
-] as const;
+export const AUDIT_ENTITIES = ["cause", "mass", "saint", "daily_content", "intention", "chat_message", "moderation_word", "push_campaign", "user"] as const;
 
 recordsRouter.get("/admin/audit", ...requireRole("superadmin"), async (req, res) => {
   const q = z

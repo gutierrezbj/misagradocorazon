@@ -7,28 +7,11 @@ import { MediaField } from "../components/MediaField.tsx";
 import { useI18n, type I18nKey } from "../i18n.tsx";
 import type { AdminSaint, DailyDay, DailyRow } from "../types.ts";
 
-const TEXT_FIELDS = [
-  "gospelEs",
-  "gospelEn",
-  "meditationEs",
-  "meditationEn",
-  "morningPrayerEs",
-  "morningPrayerEn",
-  "nightPrayerEs",
-  "nightPrayerEn",
-] as const;
-const AUDIO_FIELDS = [
-  "morningAudioUrlEs",
-  "morningAudioUrlEn",
-  "nightAudioUrlEs",
-  "nightAudioUrlEn",
-  "meditationAudioUrlEs",
-  "meditationAudioUrlEn",
-] as const;
+const TEXT_FIELDS = ["gospelEs", "gospelEn", "meditationEs", "meditationEn", "morningPrayerEs", "morningPrayerEn", "nightPrayerEs", "nightPrayerEn"] as const;
+const AUDIO_FIELDS = ["morningAudioUrlEs", "morningAudioUrlEn", "nightAudioUrlEs", "nightAudioUrlEn", "meditationAudioUrlEs", "meditationAudioUrlEn"] as const;
 type Form = Record<(typeof TEXT_FIELDS)[number] | (typeof AUDIO_FIELDS)[number] | "gospelRef" | "saintOfDayId", string>;
 
-const blank = (): Form =>
-  Object.fromEntries(["gospelRef", "saintOfDayId", ...TEXT_FIELDS, ...AUDIO_FIELDS].map((k) => [k, ""])) as Form;
+const blank = (): Form => Object.fromEntries(["gospelRef", "saintOfDayId", ...TEXT_FIELDS, ...AUDIO_FIELDS].map((k) => [k, ""])) as Form;
 const toForm = (row: DailyRow | null): Form => {
   const f = blank();
   if (!row) return f;
@@ -83,50 +66,91 @@ function DayForm({ date, season, initial, saints, onSaved }: DayProps & { initia
           {t("saintOfDay")}
           <select value={f.saintOfDayId} onChange={set("saintOfDayId")}>
             <option value="">{t("noSaint")}</option>
-            {saints.filter((s) => !s.deletedAt).map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
-            ))}
+            {saints
+              .filter((s) => !s.deletedAt)
+              .map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}
+                </option>
+              ))}
           </select>
         </label>
-        <label className="field">{t("gospelRef")}<input required placeholder="Jn 15, 9-17" value={f.gospelRef} onChange={set("gospelRef")} /></label>
+        <label className="field">
+          {t("gospelRef")}
+          <input required placeholder="Jn 15, 9-17" value={f.gospelRef} onChange={set("gospelRef")} />
+        </label>
       </div>
 
       <h3 className="section-label">{t("gospel")}</h3>
       <div className="form-grid">
-        <label className="field">{t("textEs")}<textarea required value={f.gospelEs} onChange={set("gospelEs")} /></label>
-        <label className="field">{t("textEn")}<textarea required value={f.gospelEn} onChange={set("gospelEn")} /></label>
+        <label className="field">
+          {t("textEs")}
+          <textarea required value={f.gospelEs} onChange={set("gospelEs")} />
+        </label>
+        <label className="field">
+          {t("textEn")}
+          <textarea required value={f.gospelEn} onChange={set("gospelEn")} />
+        </label>
       </div>
 
       <h3 className="section-label">{t("meditationLabel")}</h3>
       <div className="form-grid">
-        <label className="field">{t("textEs")}<textarea required value={f.meditationEs} onChange={set("meditationEs")} /></label>
-        <label className="field">{t("textEn")}<textarea required value={f.meditationEn} onChange={set("meditationEn")} /></label>
+        <label className="field">
+          {t("textEs")}
+          <textarea required value={f.meditationEs} onChange={set("meditationEs")} />
+        </label>
+        <label className="field">
+          {t("textEn")}
+          <textarea required value={f.meditationEn} onChange={set("meditationEn")} />
+        </label>
         {audio("meditationAudioUrlEs", "audioEsOptional")}
         {audio("meditationAudioUrlEn", "audioEnOptional")}
       </div>
 
       <h3 className="section-label">{t("morningPrayerLabel")}</h3>
-      <p className="muted" style={{ marginTop: 0 }}>{t("ownPrayerHint", { season: t(`season_${season}`) })}</p>
+      <p className="muted" style={{ marginTop: 0 }}>
+        {t("ownPrayerHint", { season: t(`season_${season}`) })}
+      </p>
       <div className="form-grid">
-        <label className="field">{t("textEs")}<textarea required={own.morning} value={f.morningPrayerEs} onChange={set("morningPrayerEs")} /></label>
-        <label className="field">{t("textEn")}<textarea required={own.morning} value={f.morningPrayerEn} onChange={set("morningPrayerEn")} /></label>
+        <label className="field">
+          {t("textEs")}
+          <textarea required={own.morning} value={f.morningPrayerEs} onChange={set("morningPrayerEs")} />
+        </label>
+        <label className="field">
+          {t("textEn")}
+          <textarea required={own.morning} value={f.morningPrayerEn} onChange={set("morningPrayerEn")} />
+        </label>
         {own.morning && audio("morningAudioUrlEs", "audioEs")}
         {own.morning && audio("morningAudioUrlEn", "audioEn")}
       </div>
 
       <h3 className="section-label">{t("nightPrayerLabel")}</h3>
-      <p className="muted" style={{ marginTop: 0 }}>{t("ownPrayerHint", { season: t(`season_${season}`) })}</p>
+      <p className="muted" style={{ marginTop: 0 }}>
+        {t("ownPrayerHint", { season: t(`season_${season}`) })}
+      </p>
       <div className="form-grid">
-        <label className="field">{t("textEs")}<textarea required={own.night} value={f.nightPrayerEs} onChange={set("nightPrayerEs")} /></label>
-        <label className="field">{t("textEn")}<textarea required={own.night} value={f.nightPrayerEn} onChange={set("nightPrayerEn")} /></label>
+        <label className="field">
+          {t("textEs")}
+          <textarea required={own.night} value={f.nightPrayerEs} onChange={set("nightPrayerEs")} />
+        </label>
+        <label className="field">
+          {t("textEn")}
+          <textarea required={own.night} value={f.nightPrayerEn} onChange={set("nightPrayerEn")} />
+        </label>
         {own.night && audio("nightAudioUrlEs", "audioEs")}
         {own.night && audio("nightAudioUrlEn", "audioEn")}
       </div>
 
       {save.isError && <p className="error">{t("genericError")}</p>}
       <div className="form-actions">
-        <button className="btn btn-primary" type="submit" disabled={save.isPending}>{t("save")}</button>
-        {save.isSuccess && <span className="muted" style={{ alignSelf: "center" }}>{t("saved")}</span>}
+        <button className="btn btn-primary" type="submit" disabled={save.isPending}>
+          {t("save")}
+        </button>
+        {save.isSuccess && (
+          <span className="muted" style={{ alignSelf: "center" }}>
+            {t("saved")}
+          </span>
+        )}
       </div>
     </form>
   );
@@ -153,7 +177,9 @@ export function Daily() {
   const { data: days, isLoading } = useQuery({ queryKey: ["daily-calendar"], queryFn: () => api<DailyDay[]>("/admin/daily?days=21") });
   const { data: saints } = useQuery({ queryKey: ["admin-saints"], queryFn: () => api<AdminSaint[]>("/admin/saints") });
   const fmt = (d: string) =>
-    new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
+    new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(
+      new Date(`${d}T00:00:00Z`),
+    );
   const missing = days?.filter((d) => !d.filled).length ?? 0;
   const selectedDay = days?.find((d) => d.date === selected);
 
@@ -165,9 +191,24 @@ export function Daily() {
           <div className="page-sub">{t("dailySub")}</div>
         </div>
       </div>
-      {missing > 0 && <div className="notice" style={{ marginBottom: 14 }}>{t("daysMissing", { n: missing })}</div>}
+      {missing > 0 && (
+        <div className="notice" style={{ marginBottom: 14 }}>
+          {t("daysMissing", { n: missing })}
+        </div>
+      )}
       <div className="grid two-col">
-        <div>{selectedDay && saints ? <DayEditor date={selectedDay.date} season={selectedDay.season} saints={saints} onSaved={() => void qc.invalidateQueries({ queryKey: ["daily-calendar"] })} /> : <div className="card muted">{t("pickDay")}</div>}</div>
+        <div>
+          {selectedDay && saints ? (
+            <DayEditor
+              date={selectedDay.date}
+              season={selectedDay.season}
+              saints={saints}
+              onSaved={() => void qc.invalidateQueries({ queryKey: ["daily-calendar"] })}
+            />
+          ) : (
+            <div className="card muted">{t("pickDay")}</div>
+          )}
+        </div>
         <section className="card">
           <h2>{t("next21")}</h2>
           {isLoading && <p className="muted">{t("loading")}</p>}

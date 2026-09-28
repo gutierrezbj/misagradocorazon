@@ -33,7 +33,13 @@ export default function SaintDetail() {
           <View style={styles.hero}>
             <Image source={{ uri: saint.imageUrl }} style={styles.heroImg} contentFit="cover" />
             <LinearGradient colors={["rgba(28,15,14,0.5)", "transparent", "rgba(28,15,14,0.95)"]} style={styles.heroScrim} />
-            <Pressable testID="back-button" accessibilityRole="button" accessibilityLabel={t("back")} onPress={() => router.back()} style={[styles.back, { top: insets.top + spacing.sm }]}>
+            <Pressable
+              testID="back-button"
+              accessibilityRole="button"
+              accessibilityLabel={t("back")}
+              onPress={() => router.back()}
+              style={[styles.back, { top: insets.top + spacing.sm }]}
+            >
               <Icon name="arrow-left" size={22} color="#FDFBF7" />
             </Pressable>
             <View style={styles.heroText}>
@@ -50,7 +56,14 @@ export default function SaintDetail() {
           <View style={styles.body}>
             {!!saint.audioUrl[lang] && (
               <View style={{ marginBottom: spacing.lg }}>
-                <AudioPlayer url={saint.audioUrl[lang]!} title={saint.name} artworkUrl={saint.imageUrl} route={`/saint/${saint.id}`} analyticsContent="saint" autoPlay={autoplay === "1"} />
+                <AudioPlayer
+                  url={saint.audioUrl[lang]!}
+                  title={saint.name}
+                  artworkUrl={saint.imageUrl}
+                  route={`/saint/${saint.id}`}
+                  analyticsContent="saint"
+                  autoPlay={autoplay === "1"}
+                />
               </View>
             )}
             <Section title={t("history")} text={loc(saint.history)} />
@@ -62,12 +75,7 @@ export default function SaintDetail() {
               </View>
             )}
             <View style={{ height: spacing.lg }} />
-            <AppButton
-              testID="light-candle-to-saint-button"
-              label={t("lightCandle")}
-              icon="feather"
-              onPress={() => router.push("/light-candle")}
-            />
+            <AppButton testID="light-candle-to-saint-button" label={t("lightCandle")} icon="feather" onPress={() => router.push("/light-candle")} />
           </View>
         </ScrollView>
       )}
@@ -90,7 +98,16 @@ const useStyles = makeStyles((c) => ({
   hero: { height: 360 },
   heroImg: { width: "100%", height: "100%", backgroundColor: c.surfaceTertiary },
   heroScrim: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
-  back: { position: "absolute", left: spacing.md, width: 42, height: 42, borderRadius: 21, backgroundColor: "rgba(0,0,0,0.35)", alignItems: "center", justifyContent: "center" },
+  back: {
+    position: "absolute",
+    left: spacing.md,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   heroText: { position: "absolute", bottom: spacing.lg, left: spacing.md, right: spacing.md },
   name: { fontFamily: fonts.displayBold, fontSize: 36, color: "#FDFBF7" },
   feastRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4 },

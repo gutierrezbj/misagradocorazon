@@ -32,6 +32,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Formato (Prettier, SDD-06)
+        run: pnpm format:check
       - name: Typecheck
         run: pnpm typecheck
       - name: Lint

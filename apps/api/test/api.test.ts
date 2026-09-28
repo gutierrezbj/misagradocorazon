@@ -35,9 +35,7 @@ describe("salud y autenticación", () => {
   });
 
   test("contraseña corta rechazada", async () => {
-    const res = await request(app)
-      .post("/api/auth/sign-up/email")
-      .send({ email: "corta@example.com", password: "1234", name: "X" });
+    const res = await request(app).post("/api/auth/sign-up/email").send({ email: "corta@example.com", password: "1234", name: "X" });
     expect(res.status).toBe(400);
   });
 
@@ -60,10 +58,7 @@ describe("onboarding y perfil", () => {
 
   test("zona horaria no válida → 400", async () => {
     const { token } = await signUp();
-    const res = await request(app)
-      .put("/api/me/onboarding")
-      .set(bearer(token))
-      .send({ patronSaintId: "saint_guadalupe", timezone: "Marte/Olimpo" });
+    const res = await request(app).put("/api/me/onboarding").set(bearer(token)).send({ patronSaintId: "saint_guadalupe", timezone: "Marte/Olimpo" });
     expect(res.status).toBe(400);
   });
 
@@ -188,14 +183,23 @@ describe("velas", () => {
 
   test("tipo desconocido o intención vacía → 400", async () => {
     const { token } = await signUp();
-    const a = await request(app).post("/api/candles").set(bearer(token)).send({ ...vela, type: "gigante" });
-    const b = await request(app).post("/api/candles").set(bearer(token)).send({ ...vela, intention: "   " });
+    const a = await request(app)
+      .post("/api/candles")
+      .set(bearer(token))
+      .send({ ...vela, type: "gigante" });
+    const b = await request(app)
+      .post("/api/candles")
+      .set(bearer(token))
+      .send({ ...vela, intention: "   " });
     expect([a.status, b.status]).toEqual([400, 400]);
   });
 
   test("santo inexistente → 404", async () => {
     const { token } = await signUp();
-    const res = await request(app).post("/api/candles").set(bearer(token)).send({ ...vela, saintId: "saint_nadie" });
+    const res = await request(app)
+      .post("/api/candles")
+      .set(bearer(token))
+      .send({ ...vela, saintId: "saint_nadie" });
     expect(res.status).toBe(404);
   });
 

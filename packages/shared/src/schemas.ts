@@ -10,9 +10,7 @@ const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Formato HH:MM");
 // con su valor por defecto y pisaría lo guardado.
 type Editable<S extends z.ZodRawShape> = { [K in keyof S]: z.ZodOptional<S[K] extends z.ZodDefault<infer I> ? I : S[K]> };
 export function updateSchemaOf<S extends z.ZodRawShape>(schema: z.ZodObject<S>): z.ZodObject<Editable<S>> {
-  const shape = Object.fromEntries(
-    Object.entries(schema.shape).map(([k, v]) => [k, z.optional(v instanceof z.ZodDefault ? (v.unwrap() as z.ZodType) : v)]),
-  );
+  const shape = Object.fromEntries(Object.entries(schema.shape).map(([k, v]) => [k, z.optional(v instanceof z.ZodDefault ? (v.unwrap() as z.ZodType) : v)]));
   return z.object(shape) as unknown as z.ZodObject<Editable<S>>;
 }
 
@@ -238,7 +236,10 @@ export const dailyContentInputSchema = z
   // Una oración propia del día va en los dos idiomas o en ninguno: nunca medio día propio y medio
   // del tiempo. Sin texto propio no hay audio propio (se sirve el del tiempo, no se ignora en silencio).
   .superRefine((d, ctx) => {
-    for (const [kind, audio] of [["morningPrayer", "morningAudioUrl"], ["nightPrayer", "nightAudioUrl"]] as const) {
+    for (const [kind, audio] of [
+      ["morningPrayer", "morningAudioUrl"],
+      ["nightPrayer", "nightAudioUrl"],
+    ] as const) {
       if (!d[`${kind}Es`] !== !d[`${kind}En`]) {
         ctx.addIssue({ code: "custom", path: [d[`${kind}Es`] ? `${kind}En` : `${kind}Es`], message: "Falta el otro idioma" });
       }

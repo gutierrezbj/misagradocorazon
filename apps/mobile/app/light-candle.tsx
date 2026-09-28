@@ -53,7 +53,8 @@ export default function LightCandle() {
   useEffect(() => track("candle_flow_started"), []);
 
   const lightMut = useMutation({
-    mutationFn: () => api<{ saint: { name: string } }>("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
+    mutationFn: () =>
+      api<{ saint: { name: string } }>("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
@@ -172,9 +173,7 @@ export default function LightCandle() {
               <Text style={styles.typeDesc}>{t(ty.desc)}</Text>
             </View>
             <Text style={styles.typePrice}>{priceLabel(ty.key)}</Text>
-            <View style={[styles.radio, type === ty.key && styles.radioActive]}>
-              {type === ty.key && <View style={styles.radioDot} />}
-            </View>
+            <View style={[styles.radio, type === ty.key && styles.radioActive]}>{type === ty.key && <View style={styles.radioDot} />}</View>
           </Pressable>
         ))}
       </ScrollView>
@@ -235,14 +234,38 @@ const useStyles = makeStyles((c) => ({
   radio: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: c.altarBorder, alignItems: "center", justifyContent: "center" },
   radioActive: { borderColor: c.gold },
   radioDot: { width: 12, height: 12, borderRadius: 6, backgroundColor: c.gold },
-  footer: { position: "absolute", left: 0, right: 0, bottom: 0, padding: spacing.md, backgroundColor: c.altarBgDeep, borderTopWidth: 1, borderTopColor: c.altarBorder },
+  footer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: spacing.md,
+    backgroundColor: c.altarBgDeep,
+    borderTopWidth: 1,
+    borderTopColor: c.altarBorder,
+  },
   simulated: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, textAlign: "center", marginBottom: spacing.sm },
-  lightBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, height: 56, borderRadius: radius.lg, backgroundColor: c.brandPrimary },
+  lightBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    height: 56,
+    borderRadius: radius.lg,
+    backgroundColor: c.brandPrimary,
+  },
   lightBtnText: { fontFamily: fonts.bodyBold, fontSize: 18, color: c.gold },
   doneWrap: { alignItems: "center", justifyContent: "center", padding: spacing.lg },
   doneTitle: { fontFamily: fonts.displayBold, fontSize: 30, color: c.gold, marginTop: spacing.lg, textAlign: "center" },
   doneSub: { fontFamily: fonts.body, fontSize: 16, color: c.onAltar, textAlign: "center", marginTop: spacing.sm, fontStyle: "italic" },
-  doneBtn: { marginTop: spacing.xl, backgroundColor: c.brandSecondary, borderRadius: radius.lg, paddingHorizontal: spacing.xl, height: 52, justifyContent: "center" },
+  doneBtn: {
+    marginTop: spacing.xl,
+    backgroundColor: c.brandSecondary,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.xl,
+    height: 52,
+    justifyContent: "center",
+  },
   doneSecondary: { marginTop: spacing.md, paddingVertical: spacing.sm, paddingHorizontal: spacing.lg },
   doneSecondaryText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onAltarMuted },
   doneBtnText: { fontFamily: fonts.bodyBold, fontSize: 17, color: c.onBrandSecondary },

@@ -77,8 +77,7 @@ async function appleUser(sub = `apple-${randomUUID()}`, email = `${randomUUID()}
   return { token: String(res.headers["set-auth-token"]), sub, email, userId: String(res.body.user.id) };
 }
 
-const sendCode = (session: string, code: string) =>
-  request(app).post("/api/me/apple-authorization").set(bearer(session)).send({ code });
+const sendCode = (session: string, code: string) => request(app).post("/api/me/apple-authorization").set(bearer(session)).send({ code });
 
 describe("código de autorización de Apple", () => {
   it("se canjea con un client_secret ES256 firmado con la clave .p8 y se guarda el refresh token", async () => {

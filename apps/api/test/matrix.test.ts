@@ -52,8 +52,7 @@ const PANEL: Record<string, Role[]> = {
   "GET /admin/audit": SUPER,
 };
 
-const concrete = (path: string) =>
-  path.replace(":date", "2026-01-01").replace(":word", "palabra").replace(/:\w+/g, "00000000-0000-4000-8000-000000000000");
+const concrete = (path: string) => path.replace(":date", "2026-01-01").replace(":word", "palabra").replace(/:\w+/g, "00000000-0000-4000-8000-000000000000");
 
 const panelRoutes = () => discoverRoutes().filter((r) => r.path.startsWith("/admin"));
 
@@ -61,7 +60,9 @@ beforeEach(resetDb);
 
 describe("matriz de permisos del panel", () => {
   test("todas las rutas del panel están clasificadas (y no sobra ninguna)", () => {
-    const found = panelRoutes().map((r) => `${r.method} ${r.path}`).sort();
+    const found = panelRoutes()
+      .map((r) => `${r.method} ${r.path}`)
+      .sort();
     expect(found).toEqual(Object.keys(PANEL).sort());
   });
 
@@ -101,7 +102,12 @@ describe("privacidad de los endpoints públicos", () => {
     const mass = await request(app)
       .post("/api/admin/masses")
       .set(bearer(editor.token))
-      .send({ titleEs: "Misa", titleEn: "Mass", youtubeUrl: "https://www.youtube.com/watch?v=abcdefghijk", scheduledAt: new Date(Date.now() - 60_000).toISOString() });
+      .send({
+        titleEs: "Misa",
+        titleEn: "Mass",
+        youtubeUrl: "https://www.youtube.com/watch?v=abcdefghijk",
+        scheduledAt: new Date(Date.now() - 60_000).toISOString(),
+      });
     await prisma.chatMessage.create({ data: { massId: mass.body.data.id, userId: fiel.userId, text: "Amén", status: "approved" } });
 
     const users = await prisma.user.findMany({ select: { id: true, email: true } });

@@ -99,7 +99,12 @@ describe("moderación", () => {
     const mod = await signUpAs("moderator");
     const sa = await signUpAs("superadmin");
     const codes = await Promise.all(
-      [user, editor, mod, sa].map((u) => request(app).get("/api/admin/moderation/queue").set(bearer(u.token)).then((r) => r.status)),
+      [user, editor, mod, sa].map((u) =>
+        request(app)
+          .get("/api/admin/moderation/queue")
+          .set(bearer(u.token))
+          .then((r) => r.status),
+      ),
     );
     expect(codes).toEqual([403, 403, 200, 200]);
   });
