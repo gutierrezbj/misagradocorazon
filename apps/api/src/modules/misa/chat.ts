@@ -3,11 +3,11 @@ import type { Server as HttpServer } from "node:http";
 import { chatMessageSchema } from "@msc/shared";
 import { Server, type Socket } from "socket.io";
 
-import { auth } from "../../auth.ts";
+import { auth } from "../auth/auth.ts";
 import { prisma } from "../../db.ts";
 import { env } from "../../env.ts";
 import { publicName } from "../../lib/display-name.ts";
-import { containsBannedWord } from "../moderation/filter.ts";
+import { containsBannedWord } from "../../lib/moderation.ts";
 import { massStatus } from "./service.ts";
 
 type Ack = (res: { ok: boolean; error?: string; status?: string }) => void;

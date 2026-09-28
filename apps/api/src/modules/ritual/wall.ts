@@ -10,7 +10,7 @@ import { assertRateLimit } from "../../lib/rate-limit.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { optionalUser } from "../../middleware/roles.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
-import { containsBannedWord } from "../moderation/filter.ts";
+import { containsBannedWord } from "../../lib/moderation.ts";
 
 export const wallRouter = Router();
 

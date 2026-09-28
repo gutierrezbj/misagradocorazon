@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 
 import { prisma } from "../src/db.ts";
 import { env } from "../src/env.ts";
-import { processAppleRevocations } from "../src/modules/users/apple-tokens.ts";
+import { processAppleRevocations } from "../src/modules/auth/apple-tokens.ts";
 import { app, bearer, resetDb, signUp } from "./helpers.ts";
 
 // Apple se simula en fetch: claves públicas (login), /auth/token (canje) y /auth/revoke.

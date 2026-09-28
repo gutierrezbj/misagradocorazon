@@ -6,11 +6,11 @@ import { PgBoss } from "pg-boss";
 
 import { env } from "../env.ts";
 import { monthOf } from "../lib/dates.ts";
-import { refreshKpiDaily } from "../modules/admin/kpi-daily.ts";
+import { refreshKpiDaily } from "../modules/kpis/kpi-daily.ts";
 import { closeVoting, openVoting } from "../modules/causas/service.ts";
 import { announceVotingResult, runCandleExpiryReminders, runPendingCampaigns, runReminders } from "../modules/push/reminders.ts";
 import { processReceipts } from "../modules/push/service.ts";
-import { processAppleRevocations } from "../modules/users/apple-tokens.ts";
+import { processAppleRevocations } from "../modules/auth/apple-tokens.ts";
 
 const QUEUES = {
   openVoting: "voting-open",

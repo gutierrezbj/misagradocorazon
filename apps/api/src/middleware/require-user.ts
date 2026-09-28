@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 
-import { auth } from "../auth.ts";
+import { auth } from "../modules/auth/auth.ts";
 import { prisma } from "../db.ts";
 import type { User } from "../generated/prisma/client.ts";
 import { HttpError } from "../http.ts";

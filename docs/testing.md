@@ -30,7 +30,7 @@ Los dos descubren las rutas del propio router de Express:
 
 `pnpm --filter @msc/api test` mide la cobertura y falla si no llega al mínimo:
 
-- **Autenticación y pagos:** 80 %. Incluye `auth.ts`, el middleware de sesión y roles, `modules/users`, `modules/candles` y `modules/payments`.
+- **Autenticación y pagos:** 80 %. Incluye `modules/auth` (Better Auth, cuenta, borrado y tokens de Apple), el middleware de sesión y roles, `modules/ritual/candles.ts` y `modules/payments`.
 - **Resto:** 60 %.
 
 Quedan fuera los puntos de arranque (servidor, worker, consola), que solo conectan módulos que sí se prueban. A 26-sep-2026 la cobertura total de líneas es del 97 %.

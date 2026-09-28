@@ -3,7 +3,7 @@
 import { STAFF_ROLES } from "@msc/shared";
 import { z } from "zod";
 
-import { auth } from "../../auth.ts";
+import { auth } from "../auth/auth.ts";
 import { prisma } from "../../db.ts";
 import { audit } from "../../lib/audit.ts";
 

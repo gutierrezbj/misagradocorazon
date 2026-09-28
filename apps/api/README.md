@@ -15,6 +15,23 @@ pnpm --filter @msc/api dev           # http://localhost:8001/api/health (+ chat 
 pnpm --filter @msc/api worker        # tareas programadas (pg-boss): votaciones, push, KPIs diarios y revocaciones de Apple
 ```
 
+## Estructura
+
+Módulos por pilar en `src/modules/` (CLAUDE.md y SDD-06). Cada uno agrupa sus rutas y su lógica; los contratos (esquemas Zod) están en `packages/shared`.
+
+| Módulo | Qué contiene |
+|---|---|
+| `auth` | Better Auth (email, Google, Apple, sesiones y roles), cuenta del fiel (`/me`), borrado de cuenta y revocación de tokens de Apple |
+| `ritual` | Pilar 1: santoral, contenido diario y oraciones por tiempo, racha, velas (`candles.ts`) y muro de intenciones (`wall.ts`) |
+| `misa` | Pilar 2: misas, grabación, asistencia y chat (Socket.IO) |
+| `causas` | Pilar 3: causas, votación y transparencia |
+| `admin` | Panel: causas, misas, moderación, usuarios, auditoría, staff, santoral y contenido (`content.ts`) |
+| `kpis` | KPIs del panel y agregados diarios (`kpi_daily`) |
+| `payments` | Capa de pagos (hoy simulada; RevenueCat cuando exista la sociedad) |
+| `push` | Notificaciones: tokens, recordatorios, campañas y recibos |
+
+Transversal en `src/lib/` (fechas, cifrado, auditoría, R2, Apple, límites de peticiones y filtro de moderación, que usan el muro, el chat y el panel) y `src/middleware/`.
+
 ## Cuentas de staff
 
 El panel solo lo abre un superadmin, así que el primero se crea por línea de comandos:

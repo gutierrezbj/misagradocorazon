@@ -2,21 +2,21 @@ import cors from "cors";
 import express from "express";
 import { toNodeHandler } from "better-auth/node";
 
-import { auth } from "./auth.ts";
+import { auth } from "./modules/auth/auth.ts";
 import { env } from "./env.ts";
 import { prisma } from "./db.ts";
 import { errorHandler, HttpError, ok } from "./http.ts";
 import { apiLimiter, clientIpForAuth, writeLimiter } from "./middleware/limits.ts";
 import { recordsRouter } from "./modules/admin/records.ts";
 import { adminRouter } from "./modules/admin/routes.ts";
-import { candlesRouter } from "./modules/candles/routes.ts";
+import { candlesRouter } from "./modules/ritual/candles.ts";
 import { causasRouter } from "./modules/causas/routes.ts";
-import { contentRouter } from "./modules/content/routes.ts";
+import { contentRouter } from "./modules/admin/content.ts";
 import { misaRouter } from "./modules/misa/routes.ts";
 import { pushRouter } from "./modules/push/routes.ts";
 import { ritualRouter } from "./modules/ritual/routes.ts";
-import { usersRouter } from "./modules/users/routes.ts";
-import { wallRouter } from "./modules/wall/routes.ts";
+import { usersRouter } from "./modules/auth/routes.ts";
+import { wallRouter } from "./modules/ritual/wall.ts";
 
 export function createApp({ rateLimits = env.NODE_ENV !== "test" }: { rateLimits?: boolean } = {}) {
   const app = express();

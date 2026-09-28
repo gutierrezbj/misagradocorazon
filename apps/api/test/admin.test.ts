@@ -2,7 +2,7 @@ import request from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { prisma } from "../src/db.ts";
-import { computeKpis } from "../src/modules/admin/kpis.ts";
+import { computeKpis } from "../src/modules/kpis/kpis.ts";
 import { app, bearer, resetDb, signUp, signUpAs } from "./helpers.ts";
 
 beforeEach(resetDb);
