@@ -71,6 +71,22 @@ export async function authRequest(path: "/auth/sign-in/email" | "/auth/sign-up/e
   await persistToken(token);
 }
 
+// Recuperar contraseña (US-24, plugin email-otp de Better Auth). Sin sesión; responde { success }.
+export async function passwordResetRequest(
+  path: "/auth/email-otp/request-password-reset" | "/auth/email-otp/reset-password",
+  body: { email: string; otp?: string; password?: string },
+) {
+  const res = await fetch(`${BASE}/api${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const json = (await res.json().catch(() => null)) as { code?: string; message?: string } | null;
+    throw new ApiError(res.status, json?.code ?? "auth_error", json?.message ?? res.statusText);
+  }
+}
+
 export async function signOutRequest() {
   if (!memToken) return;
   await fetch(`${BASE}/api/auth/sign-out`, { method: "POST", headers: { Authorization: `Bearer ${memToken}` } }).catch(() => undefined);

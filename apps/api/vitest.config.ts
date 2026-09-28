@@ -40,6 +40,10 @@ export default defineConfig({
       APPLE_TEAM_ID: "TEAMTEST01",
       APPLE_KEY_ID: "KEYTEST001",
       APPLE_PRIVATE_KEY: appleTestKey.replace(/\n/g, "\\n"),
+      // Recuperar contraseña (test/password-reset.test.ts): el email se captura con un transporte falso,
+      // nunca se conecta a este servidor.
+      SMTP_URL: "smtp://localhost:2525",
+      MAIL_FROM: "Mi Sagrado Corazón <no-reply@example.com>",
     },
   },
 });

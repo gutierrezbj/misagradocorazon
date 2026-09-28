@@ -22,6 +22,7 @@ Detalle de cada una en `docs/dependencias.md`.
 | Railway | API, worker, panel y base de datos en producción; activar backups antes del lanzamiento | `docs/despliegue.md`, `docs/monitorizacion.md` |
 | Cloudflare R2 | Subir imágenes y audio desde el panel | `docs/contenido.md` |
 | PostHog | Analítica de producto | `docs/kpis.md` |
+| Proveedor de email (SMTP) | Recuperar la contraseña (US-24): sin él, la opción no aparece en la app | `docs/recuperar-contrasena.md` |
 | Sentry | Errores en producción (activar "Prevent Storing of IP Addresses") | `docs/monitorizacion.md` |
 | Dominio | Enlace directo de la vela compartida (US-22), API y panel | `docs/testing.md` |
 
@@ -60,12 +61,11 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 
 | Qué | Situación | Recomendación |
 |---|---|---|
-| **Recuperación de contraseña** | No está en ningún SDD. La auditoría de la entrega señala que falta | Añadirla a SDD-05 (Épica 1) y elegir un proveedor de email a nombre del fundador |
 | **Decisiones de SDD-08** (Sentry, EAS Update, backups) | Hechas en el código y documentadas en `docs/monitorizacion.md` y `docs/despliegue.md` | Registrarlas en Notion (Claude no edita Notion sin visto bueno) |
 | **Etiqueta del tiempo litúrgico** en la pantalla de oración (US-10) | Texto pequeño ("Tiempo ordinario"), sin cambio de tema. SDD-02 deja para v1.1 un "calendario litúrgico visual" | Mantenerla: es parte de US-10, no el calendario visual |
 | **Mensajes de commit** | SDD-06 los pide en inglés. Hasta el 28-sep-2026 se escribieron en español; desde el PR #36, en inglés | Sin acción |
 
-Resuelto el 28-sep-2026: el estado global de la app sigue con Context de React (no Zustand) y los módulos de la API sin capa de controllers. SDD-06 actualizado en Notion con visto bueno del fundador (`docs/propuesta-cambios-sdd.md`).
+Resuelto el 28-sep-2026: el estado global de la app sigue con Context de React (no Zustand) y los módulos de la API sin capa de controllers. SDD-06 actualizado en Notion con visto bueno del fundador (`docs/propuesta-cambios-sdd.md`). Recuperar la contraseña se añadió a SDD-05 como US-24 y está hecho; solo falta el proveedor de email.
 
 ## Fuera del MVP
 

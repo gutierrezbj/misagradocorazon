@@ -37,6 +37,7 @@ Los tres servicios de código apuntan al mismo repositorio y a la rama `main`, y
 | `GOOGLE_CLIENT_ID`, `APPLE_BUNDLE_ID` | `docs/login-social.md` |
 | `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_PRIVATE_KEY` | `docs/login-social.md`. También en el worker (reintenta las revocaciones) |
 | `EXPO_ACCESS_TOKEN` | Opcional (`docs/push.md`) |
+| `SMTP_URL`, `MAIL_FROM` | Opcionales: email para recuperar la contraseña. Sin ellas, la opción no aparece (`docs/recuperar-contrasena.md`) |
 | `R2_*` | `docs/contenido.md` |
 
 - **`PORT`:** no hace falta. Railway la pone y la API la usa.

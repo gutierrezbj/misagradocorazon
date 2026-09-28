@@ -3,13 +3,15 @@ import { View, Text, TextInput, Pressable } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
+import { useRouter } from "expo-router";
+import { useQuery } from "@tanstack/react-query";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, useToast } from "@/src/components/ui";
 import { CandleFlame } from "@/src/ritual/CandleFlame";
-import { ApiError } from "@/src/api";
+import { api, ApiError } from "@/src/api";
 import { SocialButtons } from "@/src/components/SocialButtons";
 import type { SocialProvider } from "@/src/social";
 import { errorKey } from "@/src/errors";
@@ -21,6 +23,13 @@ export default function LoginScreen() {
   const { t } = useI18n();
   const toast = useToast();
   const { login, register, loginWithProvider } = useAuth();
+  const router = useRouter();
+  // Recuperar contraseña (US-24) solo si el servidor tiene email configurado.
+  const { data: features } = useQuery({
+    queryKey: ["features"],
+    queryFn: () => api<{ passwordReset: boolean }>("/features"),
+    staleTime: Infinity,
+  });
 
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
@@ -127,6 +136,12 @@ export default function LoginScreen() {
             />
           </View>
 
+          {mode === "login" && features?.passwordReset && (
+            <Pressable testID="forgot-password" accessibilityRole="link" onPress={() => router.push("/forgot-password")} style={styles.forgot}>
+              <Text style={styles.toggleText}>{t("forgotPassword")}</Text>
+            </Pressable>
+          )}
+
           <View style={{ height: spacing.sm }} />
           <AppButton testID="submit-auth-button" label={mode === "login" ? t("signIn") : t("signUp")} onPress={submit} loading={busy} />
 
@@ -179,5 +194,6 @@ const useStyles = makeStyles((c) => ({
     backgroundColor: c.surfaceSecondary,
   },
   toggle: { marginTop: spacing.lg, alignItems: "center" },
+  forgot: { alignSelf: "flex-end", minHeight: 44, justifyContent: "center", marginTop: -spacing.sm },
   toggleText: { fontFamily: fonts.bodyMedium, color: c.brand, fontSize: 15 },
 }));
