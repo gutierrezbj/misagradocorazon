@@ -95,5 +95,6 @@ Funcionalidad y decisiones:
 - `docs/seguridad.md`: límites de uso, IP real tras el proxy y qué comprobar en el primer despliegue
 - `docs/monitorizacion.md`: Sentry sin datos personales, EAS Update y copias de seguridad
 - `docs/testing.md`: qué test cubre cada obligación de SDD-07 y cobertura mínima de la API
+- `docs/rendimiento.md`: prueba de carga del chat de la misa (1.000 fieles)
 
 Propiedad: Juan Gutiérrez Blanco. Confidencial.
