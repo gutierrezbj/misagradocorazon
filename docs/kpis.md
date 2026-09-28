@@ -71,6 +71,7 @@ Solo con consentimiento explícito. Al final del onboarding la opción aparece *
   | `onboarding_completed` | idioma, número de santos secundarios |
   | `prayer_completed` | mañana o noche, tiempo litúrgico |
   | `audio_played` | santo, mañana, noche o meditación |
+  | `gospel_shared` | ninguna. Evangelio compartido desde su pantalla (US-25); en Android cuenta al abrir la hoja de compartir, porque el sistema no dice si se llegó a enviar |
   | `mini_player_used` | volver al audio, pausar/reanudar o cerrar. Dice cuántos escuchan mientras usan otras partes de la app |
   | `candle_flow_started` | ninguna |
   | `candle_lit` | tipo de vela, por difuntos o no |

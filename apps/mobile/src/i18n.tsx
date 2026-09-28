@@ -143,6 +143,10 @@ const dict = {
   lightCandle: { es: "Encender una vela", en: "Light a candle" },
   myCandles: { es: "Mis velas encendidas", en: "My lit candles" },
   gospelToday: { es: "Evangelio de hoy", en: "Today's Gospel" },
+  // compartir el evangelio (US-25)
+  shareGospel: { es: "Compartir el evangelio", en: "Share the Gospel" },
+  shareGospelAppLine: { es: "Evangelio de hoy en Mi Sagrado Corazón", en: "Today's Gospel on Mi Sagrado Corazón" },
+  shareError: { es: "No se pudo compartir.", en: "Could not share." },
   saintOfDay: { es: "Santo del día", en: "Saint of the day" },
   morningPrayer: { es: "Oración de la mañana", en: "Morning prayer" },
   nightPrayer: { es: "Oración de la noche", en: "Night prayer" },
