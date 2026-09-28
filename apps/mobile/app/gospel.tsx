@@ -9,8 +9,10 @@ import { api, deviceTimeZone } from "@/src/api";
 import { useAuth } from "@/src/auth";
 import type { Daily } from "@/src/types";
 import { useI18n } from "@/src/i18n";
-import { Icon } from "@/src/components/ui";
+import { Icon, useToast } from "@/src/components/ui";
 import { AudioPlayer } from "@/src/ritual/AudioPlayer";
+import { gospelMessage, shareGospel } from "@/src/ritual/share-gospel";
+import { track } from "@/src/analytics";
 
 export default function Gospel() {
   const styles = useStyles();
@@ -18,12 +20,24 @@ export default function Gospel() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { t, loc, lang } = useI18n();
+  const toast = useToast();
 
   const { user } = useAuth();
   const { data: daily, isLoading } = useQuery({
     queryKey: ["daily"],
     queryFn: () => api<Daily>(`/daily?tz=${encodeURIComponent(user?.timezone ?? deviceTimeZone())}`),
   });
+
+  // US-25: compartir el evangelio del día en el idioma del fiel.
+  const share = async () => {
+    if (!daily) return;
+    try {
+      const shared = await shareGospel(gospelMessage(daily.gospel.ref, loc(daily.gospel), t("shareGospelAppLine")), t("gospelToday"));
+      if (shared) track("gospel_shared");
+    } catch {
+      toast(t("shareError"), "error");
+    }
+  };
 
   return (
     <View style={styles.root}>
@@ -33,7 +47,13 @@ export default function Gospel() {
           <Icon name="arrow-left" size={22} color={colors.onSurface} />
         </Pressable>
         <Text style={styles.headerTitle}>{t("gospelToday")}</Text>
-        <View style={{ width: 40 }} />
+        {daily ? (
+          <Pressable testID="share-gospel" accessibilityRole="button" accessibilityLabel={t("shareGospel")} onPress={share} style={styles.back}>
+            <Icon name="share-2" size={21} color={colors.onSurface} />
+          </Pressable>
+        ) : (
+          <View style={{ width: 44 }} />
+        )}
       </View>
 
       {isLoading ? (
@@ -67,7 +87,7 @@ const useStyles = makeStyles((c) => ({
     borderBottomWidth: 1,
     borderBottomColor: c.divider,
   },
-  back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
+  back: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onSurface },
   ref: { fontFamily: fonts.bodySemibold, fontSize: 15, color: c.brand, textTransform: "uppercase", letterSpacing: 1 },
   gospel: { fontFamily: fonts.display, fontSize: 24, lineHeight: 36, color: c.onSurface, marginTop: spacing.md },
