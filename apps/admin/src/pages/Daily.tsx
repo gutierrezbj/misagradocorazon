@@ -1,3 +1,4 @@
+import type { LiturgicalSeason } from "@msc/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 
@@ -35,17 +36,21 @@ const toForm = (row: DailyRow | null): Form => {
   return f;
 };
 
-function DayEditor({ date, saints, onSaved }: { date: string; saints: AdminSaint[]; onSaved: () => void }) {
+type DayProps = { date: string; season: LiturgicalSeason; saints: AdminSaint[]; onSaved: () => void };
+
+function DayEditor({ date, season, saints, onSaved }: DayProps) {
   const { t } = useI18n();
   const { data, isLoading } = useQuery({ queryKey: ["daily", date], queryFn: () => api<DailyRow | null>(`/admin/daily/${date}`) });
   if (isLoading) return <p className="muted">{t("loading")}</p>;
-  return <DayForm key={date} date={date} initial={toForm(data ?? null)} saints={saints} onSaved={onSaved} />;
+  return <DayForm key={date} date={date} season={season} initial={toForm(data ?? null)} saints={saints} onSaved={onSaved} />;
 }
 
-function DayForm({ date, initial, saints, onSaved }: { date: string; initial: Form; saints: AdminSaint[]; onSaved: () => void }) {
+function DayForm({ date, season, initial, saints, onSaved }: DayProps & { initial: Form }) {
   const { t } = useI18n();
   const [f, setF] = useState<Form>(initial);
   const set = (k: keyof Form) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
+  // Oración propia del día (US-10): sin texto propio se reza la del tiempo, con su audio.
+  const own = { morning: !!(f.morningPrayerEs.trim() || f.morningPrayerEn.trim()), night: !!(f.nightPrayerEs.trim() || f.nightPrayerEn.trim()) };
   const save = useMutation({
     mutationFn: () =>
       api(`/admin/daily/${date}`, {
@@ -54,6 +59,8 @@ function DayForm({ date, initial, saints, onSaved }: { date: string; initial: Fo
           ...f,
           saintOfDayId: f.saintOfDayId || null,
           ...Object.fromEntries(AUDIO_FIELDS.map((k) => [k, f[k] || null])),
+          ...(!own.morning && { morningAudioUrlEs: null, morningAudioUrlEn: null }),
+          ...(!own.night && { nightAudioUrlEs: null, nightAudioUrlEn: null }),
         },
       }),
     onSuccess: onSaved,
@@ -99,19 +106,21 @@ function DayForm({ date, initial, saints, onSaved }: { date: string; initial: Fo
       </div>
 
       <h3 className="section-label">{t("morningPrayerLabel")}</h3>
+      <p className="muted" style={{ marginTop: 0 }}>{t("ownPrayerHint", { season: t(`season_${season}`) })}</p>
       <div className="form-grid">
-        <label className="field">{t("textEs")}<textarea required value={f.morningPrayerEs} onChange={set("morningPrayerEs")} /></label>
-        <label className="field">{t("textEn")}<textarea required value={f.morningPrayerEn} onChange={set("morningPrayerEn")} /></label>
-        {audio("morningAudioUrlEs", "audioEs")}
-        {audio("morningAudioUrlEn", "audioEn")}
+        <label className="field">{t("textEs")}<textarea required={own.morning} value={f.morningPrayerEs} onChange={set("morningPrayerEs")} /></label>
+        <label className="field">{t("textEn")}<textarea required={own.morning} value={f.morningPrayerEn} onChange={set("morningPrayerEn")} /></label>
+        {own.morning && audio("morningAudioUrlEs", "audioEs")}
+        {own.morning && audio("morningAudioUrlEn", "audioEn")}
       </div>
 
       <h3 className="section-label">{t("nightPrayerLabel")}</h3>
+      <p className="muted" style={{ marginTop: 0 }}>{t("ownPrayerHint", { season: t(`season_${season}`) })}</p>
       <div className="form-grid">
-        <label className="field">{t("textEs")}<textarea required value={f.nightPrayerEs} onChange={set("nightPrayerEs")} /></label>
-        <label className="field">{t("textEn")}<textarea required value={f.nightPrayerEn} onChange={set("nightPrayerEn")} /></label>
-        {audio("nightAudioUrlEs", "audioEs")}
-        {audio("nightAudioUrlEn", "audioEn")}
+        <label className="field">{t("textEs")}<textarea required={own.night} value={f.nightPrayerEs} onChange={set("nightPrayerEs")} /></label>
+        <label className="field">{t("textEn")}<textarea required={own.night} value={f.nightPrayerEn} onChange={set("nightPrayerEn")} /></label>
+        {own.night && audio("nightAudioUrlEs", "audioEs")}
+        {own.night && audio("nightAudioUrlEn", "audioEn")}
       </div>
 
       {save.isError && <p className="error">{t("genericError")}</p>}
@@ -130,6 +139,13 @@ const Pills = ({ v }: { v: { es: boolean; en: boolean } }) => (
   </>
 );
 
+// Oración que verá el fiel: la propia del día no se marca; la del tiempo o su ausencia, sí.
+function Source({ s }: { s: "day" | "season" | null }) {
+  const { t } = useI18n();
+  if (s === "day") return null;
+  return <span className={s === "season" ? "pill" : "badge missing"}>{s === "season" ? t("prayerFromSeason") : t("prayerMissing")}</span>;
+}
+
 export function Daily() {
   const { t, lang } = useI18n();
   const qc = useQueryClient();
@@ -139,6 +155,7 @@ export function Daily() {
   const fmt = (d: string) =>
     new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" }).format(new Date(`${d}T00:00:00Z`));
   const missing = days?.filter((d) => !d.filled).length ?? 0;
+  const selectedDay = days?.find((d) => d.date === selected);
 
   return (
     <>
@@ -150,7 +167,7 @@ export function Daily() {
       </div>
       {missing > 0 && <div className="notice" style={{ marginBottom: 14 }}>{t("daysMissing", { n: missing })}</div>}
       <div className="grid two-col">
-        <div>{selected && saints ? <DayEditor date={selected} saints={saints} onSaved={() => void qc.invalidateQueries({ queryKey: ["daily-calendar"] })} /> : <div className="card muted">{t("pickDay")}</div>}</div>
+        <div>{selectedDay && saints ? <DayEditor date={selectedDay.date} season={selectedDay.season} saints={saints} onSaved={() => void qc.invalidateQueries({ queryKey: ["daily-calendar"] })} /> : <div className="card muted">{t("pickDay")}</div>}</div>
         <section className="card">
           <h2>{t("next21")}</h2>
           {isLoading && <p className="muted">{t("loading")}</p>}
@@ -163,12 +180,14 @@ export function Daily() {
                       <strong>{fmt(d.date)}</strong>
                       {!d.filled && <span className="badge missing">{t("missing")}</span>}
                     </div>
+                    <div className="muted">{t(`season_${d.season}`)}</div>
                     {d.filled && (
                       <>
                         <div className="muted">{`${d.gospelRef}${d.saintOfDay ? ` · ${d.saintOfDay}` : ""}`}</div>
-                        {d.audio && (
+                        {d.audio && d.prayers && (
                           <div className="muted" style={{ marginTop: 4 }}>
-                            {t("morningShort")} <Pills v={d.audio.morning} /> {t("nightShort")} <Pills v={d.audio.night} />
+                            {t("morningShort")} <Source s={d.prayers.morning} /> <Pills v={d.audio.morning} /> {t("nightShort")} <Source s={d.prayers.night} />{" "}
+                            <Pills v={d.audio.night} />
                           </div>
                         )}
                       </>

@@ -43,6 +43,8 @@ const PANEL: Record<string, Role[]> = {
   "GET /admin/daily": EDIT,
   "GET /admin/daily/:date": EDIT,
   "PUT /admin/daily/:date": EDIT,
+  "GET /admin/seasonal-prayers": EDIT,
+  "PUT /admin/seasonal-prayers/:season/:kind": EDIT,
   "POST /admin/uploads": EDIT,
   "GET /admin/users": SUPER,
   "PATCH /admin/users/:id": SUPER,

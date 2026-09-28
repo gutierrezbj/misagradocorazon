@@ -169,3 +169,7 @@ button, input, select, textarea { font: inherit; }
 .day-row[aria-selected="true"] td { background: var(--gold-soft); }
 .badge.missing { background: #f8eaea; color: var(--danger); border-color: #e7c9c9; }
 .section-label { font-family: var(--font-display); font-size: 17px; color: var(--ink); margin: 22px 0 10px; }
+
+/* Oraciones por tiempo litúrgico */
+.badge.current { background: #fbf4e6; color: var(--warning); border-color: var(--gold-soft); }
+.prayer-preview { font-family: var(--font-display); font-style: italic; font-size: 16px; line-height: 1.5; margin: 0 0 6px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

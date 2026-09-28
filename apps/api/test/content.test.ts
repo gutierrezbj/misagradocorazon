@@ -119,6 +119,90 @@ describe("contenido diario", () => {
   });
 });
 
+describe("oraciones por tiempo litúrgico (US-10)", () => {
+  const bare = { gospelRef: "Mt 5, 1-12", gospelEs: "g", gospelEn: "g", meditationEs: "m", meditationEn: "m" };
+  const set = (textEs: string, audioUrlEs?: string) => ({ textEs, textEn: `${textEs} (en)`, ...(audioUrlEs && { audioUrlEs }) });
+
+  it("un día sin oración propia sirve la de su tiempo, con su audio; sin set del tiempo, la del ordinario", async () => {
+    const ed = await signUpAs("editor");
+    await request(app).put("/api/admin/seasonal-prayers/advent/morning").set(bearer(ed.token)).send(set("Ven, Señor Jesús", "https://media.example/adv-es.mp3")).expect(200);
+    await request(app).put("/api/admin/seasonal-prayers/ordinary/morning").set(bearer(ed.token)).send(set("Buenos días, Señor")).expect(200);
+    await request(app).put("/api/admin/seasonal-prayers/ordinary/night").set(bearer(ed.token)).send(set("Buenas noches, Señor")).expect(200);
+    for (const date of ["2026-12-01", "2026-12-26", "2026-10-01"]) {
+      await request(app).put(`/api/admin/daily/${date}`).set(bearer(ed.token)).send(bare).expect(200);
+    }
+
+    const advent = (await request(app).get("/api/daily?date=2026-12-01")).body.data;
+    expect(advent.season).toBe("advent");
+    expect(advent.morningPrayer).toEqual({ es: "Ven, Señor Jesús", en: "Ven, Señor Jesús (en)", audioUrl: { es: "https://media.example/adv-es.mp3", en: null }, source: "season" });
+    // Adviento no tiene oración de noche: se usa la del tiempo ordinario.
+    expect(advent.nightPrayer.es).toBe("Buenas noches, Señor");
+
+    const christmas = (await request(app).get("/api/daily?date=2026-12-26")).body.data;
+    expect(christmas.season).toBe("christmas");
+    expect(christmas.morningPrayer.es).toBe("Buenos días, Señor");
+    expect((await request(app).get("/api/daily?date=2026-10-01")).body.data.season).toBe("ordinary");
+  });
+
+  it("la oración propia del día manda sobre la del tiempo, con su propio audio", async () => {
+    const ed = await signUpAs("editor");
+    await request(app).put("/api/admin/seasonal-prayers/advent/night").set(bearer(ed.token)).send(set("Maranatha", "https://media.example/adv.mp3")).expect(200);
+    await request(app)
+      .put("/api/admin/daily/2026-12-08")
+      .set(bearer(ed.token))
+      .send({ ...bare, nightPrayerEs: "Inmaculada", nightPrayerEn: "Immaculate" })
+      .expect(200);
+    const day = (await request(app).get("/api/daily?date=2026-12-08")).body.data;
+    expect(day.nightPrayer).toEqual({ es: "Inmaculada", en: "Immaculate", audioUrl: { es: null, en: null }, source: "day" });
+  });
+
+  it("sin oración propia ni sets, la oración llega vacía en vez de romper", async () => {
+    const ed = await signUpAs("editor");
+    await request(app).put("/api/admin/daily/2026-10-02").set(bearer(ed.token)).send(bare).expect(200);
+    const day = (await request(app).get("/api/daily?date=2026-10-02")).body.data;
+    expect(day.morningPrayer).toBeNull();
+    expect(day.nightPrayer).toBeNull();
+  });
+
+  it("el calendario del panel dice el tiempo de cada día y de dónde sale la oración", async () => {
+    const ed = await signUpAs("editor");
+    await request(app).put("/api/admin/seasonal-prayers/advent/morning").set(bearer(ed.token)).send(set("Ven", "https://media.example/a.mp3")).expect(200);
+    await request(app).put("/api/admin/daily/2026-11-29").set(bearer(ed.token)).send({ ...bare, nightPrayerEs: "n", nightPrayerEn: "n" }).expect(200);
+    const cal = (await request(app).get("/api/admin/daily?from=2026-11-28&days=2").set(bearer(ed.token))).body.data;
+    expect(cal[0]).toMatchObject({ date: "2026-11-28", season: "ordinary", filled: false });
+    expect(cal[1]).toMatchObject({
+      date: "2026-11-29",
+      season: "advent",
+      prayers: { morning: "season", night: "day" },
+      audio: { morning: { es: true, en: false }, night: { es: false, en: false } },
+    });
+  });
+
+  it("solo editores; valida tiempo, tipo y textos; queda auditado", async () => {
+    const mod = await signUpAs("moderator");
+    expect((await request(app).get("/api/admin/seasonal-prayers").set(bearer(mod.token))).status).toBe(403);
+    expect((await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(mod.token)).send(set("x"))).status).toBe(403);
+
+    const ed = await signUpAs("editor");
+    expect((await request(app).put("/api/admin/seasonal-prayers/pentecost/morning").set(bearer(ed.token)).send(set("x"))).status).toBe(400);
+    expect((await request(app).put("/api/admin/seasonal-prayers/lent/noon").set(bearer(ed.token)).send(set("x"))).status).toBe(400);
+    expect((await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send({ textEs: "x" })).status).toBe(400);
+    expect((await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send({ ...set("x"), audioUrlEs: "javascript:alert(1)" })).status).toBe(400);
+
+    await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send(set("Misericordia")).expect(200);
+    await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send(set("Perdón")).expect(200);
+    const list = (await request(app).get("/api/admin/seasonal-prayers").set(bearer(ed.token))).body.data;
+    expect(list.map((s: { season: string }) => s.season)).toEqual(["advent", "christmas", "lent", "easter", "ordinary"]);
+    expect(list[2].morning.textEs).toBe("Perdón");
+    expect(list[2].night).toBeNull();
+    const log = await prisma.adminAuditLog.findMany({ where: { entity: "seasonal_prayer" } });
+    expect(log.map((l) => [l.action, l.entityId])).toEqual([
+      ["seasonal_prayer.update", "lent:morning"],
+      ["seasonal_prayer.update", "lent:morning"],
+    ]);
+  });
+});
+
 describe("subidas a R2", () => {
   const saved = { ...env };
   afterEach(() => Object.assign(env, saved));

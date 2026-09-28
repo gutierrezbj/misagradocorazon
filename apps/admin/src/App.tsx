@@ -6,6 +6,7 @@ import { useI18n } from "./i18n.tsx";
 import { Audit } from "./pages/Audit.tsx";
 import { Causes } from "./pages/Causes.tsx";
 import { Daily } from "./pages/Daily.tsx";
+import { Seasons } from "./pages/Seasons.tsx";
 import { Dashboard } from "./pages/Dashboard.tsx";
 import { Forbidden, Login } from "./pages/Login.tsx";
 import { Masses } from "./pages/Masses.tsx";
@@ -28,6 +29,7 @@ export function App() {
         <Route index element={<Dashboard />} />
         {can(me, "moderator") && <Route path="moderacion" element={<Moderation />} />}
         {can(me, "editor") && <Route path="contenido" element={<Daily />} />}
+        {can(me, "editor") && <Route path="tiempos" element={<Seasons />} />}
         {can(me, "editor") && <Route path="santoral" element={<Saints />} />}
         {can(me, "editor") && <Route path="causas" element={<Causes />} />}
         {can(me, "editor") && <Route path="misas" element={<Masses />} />}

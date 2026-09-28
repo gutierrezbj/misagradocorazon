@@ -40,6 +40,15 @@ enum PrayerKind {
   night
 }
 
+// Tiempo litúrgico (US-10). El cálculo vive en @msc/shared (liturgicalSeason).
+enum LiturgicalSeason {
+  advent
+  christmas
+  lent
+  easter
+  ordinary
+}
+
 enum IntentionCategory {
   salud
   familia
@@ -236,10 +245,10 @@ model DailyContent {
   // Audio por idioma (SDD-05 US-07): el fiel escucha el de su idioma.
   meditationAudioUrlEs String?
   meditationAudioUrlEn String?
-  morningPrayerEs   String
-  morningPrayerEn   String
-  nightPrayerEs     String
-  nightPrayerEn     String
+  morningPrayerEs   String? // vacía = la del tiempo litúrgico (US-10)
+  morningPrayerEn   String? // vacía = la del tiempo litúrgico (US-10)
+  nightPrayerEs     String? // vacía = la del tiempo litúrgico (US-10)
+  nightPrayerEn     String? // vacía = la del tiempo litúrgico (US-10)
   morningAudioUrlEs String?
   morningAudioUrlEn String?
   nightAudioUrlEs   String?
@@ -249,6 +258,21 @@ model DailyContent {
   saintOfDay Saint? @relation(fields: [saintOfDayId], references: [id])
 
   @@map("daily_content")
+}
+
+// Oración de mañana o de noche de un tiempo litúrgico (US-10). Se sirve los días sin oración propia.
+// Sin set para un tiempo, se usa el del tiempo ordinario.
+model SeasonalPrayer {
+  season     LiturgicalSeason
+  kind       PrayerKind
+  textEs     String
+  textEn     String
+  audioUrlEs String?
+  audioUrlEn String?
+  updatedAt  DateTime @updatedAt
+
+  @@id([season, kind])
+  @@map("seasonal_prayer")
 }
 
 model PrayerLog {

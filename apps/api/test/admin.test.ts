@@ -2,11 +2,39 @@ import request from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { prisma } from "../src/db.ts";
+import { computeKpis } from "../src/modules/admin/kpis.ts";
 import { app, bearer, resetDb, signUp, signUpAs } from "./helpers.ts";
 
 beforeEach(resetDb);
 
 describe("KPIs", () => {
+  test("oraciones por tiempo litúrgico: media por día de cada tiempo, sin contar al staff (US-10)", async () => {
+    const a = await signUp();
+    const b = await signUp();
+    const ed = await signUpAs("editor");
+    const log = (userId: string, localDate: string, kind: "morning" | "night") => ({ userId, localDate, kind });
+    await prisma.prayerLog.createMany({
+      data: [
+        // Tiempo ordinario (antes del Miércoles de Ceniza, 18-feb-2026)
+        log(a.userId, "2026-02-10", "morning"),
+        // Cuaresma
+        log(a.userId, "2026-02-20", "morning"),
+        log(a.userId, "2026-02-20", "night"),
+        log(b.userId, "2026-02-21", "morning"),
+        log(ed.userId, "2026-02-21", "morning"),
+      ],
+    });
+    const k = await computeKpis(30, new Date("2026-03-01T12:00:00Z"));
+    // Ventana: del 30-ene al 1-mar: 19 días de tiempo ordinario y 12 de Cuaresma.
+    expect(k.prayers).toEqual({
+      current: "lent",
+      bySeason: [
+        { season: "lent", days: 12, prayers: 3, perDay: 0.3 },
+        { season: "ordinary", days: 19, prayers: 1, perDay: 0.1 },
+      ],
+    });
+  });
+
   test("solo el staff los ve", async () => {
     const user = await signUp();
     const mod = await signUpAs("moderator");

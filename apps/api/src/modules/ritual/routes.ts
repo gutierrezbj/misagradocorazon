@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { prayerCompleteSchema } from "@msc/shared";
+import { liturgicalSeason, prayerCompleteSchema } from "@msc/shared";
 import { z } from "zod";
 
 import { prisma } from "../../db.ts";
 import { isValidTimeZone, localDate } from "../../lib/dates.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
+import { resolvePrayers, seasonalPrayers } from "./prayers.ts";
 import { dailyDto, saintDto } from "./serializers.ts";
 import { currentStreak } from "./streak.ts";
 
@@ -37,7 +38,8 @@ ritualRouter.get("/daily", async (req, res) => {
   const date = q.date ?? localDate(new Date(), q.tz ?? "America/Mexico_City");
   const content = await prisma.dailyContent.findUnique({ where: { date }, include: { saintOfDay: true } });
   if (!content) throw new HttpError(404, "no_content", `No hay contenido para ${date}`);
-  ok(res, dailyDto(content));
+  const sets = await seasonalPrayers([liturgicalSeason(date)]);
+  ok(res, dailyDto(content, resolvePrayers(content, sets)));
 });
 
 ritualRouter.post("/prayers/complete", requireUser, async (req, res) => {

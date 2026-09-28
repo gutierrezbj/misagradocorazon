@@ -48,7 +48,8 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 ## Pendiente de contenido y legal
 
 - **Audio:** lo graba el equipo (nunca con IA) y se sube desde el panel (`docs/audio.md`).
-- **Contenido diario:** evangelio, meditación y oraciones de cada día, preparados en el panel (`docs/contenido.md`).
+- **Contenido diario:** evangelio y meditación de cada día, preparados en el panel (`docs/contenido.md`).
+- **Oraciones por tiempo litúrgico:** al menos las de tiempo ordinario y las del próximo tiempo fuerte (Adviento empieza el 29-nov-2026), con su audio. Sin ellas, los días sin oración propia se quedan sin oración (`docs/contenido.md`).
 - **Imágenes de los santos:** las del catálogo inicial enlazan a Wikimedia y Pexels con licencias sin verificar. Hay que sustituirlas por ficheros propios en R2 antes de publicar (`docs/fuentes-imagenes.md`).
 - **Aviso de privacidad y fichas de privacidad de las tiendas:** tienen que incluir la analítica (`docs/kpis.md`). Recomendación: explicar también cómo se tratan las intenciones, que son datos de creencias religiosas (GDPR art. 9).
 - **Sociedad:** necesaria para cobrar de verdad y para las cuentas a su nombre.

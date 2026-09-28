@@ -8,6 +8,26 @@ Alcance de SDD-02 (módulos santoral y contenido diario, con audio) y SDD-05 US-
 - **Calendario:** el panel muestra los próximos 21 días. Marca los que faltan y, para los que están listos, qué audio hay en cada idioma.
 - **Días sin contenido:** la app no muestra nada ese día y el santo del día no se notifica. Nunca se sirve el contenido de otro día.
 - **Santo del día:** solo se pueden elegir santos visibles.
+- **Oraciones del día:** opcionales. Si se dejan vacías en los dos idiomas, se reza la del tiempo litúrgico, con su audio. Si se escriben, van en los dos idiomas y mandan sobre la del tiempo; su audio solo se puede poner con texto propio. El calendario marca los días que usan la del tiempo y los que se quedarían sin oración.
+
+## Oraciones por tiempo litúrgico (US-10)
+
+Página **Oraciones por tiempo** del panel. Para cada tiempo, una oración de mañana y una de noche, con texto y audio ES/EN. Así el equipo graba el audio una vez por tiempo en lugar de cada día.
+
+| Tiempo | Días (calendario romano general) |
+|---|---|
+| Adviento | Del domingo entre el 27-nov y el 3-dic al 24-dic |
+| Navidad | Del 25-dic al Bautismo del Señor (domingo después del 6-ene) |
+| Cuaresma | Del Miércoles de Ceniza al Sábado Santo |
+| Pascua | Del Domingo de Resurrección a Pentecostés |
+| Tiempo ordinario | El resto |
+
+- **Mínimo del MVP:** dos sets (SDD-05 US-10). Un tiempo sin oración usa la del **tiempo ordinario**, así que basta con el ordinario y uno más para empezar.
+- **Simplificaciones, con granularidad de día:**
+  - El Triduo Pascual se sirve como Cuaresma hasta el Sábado Santo.
+  - Donde la Epifanía se traslada a domingo y cae el 7 u 8 de enero, el Bautismo del Señor pasa al lunes. La app cambia de tiempo un día antes.
+  - Cualquier día concreto se puede ajustar escribiendo su oración propia en Contenido diario.
+- **El cálculo** está en `liturgicalSeason()` de `packages/shared/src/domain.ts`, con la fecha de Pascua por el algoritmo gregoriano y tests de sus límites.
 
 ## Santoral
 

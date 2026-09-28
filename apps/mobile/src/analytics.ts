@@ -6,12 +6,12 @@
 // - Se identifica solo por el id interno. Sin geolocalización por IP, sin grabación de sesiones.
 // - Sin EXPO_PUBLIC_POSTHOG_KEY la analítica está apagada (desarrollo, tests, builds sin cuenta).
 import PostHog from "posthog-react-native";
-import type { CandleType, IntentionCategory } from "@msc/shared";
+import type { CandleType, IntentionCategory, LiturgicalSeason } from "@msc/shared";
 
 /** Todos los eventos que existen. Añadir uno aquí es la única forma de enviarlo. */
 export type AnalyticsEvents = {
   onboarding_completed: { language: "es" | "en"; secondarySaints: number };
-  prayer_completed: { kind: "morning" | "night" };
+  prayer_completed: { kind: "morning" | "night"; season: LiturgicalSeason };
   audio_played: { content: "saint" | "morning" | "night" | "meditation" };
   candle_flow_started: Record<string, never>;
   candle_lit: { type: CandleType; forDeceased: boolean };

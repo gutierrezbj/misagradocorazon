@@ -1,5 +1,5 @@
 // Tipos de la API (apps/api). Los campos localizados llegan como { es, en } y se muestran con loc().
-import type { CandleCategory, CandleType, IntentionCategory, Locale, Role } from "@msc/shared";
+import type { CandleCategory, CandleType, IntentionCategory, LiturgicalSeason, Locale, Role } from "@msc/shared";
 
 export type Localized = { es: string; en: string };
 
@@ -41,13 +41,17 @@ export type Saint = {
   isPatronCatalog: boolean;
 };
 
+// Oración ya resuelta por la API: la propia del día o la del tiempo litúrgico (US-10). null si no hay.
+export type DailyPrayer = Localized & { audioUrl: LocalizedAudio; source: "day" | "season" };
+
 export type Daily = {
   date: string;
+  season: LiturgicalSeason;
   saintOfDay: Saint | null;
   gospel: { ref: string } & Localized;
   meditation: Localized & { audioUrl: LocalizedAudio };
-  morningPrayer: Localized & { audioUrl: LocalizedAudio };
-  nightPrayer: Localized & { audioUrl: LocalizedAudio };
+  morningPrayer: DailyPrayer | null;
+  nightPrayer: DailyPrayer | null;
 };
 
 export type MyCandle = {

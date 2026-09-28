@@ -1,7 +1,7 @@
 // Esquemas de validación: única definición de los contratos de la API (SDD-06).
 import { z } from "zod";
 
-import { CANDLE_CATEGORIES, CANDLE_TYPE_KEYS, INTENTION_CATEGORIES, LOCALES, ROLES } from "./domain.ts";
+import { CANDLE_CATEGORIES, CANDLE_TYPE_KEYS, INTENTION_CATEGORIES, LITURGICAL_SEASONS, LOCALES, ROLES } from "./domain.ts";
 
 const hhmm = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Formato HH:MM");
 
@@ -196,25 +196,57 @@ export const saintInputSchema = z.object({
 export type SaintInput = z.infer<typeof saintInputSchema>;
 export const saintUpdateSchema = updateSchemaOf(saintInputSchema);
 
-export const dailyContentInputSchema = z.object({
-  saintOfDayId: z.string().min(1).nullable().optional(),
-  gospelRef: z.string().trim().min(1).max(120),
-  gospelEs: z.string().trim().min(1).max(8000),
-  gospelEn: z.string().trim().min(1).max(8000),
-  meditationEs: z.string().trim().min(1).max(8000),
-  meditationEn: z.string().trim().min(1).max(8000),
-  morningPrayerEs: z.string().trim().min(1).max(3000),
-  morningPrayerEn: z.string().trim().min(1).max(3000),
-  nightPrayerEs: z.string().trim().min(1).max(3000),
-  nightPrayerEn: z.string().trim().min(1).max(3000),
-  meditationAudioUrlEs: optionalUrl,
-  meditationAudioUrlEn: optionalUrl,
-  morningAudioUrlEs: optionalUrl,
-  morningAudioUrlEn: optionalUrl,
-  nightAudioUrlEs: optionalUrl,
-  nightAudioUrlEn: optionalUrl,
-});
+// Oración del día opcional (US-10): vacía en los dos idiomas = se sirve la del tiempo litúrgico.
+const optionalPrayer = z
+  .string()
+  .trim()
+  .max(3000)
+  .nullable()
+  .optional()
+  .transform((s) => s || null);
+
+export const dailyContentInputSchema = z
+  .object({
+    saintOfDayId: z.string().min(1).nullable().optional(),
+    gospelRef: z.string().trim().min(1).max(120),
+    gospelEs: z.string().trim().min(1).max(8000),
+    gospelEn: z.string().trim().min(1).max(8000),
+    meditationEs: z.string().trim().min(1).max(8000),
+    meditationEn: z.string().trim().min(1).max(8000),
+    morningPrayerEs: optionalPrayer,
+    morningPrayerEn: optionalPrayer,
+    nightPrayerEs: optionalPrayer,
+    nightPrayerEn: optionalPrayer,
+    meditationAudioUrlEs: optionalUrl,
+    meditationAudioUrlEn: optionalUrl,
+    morningAudioUrlEs: optionalUrl,
+    morningAudioUrlEn: optionalUrl,
+    nightAudioUrlEs: optionalUrl,
+    nightAudioUrlEn: optionalUrl,
+  })
+  // Una oración propia del día va en los dos idiomas o en ninguno: nunca medio día propio y medio
+  // del tiempo. Sin texto propio no hay audio propio (se sirve el del tiempo, no se ignora en silencio).
+  .superRefine((d, ctx) => {
+    for (const [kind, audio] of [["morningPrayer", "morningAudioUrl"], ["nightPrayer", "nightAudioUrl"]] as const) {
+      if (!d[`${kind}Es`] !== !d[`${kind}En`]) {
+        ctx.addIssue({ code: "custom", path: [d[`${kind}Es`] ? `${kind}En` : `${kind}Es`], message: "Falta el otro idioma" });
+      }
+      if (!d[`${kind}Es`] && (d[`${audio}Es`] || d[`${audio}En`])) {
+        ctx.addIssue({ code: "custom", path: [kind + "Es"], message: "Audio sin texto propio del día" });
+      }
+    }
+  });
 export type DailyContentInput = z.infer<typeof dailyContentInputSchema>;
+
+// Oraciones de mañana y noche de un tiempo litúrgico (US-10). El audio lo graba el equipo.
+export const seasonalPrayerKeySchema = z.object({ season: z.enum(LITURGICAL_SEASONS), kind: prayerCompleteSchema.shape.kind });
+export const seasonalPrayerInputSchema = z.object({
+  textEs: z.string().trim().min(1).max(3000),
+  textEn: z.string().trim().min(1).max(3000),
+  audioUrlEs: optionalUrl,
+  audioUrlEn: optionalUrl,
+});
+export type SeasonalPrayerInput = z.infer<typeof seasonalPrayerInputSchema>;
 
 // Borrado de cuenta (SDD-02, transversal): confirmación explícita desde la app.
 export const accountDeleteSchema = z.object({ confirm: z.literal(true) });

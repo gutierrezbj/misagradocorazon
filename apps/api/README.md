@@ -125,6 +125,8 @@ Staff = moderador, editor y superadmin. El superadmin puede con todo. La matriz 
 | GET | `/api/admin/daily` | editor | Calendario de los próximos días: qué está listo y qué falta |
 | GET | `/api/admin/daily/:date` | editor | Contenido de un día |
 | PUT | `/api/admin/daily/:date` | editor | Guardar el contenido de un día |
+| GET | `/api/admin/seasonal-prayers` | editor | Oraciones de mañana y noche de cada tiempo litúrgico |
+| PUT | `/api/admin/seasonal-prayers/:season/:kind` | editor | Guardar la oración de un tiempo (`advent`, `christmas`, `lent`, `easter`, `ordinary` × `morning`, `night`) |
 | POST | `/api/admin/uploads` | editor | URL firmada de subida a R2 (`docs/contenido.md`) |
 | GET | `/api/admin/causes` | editor | Todas las causas, del mes más reciente al más antiguo |
 | POST | `/api/admin/causes` | editor | Alta de causa candidata |

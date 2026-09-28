@@ -28,7 +28,8 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 | Tabla | Para qué | Campos clave |
 |---|---|---|
 | `saint` | Santoral | Nombre, fiesta (`MM-DD`), imagen, audio ES/EN, historia, patronazgos y oración en ES/EN; `isPatronCatalog` (elegible como patrón); `deletedAt` (baja lógica) |
-| `daily_content` | Contenido de cada día | Clave `date` (`YYYY-MM-DD`); santo del día; evangelio, meditación y oraciones de mañana y noche en ES/EN, con audio por idioma |
+| `daily_content` | Contenido de cada día | Clave `date` (`YYYY-MM-DD`); santo del día; evangelio, meditación y oraciones de mañana y noche en ES/EN, con audio por idioma. Las oraciones son opcionales: vacías, se sirve la del tiempo litúrgico |
+| `seasonal_prayer` | Oraciones de mañana y noche de cada tiempo litúrgico (US-10) | Clave `(season, kind)`: Adviento, Navidad, Cuaresma, Pascua u ordinario × mañana o noche; texto y audio ES/EN |
 | `prayer_log` | Oraciones hechas (racha) | Única por `(userId, localDate, kind)`: una de mañana y una de noche por día |
 | `private_intention` | "Por quién rezo hoy" | `textEncrypted`; solo la ve su autor |
 
@@ -92,3 +93,4 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 | `20260926191000_analytics_consent` | Consentimiento de analítica |
 | `20260927090000_candle_expiry` | Aviso de vela permanente apagada |
 | `20260927150000_apple_revocation` | Tokens de Apple pendientes de revocar |
+| `20260928084515_seasonal_prayer` | Oraciones por tiempo litúrgico; oraciones del día opcionales |

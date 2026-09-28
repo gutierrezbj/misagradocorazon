@@ -1,7 +1,16 @@
 // Gestión de contenido del panel (SDD-02: santoral y contenido diario con audio; SDD-05 US-19).
 // Rol editor. Cada cambio queda en admin_audit_log.
 import { Router } from "express";
-import { dailyContentInputSchema, saintInputSchema, saintUpdateSchema, uploadRequestSchema } from "@msc/shared";
+import {
+  dailyContentInputSchema,
+  LITURGICAL_SEASONS,
+  liturgicalSeason,
+  saintInputSchema,
+  saintUpdateSchema,
+  seasonalPrayerInputSchema,
+  seasonalPrayerKeySchema,
+  uploadRequestSchema,
+} from "@msc/shared";
 import { z } from "zod";
 
 import { prisma } from "../../db.ts";
@@ -10,6 +19,7 @@ import { createUpload, storageConfigured } from "../../lib/storage.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { requireRole } from "../../middleware/roles.ts";
 import { currentUser } from "../../middleware/require-user.ts";
+import { resolvePrayers, seasonalPrayers } from "../ritual/prayers.ts";
 
 export const contentRouter = Router();
 const editor = requireRole("editor");
@@ -130,22 +140,28 @@ contentRouter.get("/admin/daily", ...editor, async (req, res) => {
     include: { saintOfDay: { select: { name: true } } },
   });
   const byDate = new Map(rows.map((r) => [r.date, r]));
-  const days = Array.from({ length: q.days }, (_, i) => {
-    const date = addDays(from, i);
+  const dates = Array.from({ length: q.days }, (_, i) => addDays(from, i));
+  const sets = await seasonalPrayers(dates.map(liturgicalSeason));
+  const days = dates.map((date) => {
     const r = byDate.get(date);
-    return r
-      ? {
-          date,
-          filled: true,
-          saintOfDay: r.saintOfDay?.name ?? null,
-          gospelRef: r.gospelRef,
-          audio: {
-            morning: { es: !!r.morningAudioUrlEs, en: !!r.morningAudioUrlEn },
-            night: { es: !!r.nightAudioUrlEs, en: !!r.nightAudioUrlEn },
-            meditation: { es: !!r.meditationAudioUrlEs, en: !!r.meditationAudioUrlEn },
-          },
-        }
-      : { date, filled: false, saintOfDay: null, gospelRef: null, audio: null };
+    const season = liturgicalSeason(date);
+    if (!r) return { date, season, filled: false, saintOfDay: null, gospelRef: null, prayers: null, audio: null };
+    // Lo que verá el fiel: la oración propia del día o la del tiempo, con su audio.
+    const p = resolvePrayers(r, sets);
+    const has = (x: typeof p.morning) => ({ es: !!x?.audioUrl.es, en: !!x?.audioUrl.en });
+    return {
+      date,
+      season,
+      filled: true,
+      saintOfDay: r.saintOfDay?.name ?? null,
+      gospelRef: r.gospelRef,
+      prayers: { morning: p.morning?.source ?? null, night: p.night?.source ?? null },
+      audio: {
+        morning: has(p.morning),
+        night: has(p.night),
+        meditation: { es: !!r.meditationAudioUrlEs, en: !!r.meditationAudioUrlEn },
+      },
+    };
   });
   ok(res, days);
 });
@@ -167,6 +183,41 @@ contentRouter.put("/admin/daily/:date", ...editor, async (req, res) => {
     const existed = await tx.dailyContent.findUnique({ where: { date }, select: { date: true } });
     const row = await tx.dailyContent.upsert({ where: { date }, create: { date, ...input }, update: input });
     await audit(tx, actor.id, existed ? "daily.update" : "daily.create", "daily_content", date, { saintOfDayId: row.saintOfDayId });
+    return row;
+  });
+  ok(res, saved);
+});
+
+// --- Oraciones por tiempo litúrgico (US-10) ------------------------------------------
+
+// Los cinco tiempos con su oración de mañana y de noche (null = sin set: se usa el ordinario).
+contentRouter.get("/admin/seasonal-prayers", ...editor, async (_req, res) => {
+  const rows = await prisma.seasonalPrayer.findMany();
+  const byKey = new Map(rows.map((r) => [`${r.season}:${r.kind}`, r]));
+  ok(
+    res,
+    LITURGICAL_SEASONS.map((season) => ({
+      season,
+      current: season === liturgicalSeason(new Date().toISOString().slice(0, 10)),
+      morning: byKey.get(`${season}:morning`) ?? null,
+      night: byKey.get(`${season}:night`) ?? null,
+    })),
+  );
+});
+
+contentRouter.put("/admin/seasonal-prayers/:season/:kind", ...editor, async (req, res) => {
+  const actor = currentUser(req);
+  const key = seasonalPrayerKeySchema.parse({ season: pathParam(req, "season"), kind: pathParam(req, "kind") });
+  const input = seasonalPrayerInputSchema.parse(req.body);
+  const saved = await prisma.$transaction(async (tx) => {
+    const row = await tx.seasonalPrayer.upsert({
+      where: { season_kind: key },
+      create: { ...key, ...input },
+      update: input,
+    });
+    await audit(tx, actor.id, "seasonal_prayer.update", "seasonal_prayer", `${key.season}:${key.kind}`, {
+      audio: { es: !!row.audioUrlEs, en: !!row.audioUrlEn },
+    });
     return row;
   });
   ok(res, saved);

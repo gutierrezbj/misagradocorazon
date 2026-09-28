@@ -69,6 +69,7 @@ export function Dashboard() {
           </div>
 
           <Goals goals={k.goals} simulated={k.money.simulated} />
+          <PrayersBySeason prayers={k.prayers} />
 
           <div className="grid two-col">
             <section className="card">
@@ -130,6 +131,43 @@ export function Dashboard() {
         </div>
       )}
     </>
+  );
+}
+
+// Oraciones rezadas por tiempo litúrgico (US-10): la media por día permite comparar tiempos de distinta duración.
+function PrayersBySeason({ prayers }: { prayers: Kpis["prayers"] }) {
+  const { t, lang } = useI18n();
+  return (
+    <section className="card" data-testid="prayers-by-season">
+      <div className="card-head">
+        <div>
+          <h2>{t("prayersTitle")}</h2>
+          <div className="muted">{t("prayersSub")}</div>
+        </div>
+      </div>
+      <table className="table">
+        <thead>
+          <tr>
+            <th>{t("colSeason")}</th>
+            <th className="num">{t("colDays")}</th>
+            <th className="num">{t("colPrayers")}</th>
+            <th className="num">{t("colPerDay")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {prayers.bySeason.map((s) => (
+            <tr key={s.season}>
+              <td>
+                {t(`season_${s.season}`)} {s.season === prayers.current && <span className="badge current">{t("seasonCurrent")}</span>}
+              </td>
+              <td className="num">{formatNumber(s.days, lang)}</td>
+              <td className="num">{formatNumber(s.prayers, lang)}</td>
+              <td className="num">{s.perDay.toLocaleString(lang === "en" ? "en-US" : "es-MX")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
   );
 }
 

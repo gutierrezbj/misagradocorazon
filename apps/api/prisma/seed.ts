@@ -53,7 +53,17 @@ async function main() {
     await prisma.dailyContent.upsert({ where: { date }, create: { date, ...data }, update: data });
   }
 
-  console.log(`Seed: ${saints.length} santos, ${daily.saintRotation.length} días de contenido`);
+  // Set del tiempo ordinario (US-10) con el mismo texto de ejemplo: los días sin oración propia lo usan.
+  const t = daily.template;
+  for (const [kind, textEs, textEn] of [
+    ["morning", t.morningPrayerEs, t.morningPrayerEn],
+    ["night", t.nightPrayerEs, t.nightPrayerEn],
+  ] as const) {
+    const key = { season: "ordinary" as const, kind };
+    await prisma.seasonalPrayer.upsert({ where: { season_kind: key }, create: { ...key, textEs, textEn }, update: { textEs, textEn } });
+  }
+
+  console.log(`Seed: ${saints.length} santos, ${daily.saintRotation.length} días de contenido, oraciones del tiempo ordinario`);
 }
 
 main().finally(() => prisma.$disconnect());
