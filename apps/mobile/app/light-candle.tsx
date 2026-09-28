@@ -16,8 +16,8 @@ import { queryClient } from "@/src/query-client";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
-import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
-import { ShareCandlePanel } from "@/src/components/ShareCandlePanel";
+import { CandleFlame, type CandleVariant } from "@/src/ritual/CandleFlame";
+import { ShareCandlePanel } from "@/src/ritual/ShareCandlePanel";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
 

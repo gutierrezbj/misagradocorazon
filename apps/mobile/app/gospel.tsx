@@ -10,7 +10,7 @@ import { useAuth } from "@/src/auth";
 import type { Daily } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
-import { AudioPlayer } from "@/src/components/AudioPlayer";
+import { AudioPlayer } from "@/src/ritual/AudioPlayer";
 
 export default function Gospel() {
   const styles = useStyles();

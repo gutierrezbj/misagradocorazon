@@ -18,7 +18,7 @@ jest.mock("@/src/auth", () => ({ useAuth: () => ({ user: { timezone: "Europe/Mad
 const mockBack = jest.fn();
 let mockParams: Record<string, string> = { kind: "morning" };
 jest.mock("expo-router", () => ({ useRouter: () => ({ back: mockBack }), useLocalSearchParams: () => mockParams }));
-jest.mock("@/src/components/AudioPlayer", () => ({ AudioPlayer: () => null }));
+jest.mock("@/src/ritual/AudioPlayer", () => ({ AudioPlayer: () => null }));
 
 const daily = (extra: Record<string, unknown>) => ({
   date: "2026-12-01",

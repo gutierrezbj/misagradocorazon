@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View, type LayoutChangeEvent } from "react-native";
 
 import { type AnalyticsEvents } from "@/src/analytics";
-import { useAudio, type AudioTrack } from "@/src/audio-state";
+import { useAudio, type AudioTrack } from "@/src/ritual/audio-state";
 import { useI18n } from "@/src/i18n";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { Icon } from "@/src/components/ui";

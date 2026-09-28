@@ -11,7 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ErrorBoundary } from "@/src/components/error-boundary";
 import { queryClient } from "@/src/query-client";
 import { AuthProvider, useAuth } from "@/src/auth";
-import { AudioProvider } from "@/src/audio";
+import { AudioProvider } from "@/src/ritual/audio";
 import { registerForPush, usePushNavigation } from "@/src/push";
 import { OfflineBanner, useQueryOnlineSync } from "@/src/network";
 import { trackScreen } from "@/src/analytics";

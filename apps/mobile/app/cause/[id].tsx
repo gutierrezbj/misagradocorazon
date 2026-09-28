@@ -13,7 +13,7 @@ import { api } from "@/src/api";
 import type { CauseDetail } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
-import { formatUsd } from "@/src/money";
+import { formatUsd } from "@/src/causas/money";
 
 export default function CauseScreen() {
   const styles = useStyles();

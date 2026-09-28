@@ -13,7 +13,7 @@ import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Chip, Icon, AppButton, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
-import { useMiniPlayerInset } from "@/src/audio-state";
+import { useMiniPlayerInset } from "@/src/ritual/audio-state";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
 

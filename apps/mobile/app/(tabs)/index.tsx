@@ -14,9 +14,9 @@ import type { CommunityCandles, Daily, MyCandle, Saint } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
-import { CandleFlame } from "@/src/components/CandleFlame";
+import { CandleFlame } from "@/src/ritual/CandleFlame";
 import { usesNativeTabs } from "@/src/navigation";
-import { useMiniPlayerInset } from "@/src/audio-state";
+import { useMiniPlayerInset } from "@/src/ritual/audio-state";
 
 export default function Altar() {
   const styles = useStyles();
