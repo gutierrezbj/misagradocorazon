@@ -118,6 +118,13 @@ const dict = {
   saintOfDay: { es: "Santo del día", en: "Saint of the day" },
   morningPrayer: { es: "Oración de la mañana", en: "Morning prayer" },
   nightPrayer: { es: "Oración de la noche", en: "Night prayer" },
+  // tiempo litúrgico (US-10)
+  season_advent: { es: "Tiempo de Adviento", en: "Advent" },
+  season_christmas: { es: "Tiempo de Navidad", en: "Christmas Time" },
+  season_lent: { es: "Cuaresma", en: "Lent" },
+  season_easter: { es: "Tiempo de Pascua", en: "Easter Time" },
+  season_ordinary: { es: "Tiempo ordinario", en: "Ordinary Time" },
+  prayerUnavailable: { es: "La oración de hoy aún no está disponible.", en: "Today's prayer is not available yet." },
   noCandles: { es: "Aún no has encendido ninguna vela", en: "You haven't lit any candles yet" },
   selectPatronFirst: { es: "Selecciona tu santo patrón", en: "Select your patron saint" },
   // candle

@@ -1,7 +1,7 @@
 // KPIs del panel (SDD-02: MAU, retención D7/D30, conversión a vela, velas, ingresos, 20 %,
 // participación en votación, asistencia a misa). Las cifras de la ventana se consultan en vivo;
 // la serie por día sale de los agregados diarios (kpi_daily) más el día de hoy en vivo.
-import { MVP_TARGETS, type MvpGoalKey } from "@msc/shared";
+import { LITURGICAL_SEASONS, liturgicalSeason, MVP_TARGETS, type MvpGoalKey } from "@msc/shared";
 
 import { prisma } from "../../db.ts";
 import { monthOf } from "../../lib/dates.ts";
@@ -93,6 +93,25 @@ export async function computeKpis(days: number, now = new Date()) {
       ])
     : [0, 0];
 
+  // Oraciones rezadas por tiempo litúrgico (US-10): media por día de cada tiempo dentro de la ventana,
+  // para comparar tiempos de distinta duración. El día es el local del fiel (prayer_log.localDate).
+  const prayerDays = await prisma.$queryRawUnsafe<{ day: string; prayers: bigint }[]>(
+    `SELECT p."localDate" AS day, count(*) AS prayers
+       FROM prayer_log p JOIN "user" u ON u.id = p."userId" AND u.role = 'user'
+      WHERE p."localDate" >= $1 GROUP BY 1`,
+    isoDay(since),
+  );
+  const seasonDays = new Map<string, number>();
+  for (let t = Date.parse(`${isoDay(since)}T00:00:00Z`); t <= now.getTime(); t += 86_400_000) {
+    const s = liturgicalSeason(new Date(t).toISOString().slice(0, 10));
+    seasonDays.set(s, (seasonDays.get(s) ?? 0) + 1);
+  }
+  const prayersBySeason = LITURGICAL_SEASONS.filter((s) => seasonDays.has(s)).map((season) => {
+    const prayers = prayerDays.filter((d) => liturgicalSeason(d.day) === season).reduce((a, d) => a + n(d.prayers), 0);
+    const days = seasonDays.get(season)!;
+    return { season, days, prayers, perDay: Math.round((prayers / days) * 10) / 10 };
+  });
+
   const pendingModeration =
     (await prisma.intention.count({ where: { status: "pending" } })) +
     (await prisma.chatMessage.count({ where: { status: "pending" } }));
@@ -156,6 +175,7 @@ export async function computeKpis(days: number, now = new Date()) {
       : null,
     daily: daily.map((d) => ({ day: d.day, newUsers: d.newUsers, activeUsers: d.activeUsers, candles: d.candles, revenueCents: d.revenueCents })),
     moderation: { pending: pendingModeration },
+    prayers: { current: liturgicalSeason(isoDay(now)), bySeason: prayersBySeason },
     goals,
   };
 }

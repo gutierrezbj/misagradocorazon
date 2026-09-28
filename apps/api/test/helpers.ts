@@ -17,7 +17,7 @@ export async function resetDb() {
   if (!dbName.endsWith("_test")) throw new Error(`resetDb se niega a vaciar "${dbName}": no es una base _test`);
   // TRUNCATE no dispara el trigger por fila del libro de movimientos.
   await prisma.$executeRawUnsafe(
-    `TRUNCATE "ledger_entry", "candle", "prayer_log", "daily_content", "intention_prayer", "intention",
+    `TRUNCATE "ledger_entry", "candle", "prayer_log", "daily_content", "seasonal_prayer", "intention_prayer", "intention",
       "private_intention", "chat_message", "mass", "vote", "cause_update", "cause", "admin_audit_log",
       "moderation_word", "push_token", "push_delivery", "push_ticket", "push_campaign", "mass_attendance", "kpi_daily",
       "session", "account", "verification", "apple_revocation", "user", "saint" CASCADE`,

@@ -35,7 +35,7 @@ export default function Prayer() {
   const completeMut = useMutation({
     mutationFn: () => api<{ streak: number }>("/prayers/complete", { method: "POST", body: { kind: isMorning ? "morning" : "night" } }),
     onSuccess: (res) => {
-      track("prayer_completed", { kind: isMorning ? "morning" : "night" });
+      if (daily) track("prayer_completed", { kind: isMorning ? "morning" : "night", season: daily.season });
       void refresh();
       toast(`${res.streak} ${t("streakDays")}`, "success");
       router.back();
@@ -59,13 +59,14 @@ export default function Prayer() {
         <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
           <View style={styles.iconWrap}>
             <Icon name={isMorning ? "sunrise" : "moon"} size={40} color={colors.gold} />
+            {!!daily && <Text testID="liturgical-season" style={styles.season}>{t(`season_${daily.season}`)}</Text>}
           </View>
           {!!audioUrl && (
             <View style={{ marginBottom: spacing.lg }}>
               <AudioPlayer url={audioUrl} title={isMorning ? t("morningPrayer") : t("nightPrayer")} analyticsContent={isMorning ? "morning" : "night"} autoPlay={autoplay === "1"} tone="altar" />
             </View>
           )}
-          <Text style={styles.prayer}>{loc(prayer)}</Text>
+          {prayer ? <Text style={styles.prayer}>{loc(prayer)}</Text> : <Text style={styles.unavailable}>{t("prayerUnavailable")}</Text>}
           <View style={{ height: spacing.xl }} />
           <AppButton testID="complete-prayer-button" label={t("amenComplete")} onPress={() => completeMut.mutate()} loading={completeMut.isPending} variant="gold" icon="check" />
         </ScrollView>
@@ -80,5 +81,7 @@ const useStyles = makeStyles((c) => ({
   back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onAltar },
   iconWrap: { alignItems: "center", marginVertical: spacing.lg },
+  season: { fontFamily: fonts.bodyMedium, fontSize: 14, letterSpacing: 1.5, textTransform: "uppercase", color: c.gold, marginTop: spacing.sm },
   prayer: { fontFamily: fonts.display, fontSize: 28, lineHeight: 42, color: c.onAltar, textAlign: "center", fontStyle: "italic" },
+  unavailable: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: c.onAltar, textAlign: "center" },
 }));

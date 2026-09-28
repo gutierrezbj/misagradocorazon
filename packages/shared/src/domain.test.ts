@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { CANDLE_TYPES, impactCents, isVotingOpen } from "./domain.ts";
-import { causeUpdateSchema, lightCandleSchema, massUpdateSchema, onboardingSchema, profileUpdateSchema, saintUpdateSchema } from "./schemas.ts";
+import { CANDLE_TYPES, easterSunday, impactCents, isVotingOpen, liturgicalSeason } from "./domain.ts";
+import { causeUpdateSchema, dailyContentInputSchema, lightCandleSchema, massUpdateSchema, onboardingSchema, profileUpdateSchema, saintUpdateSchema } from "./schemas.ts";
 import { scrubEvent } from "./sentry.ts";
 
 test("el 20 % de cada tier de vela se calcula en céntimos", () => {
@@ -78,4 +78,49 @@ test("los esquemas de edición no inventan campos que no llegan", () => {
   // Las reglas de cada campo se mantienen.
   assert.equal(massUpdateSchema.safeParse({ durationMin: 5 }).success, false);
   assert.equal(saintUpdateSchema.safeParse({ sortOrder: -1 }).success, false);
+});
+
+// US-10: oraciones según el tiempo litúrgico. Fechas de Pascua conocidas y límites de cada tiempo.
+test("el domingo de Pascua cae en su fecha", () => {
+  const easter = (y: number) => new Date(easterSunday(y)).toISOString().slice(0, 10);
+  assert.equal(easter(2008), "2008-03-23");
+  assert.equal(easter(2024), "2024-03-31");
+  assert.equal(easter(2025), "2025-04-20");
+  assert.equal(easter(2026), "2026-04-05");
+  assert.equal(easter(2027), "2027-03-28");
+  assert.equal(easter(2038), "2038-04-25");
+});
+
+test("cada día cae en su tiempo litúrgico, límites incluidos", () => {
+  const cases: [string, string][] = [
+    ["2026-01-11", "christmas"], // Bautismo del Señor
+    ["2026-01-12", "ordinary"],
+    ["2026-02-17", "ordinary"],
+    ["2026-02-18", "lent"], // Miércoles de Ceniza
+    ["2026-04-04", "lent"], // Sábado Santo
+    ["2026-04-05", "easter"],
+    ["2026-05-24", "easter"], // Pentecostés
+    ["2026-05-25", "ordinary"],
+    ["2026-11-28", "ordinary"],
+    ["2026-11-29", "advent"], // Primer domingo de Adviento
+    ["2026-12-24", "advent"],
+    ["2026-12-25", "christmas"],
+    ["2027-01-10", "christmas"],
+    ["2027-01-11", "ordinary"],
+    ["2028-12-03", "advent"], // el 3-dic es el último día posible de inicio
+    ["2028-12-02", "ordinary"],
+    ["2019-01-13", "christmas"], // 6-ene en domingo: Bautismo el 13
+    ["2019-01-14", "ordinary"],
+  ];
+  for (const [date, season] of cases) assert.equal(liturgicalSeason(date), season, date);
+});
+
+test("la oración del día es opcional, pero en los dos idiomas o en ninguno", () => {
+  const base = { gospelRef: "Jn 1", gospelEs: "g", gospelEn: "g", meditationEs: "m", meditationEn: "m" };
+  const empty = dailyContentInputSchema.parse({ ...base, morningPrayerEs: "", morningPrayerEn: "  " });
+  assert.equal(empty.morningPrayerEs, null);
+  assert.equal(empty.nightPrayerEn, null);
+  assert.equal(dailyContentInputSchema.safeParse({ ...base, morningPrayerEs: "Señor", morningPrayerEn: "" }).success, false);
+  assert.equal(dailyContentInputSchema.safeParse({ ...base, nightAudioUrlEs: "https://cdn.example.com/a.mp3" }).success, false);
+  assert.equal(dailyContentInputSchema.safeParse({ ...base, nightPrayerEs: "Señor", nightPrayerEn: "Lord" }).success, true);
 });

@@ -1,4 +1,4 @@
-import type { Role } from "@msc/shared";
+import type { LiturgicalSeason, Role } from "@msc/shared";
 
 export type Me = { id: string; name: string; email: string; role: Role };
 
@@ -21,6 +21,7 @@ export type Kpis = {
   mass: { massId: string; scheduledAt: string; attendees: number; chatParticipants: number } | null;
   daily: { day: string; newUsers: number; activeUsers: number; candles: number; revenueCents: number }[];
   moderation: { pending: number };
+  prayers: { current: LiturgicalSeason; bySeason: { season: LiturgicalSeason; days: number; prayers: number; perDay: number }[] };
   goals: Goal[];
 };
 
@@ -99,11 +100,18 @@ export type AdminSaint = {
 type LangFlags = { es: boolean; en: boolean };
 export type DailyDay = {
   date: string;
+  season: LiturgicalSeason;
   filled: boolean;
   saintOfDay: string | null;
   gospelRef: string | null;
+  // De dónde sale la oración que verá el fiel: la propia del día o la del tiempo (null = ninguna).
+  prayers: { morning: PrayerSource | null; night: PrayerSource | null } | null;
   audio: { morning: LangFlags; night: LangFlags; meditation: LangFlags } | null;
 };
+type PrayerSource = "day" | "season";
+
+export type SeasonalPrayer = { textEs: string; textEn: string; audioUrlEs: string | null; audioUrlEn: string | null };
+export type SeasonRow = { season: LiturgicalSeason; current: boolean; morning: SeasonalPrayer | null; night: SeasonalPrayer | null };
 
 export type DailyRow = {
   date: string;
@@ -113,10 +121,10 @@ export type DailyRow = {
   gospelEn: string;
   meditationEs: string;
   meditationEn: string;
-  morningPrayerEs: string;
-  morningPrayerEn: string;
-  nightPrayerEs: string;
-  nightPrayerEn: string;
+  morningPrayerEs: string | null;
+  morningPrayerEn: string | null;
+  nightPrayerEs: string | null;
+  nightPrayerEn: string | null;
   meditationAudioUrlEs: string | null;
   meditationAudioUrlEn: string | null;
   morningAudioUrlEs: string | null;

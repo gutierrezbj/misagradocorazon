@@ -59,3 +59,60 @@ export const MVP_TARGETS = {
   impactTransferredCentsPerMonth: { m3: 40_000, m6: 300_000 },
 } as const;
 export type MvpGoalKey = keyof typeof MVP_TARGETS;
+
+// Tiempo litúrgico (SDD-05 US-10): las oraciones de mañana y noche cambian según el tiempo.
+// Calendario romano general, con granularidad de día:
+// - Adviento: del domingo entre el 27-nov y el 3-dic hasta el 24-dic.
+// - Navidad: del 25-dic al Bautismo del Señor (domingo después del 6-ene).
+// - Cuaresma: del Miércoles de Ceniza al Sábado Santo (el Triduo se sirve como Cuaresma).
+// - Pascua: del Domingo de Resurrección a Pentecostés.
+// - Tiempo ordinario: el resto.
+export const LITURGICAL_SEASONS = ["advent", "christmas", "lent", "easter", "ordinary"] as const;
+export type LiturgicalSeason = (typeof LITURGICAL_SEASONS)[number];
+
+const DAY_MS = 86_400_000;
+const utc = (y: number, m: number, d: number) => Date.UTC(y, m - 1, d);
+
+// Domingo de Pascua (algoritmo gregoriano anónimo, Meeus/Jones/Butcher). Devuelve ms UTC.
+export function easterSunday(year: number): number {
+  const a = year % 19;
+  const b = Math.floor(year / 100);
+  const c = year % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const month = Math.floor((h + l - 7 * m + 114) / 31);
+  const day = ((h + l - 7 * m + 114) % 31) + 1;
+  return utc(year, month, day);
+}
+
+// Primer domingo de Adviento: el domingo entre el 27-nov y el 3-dic.
+function adventStart(year: number): number {
+  const nov27 = utc(year, 11, 27);
+  return nov27 + ((7 - new Date(nov27).getUTCDay()) % 7) * DAY_MS;
+}
+
+// Bautismo del Señor: el domingo siguiente al 6-ene.
+function baptismOfTheLord(year: number): number {
+  const jan6 = utc(year, 1, 6);
+  return jan6 + (7 - new Date(jan6).getUTCDay()) * DAY_MS;
+}
+
+// `date` es una fecha local "AAAA-MM-DD" (la del día del fiel).
+export function liturgicalSeason(date: string): LiturgicalSeason {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  const t = utc(y, m, d);
+  if (t <= baptismOfTheLord(y)) return "christmas";
+  if (t >= utc(y, 12, 25)) return "christmas";
+  if (t >= adventStart(y)) return "advent";
+  const easter = easterSunday(y);
+  if (t >= easter - 46 * DAY_MS && t < easter) return "lent";
+  if (t >= easter && t <= easter + 49 * DAY_MS) return "easter";
+  return "ordinary";
+}

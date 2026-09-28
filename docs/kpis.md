@@ -34,6 +34,10 @@ Cuenta como asistente quien tiene abierta la pantalla de la misa mientras está 
 
 El panel muestra los asistentes a la última misa empezada y, aparte, cuántos de ellos escribieron en el chat.
 
+## Oraciones por tiempo litúrgico
+
+El resumen del panel muestra, para la ventana elegida, cuántas oraciones rezaron los fieles en cada tiempo litúrgico (US-10) y la **media por día** de cada tiempo, que es la cifra comparable: los tiempos duran distinto. Sale de `prayer_log` (día local del fiel) y no cuenta al staff. Sirve para ver si la gente reza más en Cuaresma o en Adviento que en el tiempo ordinario.
+
 ## Objetivos del MVP
 
 El resumen del panel compara las métricas de éxito de la especificación funcional (§10) con sus metas a los meses 1-3 y al mes 6. Son mensuales, así que se miden siempre sobre los **últimos 30 días**, sea cual sea la ventana elegida arriba. Las metas están en un solo sitio: `MVP_TARGETS` en `packages/shared/src/domain.ts`.
@@ -65,7 +69,7 @@ Solo con consentimiento explícito. Al final del onboarding la opción aparece *
   | Evento | Propiedades |
   |---|---|
   | `onboarding_completed` | idioma, número de santos secundarios |
-  | `prayer_completed` | mañana o noche |
+  | `prayer_completed` | mañana o noche, tiempo litúrgico |
   | `audio_played` | santo, mañana, noche o meditación |
   | `candle_flow_started` | ninguna |
   | `candle_lit` | tipo de vela, por difuntos o no |
