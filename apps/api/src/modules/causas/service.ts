@@ -1,10 +1,14 @@
 import { isVotingOpen } from "@msc/shared";
 
-import type { Cause } from "../../generated/prisma/client.ts";
+import type { Cause, CauseBudgetItem } from "../../generated/prisma/client.ts";
 import { prisma } from "../../db.ts";
 import { monthOf } from "../../lib/dates.ts";
 
-export function causeDto(c: Cause, votes?: number, totalVotes?: number) {
+// Las partidas del presupuesto siempre van en orden; toda consulta que sirva una ficha las incluye.
+export const withBudget = { budgetItems: { orderBy: { position: "asc" } } } as const;
+type CauseWithBudget = Cause & { budgetItems: CauseBudgetItem[] };
+
+export function causeDto(c: CauseWithBudget, votes?: number, totalVotes?: number) {
   return {
     id: c.id,
     month: c.month,
@@ -12,7 +16,9 @@ export function causeDto(c: Cause, votes?: number, totalVotes?: number) {
     location: c.location,
     responsible: c.responsible,
     description: { es: c.descriptionEs, en: c.descriptionEn },
+    fundsUse: c.fundsUseEs && c.fundsUseEn ? { es: c.fundsUseEs, en: c.fundsUseEn } : null,
     budgetCents: c.budgetCents,
+    budgetItems: c.budgetItems.map((i) => ({ concept: { es: i.conceptEs, en: i.conceptEn }, amountCents: i.amountCents })),
     photos: c.photos,
     timeline: c.timeline,
     status: c.status,

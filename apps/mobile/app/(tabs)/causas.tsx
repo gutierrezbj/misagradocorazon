@@ -16,13 +16,14 @@ import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
+import { formatUsd } from "@/src/money";
 
 export default function Causas() {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { t, loc } = useI18n();
+  const { t, loc, lang } = useI18n();
   const toast = useToast();
   const bottomChrome = usesNativeTabs ? insets.bottom : 0;
 
@@ -95,8 +96,20 @@ export default function Causas() {
                 </Text>
                 <View style={styles.metaRow}>
                   <Meta icon="user" label={t("responsible")} value={cause.responsible} />
-                  <Meta icon="dollar-sign" label={t("budget")} value={`$${(cause.budgetCents / 100).toLocaleString()}`} />
+                  <Meta icon="dollar-sign" label={t("budget")} value={formatUsd(cause.budgetCents, lang)} />
                 </View>
+                <Pressable
+                  testID={`see-cause-${cause.id}`}
+                  accessibilityRole="link"
+                  onPress={() => {
+                    track("cause_opened");
+                    router.push(`/cause/${cause.id}`);
+                  }}
+                  style={styles.seeCause}
+                >
+                  <Text style={styles.seeCauseText}>{t("seeCause")}</Text>
+                  <Icon name="chevron-right" size={18} color={colors.brand} />
+                </Pressable>
 
                 {/* Progress */}
                 <View style={styles.progressTrack}>
@@ -215,6 +228,8 @@ const useStyles = makeStyles((c) => ({
   metaLabelRow: { flexDirection: "row", alignItems: "center", gap: 4 },
   metaLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.muted, textTransform: "uppercase" },
   metaValue: { fontFamily: fonts.bodySemibold, fontSize: 14, color: c.onSurface, marginTop: 2 },
+  seeCause: { flexDirection: "row", alignItems: "center", gap: 2, alignSelf: "flex-start", minHeight: 44, marginTop: spacing.xs },
+  seeCauseText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.brand },
   progressTrack: { height: 10, borderRadius: 5, backgroundColor: c.surfaceTertiary, marginTop: spacing.md, overflow: "hidden" },
   progressFill: { height: "100%", borderRadius: 5, backgroundColor: c.brandSecondary },
   percentage: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginTop: 6 },

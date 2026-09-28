@@ -61,8 +61,9 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 
 | Tabla | Para qué | Campos clave |
 |---|---|---|
-| `cause` | Causas del mes | `month`, nombre y descripción ES/EN, lugar, responsable, `budgetCents`, fotos, plazos, `status` (`candidate`, `voting`, `won`, `funded`, `archived`) |
+| `cause` | Causas del mes | `month`, nombre y descripción ES/EN, lugar, responsable, destino del dinero ES/EN (`fundsUseEs`, `fundsUseEn`), `budgetCents` (suma de las partidas), fotos, plazos, `status` (`candidate`, `voting`, `won`, `funded`, `archived`) |
 | `cause_update` | Avances de una causa ganadora | Texto ES/EN y foto |
+| `cause_budget_item` | Presupuesto desglosado de una causa | Concepto ES/EN e importe, en orden (`position`). `cause.budgetCents` es siempre su suma |
 | `vote` | Votos | Clave `(userId, month)`: un voto por persona y mes, también ante votos simultáneos |
 
 ## KPIs
@@ -94,3 +95,4 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 | `20260927090000_candle_expiry` | Aviso de vela permanente apagada |
 | `20260927150000_apple_revocation` | Tokens de Apple pendientes de revocar |
 | `20260928084515_seasonal_prayer` | Oraciones por tiempo litúrgico; oraciones del día opcionales |
+| `20260928101941_cause_budget_items` | Destino del dinero y presupuesto desglosado de las causas; las causas existentes pasan a tener una partida única |

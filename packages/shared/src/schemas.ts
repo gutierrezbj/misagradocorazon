@@ -99,6 +99,15 @@ export const moderationWordSchema = z.object({
 
 const yearMonth = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/, "Formato YYYY-MM");
 
+// Ficha pública de la causa (SDD-02 Pilar 3; especificación §2.3): presupuesto desglosado y
+// descripción exacta de qué se hará con el dinero. El total no se teclea: es la suma de las partidas.
+export const budgetItemSchema = z.object({
+  conceptEs: z.string().trim().min(1).max(160),
+  conceptEn: z.string().trim().min(1).max(160),
+  amountCents: z.number().int().positive(),
+});
+export type BudgetItem = z.infer<typeof budgetItemSchema>;
+
 export const causeInputSchema = z.object({
   month: yearMonth,
   nameEs: z.string().trim().min(1).max(120),
@@ -107,7 +116,9 @@ export const causeInputSchema = z.object({
   responsible: z.string().trim().min(1).max(120),
   descriptionEs: z.string().trim().min(1).max(4000),
   descriptionEn: z.string().trim().min(1).max(4000),
-  budgetCents: z.number().int().positive(),
+  fundsUseEs: z.string().trim().min(1).max(2000),
+  fundsUseEn: z.string().trim().min(1).max(2000),
+  budgetItems: z.array(budgetItemSchema).min(1).max(20),
   photos: z.array(z.url()).max(12).default([]),
   timeline: z.string().trim().min(1).max(120),
 });

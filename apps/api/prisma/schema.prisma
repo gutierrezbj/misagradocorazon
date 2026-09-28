@@ -486,6 +486,10 @@ model Cause {
   responsible   String
   descriptionEs String
   descriptionEn String
+  // Destino del dinero (SDD-02): obligatorio en causas nuevas; null en las creadas antes.
+  fundsUseEs    String?
+  fundsUseEn    String?
+  // Suma de las partidas de cause_budget_item. Se calcula al guardar, nunca se teclea.
   budgetCents   Int
   photos        String[]    @default([])
   timeline      String
@@ -493,12 +497,28 @@ model Cause {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 
-  votes   Vote[]
-  updates CauseUpdate[]
-  ledger  LedgerEntry[]
+  votes       Vote[]
+  updates     CauseUpdate[]
+  ledger      LedgerEntry[]
+  budgetItems CauseBudgetItem[]
 
   @@index([month, status])
   @@map("cause")
+}
+
+// Presupuesto desglosado de una causa (especificación §2.3). Se sustituye entero al editar.
+model CauseBudgetItem {
+  id          String @id @default(uuid())
+  causeId     String
+  position    Int
+  conceptEs   String
+  conceptEn   String
+  amountCents Int
+
+  cause Cause @relation(fields: [causeId], references: [id], onDelete: Cascade)
+
+  @@unique([causeId, position])
+  @@map("cause_budget_item")
 }
 
 model CauseUpdate {

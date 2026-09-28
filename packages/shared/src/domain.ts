@@ -39,6 +39,11 @@ export function impactCents(amountCents: number): number {
   return Math.round((amountCents * IMPACT_SHARE_BASIS_POINTS) / 10_000);
 }
 
+// Presupuesto de una causa: siempre la suma de sus partidas, nunca un total tecleado aparte.
+export function budgetTotalCents(items: readonly { amountCents: number }[]): number {
+  return items.reduce((sum, i) => sum + i.amountCents, 0);
+}
+
 export function isVotingOpen(date: Date): boolean {
   const day = date.getUTCDate();
   return day >= VOTING_WINDOW.firstDay && day <= VOTING_WINDOW.lastDay;

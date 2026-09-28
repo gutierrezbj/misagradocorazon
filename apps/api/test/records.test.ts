@@ -20,7 +20,9 @@ const causeBody = (n: number) => ({
   responsible: "Parroquia de prueba",
   descriptionEs: "Descripción",
   descriptionEn: "Description",
-  budgetCents: 1_000_000,
+  fundsUseEs: "Destino",
+  fundsUseEn: "Use of funds",
+  budgetItems: [{ conceptEs: "Obra", conceptEn: "Works", amountCents: 1_000_000 }],
   timeline: "3 meses",
 });
 

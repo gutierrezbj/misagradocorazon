@@ -4,7 +4,7 @@ import { prisma } from "../../db.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { optionalUser } from "../../middleware/roles.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
-import { causeDto, transparencySummary, voteCounts, votingState } from "./service.ts";
+import { causeDto, transparencySummary, voteCounts, votingState, withBudget } from "./service.ts";
 
 export const causasRouter = Router();
 
@@ -13,6 +13,7 @@ causasRouter.get("/causes/current", optionalUser, async (req, res) => {
   const causes = await prisma.cause.findMany({
     where: { month, status: { in: ["voting", "won"] } },
     orderBy: [{ createdAt: "asc" }, { id: "asc" }],
+    include: withBudget,
   });
   const counts = await voteCounts(causes.map((c) => c.id));
   const total = [...counts.values()].reduce((a, b) => a + b, 0);
@@ -65,7 +66,7 @@ causasRouter.get("/causes/history", async (_req, res) => {
   const causes = await prisma.cause.findMany({
     where: { status: { in: ["won", "funded"] } },
     orderBy: { month: "desc" },
-    include: { updates: { orderBy: { createdAt: "asc" } } },
+    include: { ...withBudget, updates: { orderBy: { createdAt: "asc" } } },
   });
   ok(
     res,
@@ -74,6 +75,19 @@ causasRouter.get("/causes/history", async (_req, res) => {
       updates: c.updates.map((u) => ({ id: u.id, text: { es: u.textEs, en: u.textEn }, photoUrl: u.photoUrl, createdAt: u.createdAt })),
     })),
   );
+});
+
+// Ficha completa de una causa publicada (SDD-02 Pilar 3). Las candidatas aún no son públicas.
+causasRouter.get("/causes/:id", async (req, res) => {
+  const cause = await prisma.cause.findFirst({
+    where: { id: pathParam(req, "id"), status: { not: "candidate" } },
+    include: { ...withBudget, updates: { orderBy: { createdAt: "asc" } } },
+  });
+  if (!cause) throw notFound("Causa");
+  ok(res, {
+    ...causeDto(cause),
+    updates: cause.updates.map((u) => ({ id: u.id, text: { es: u.textEs, en: u.textEn }, photoUrl: u.photoUrl, createdAt: u.createdAt })),
+  });
 });
 
 // Transparencia: todo sale del libro de movimientos. Nada se teclea a mano.

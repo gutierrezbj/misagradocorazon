@@ -24,7 +24,9 @@ const causeBody = (n: number) => ({
   responsible: "Parroquia de prueba",
   descriptionEs: "Descripción",
   descriptionEn: "Description",
-  budgetCents: 1_000_000,
+  fundsUseEs: "Destino",
+  fundsUseEn: "Use of funds",
+  budgetItems: [{ conceptEs: "Obra", conceptEn: "Works", amountCents: 1_000_000 }],
   timeline: "3 meses",
 });
 
@@ -103,9 +105,70 @@ describe("causas y votación", () => {
     expect(stored).toMatchObject({ nameEs: "Pozo de agua", nameEn: "Cause 1", photos });
   });
 
+  test("ficha completa: destino del dinero y presupuesto desglosado; el total es la suma de las partidas", async () => {
+    const editor = await signUpAs("editor");
+    const items = [
+      { conceptEs: "Perforación", conceptEn: "Drilling", amountCents: 600_000 },
+      { conceptEs: "Bomba solar", conceptEn: "Solar pump", amountCents: 250_050 },
+    ];
+    const created = await request(app)
+      .post("/api/admin/causes")
+      .set(bearer(editor.token))
+      .send({ ...causeBody(1), fundsUseEs: "Perforar y equipar el pozo", fundsUseEn: "Drill and equip the well", budgetItems: items });
+    expect(created.status).toBe(201);
+    expect(created.body.data.budgetCents).toBe(850_050);
+
+    // Mientras es candidata no es pública.
+    expect((await request(app).get(`/api/causes/${created.body.data.id}`)).status).toBe(404);
+    await openVoting("2026-10");
+    const pub = await request(app).get(`/api/causes/${created.body.data.id}`);
+    expect(pub.status).toBe(200);
+    expect(pub.body.data).toMatchObject({
+      fundsUse: { es: "Perforar y equipar el pozo", en: "Drill and equip the well" },
+      budgetCents: 850_050,
+      budgetItems: [
+        { concept: { es: "Perforación", en: "Drilling" }, amountCents: 600_000 },
+        { concept: { es: "Bomba solar", en: "Solar pump" }, amountCents: 250_050 },
+      ],
+      timeline: "3 meses",
+      updates: [],
+    });
+    const current = await request(app).get("/api/causes/current");
+    expect(current.body.data.causes[0].budgetItems).toHaveLength(2);
+  });
+
+  test("al editar las partidas se sustituyen enteras y el total se recalcula", async () => {
+    const editor = await signUpAs("editor");
+    const created = await request(app).post("/api/admin/causes").set(bearer(editor.token)).send(causeBody(1));
+    const id = created.body.data.id;
+    const res = await request(app)
+      .patch(`/api/admin/causes/${id}`)
+      .set(bearer(editor.token))
+      .send({ budgetItems: [{ conceptEs: "Techo", conceptEn: "Roof", amountCents: 300_000 }, { conceptEs: "Mano de obra", conceptEn: "Labour", amountCents: 100_000 }] });
+    expect(res.status).toBe(200);
+    expect(res.body.data.budgetCents).toBe(400_000);
+    expect(res.body.data.budgetItems.map((i: { concept: { es: string } }) => i.concept.es)).toEqual(["Techo", "Mano de obra"]);
+    expect(await prisma.causeBudgetItem.count({ where: { causeId: id } })).toBe(2);
+
+    // Sin partidas no se toca el presupuesto.
+    await request(app).patch(`/api/admin/causes/${id}`).set(bearer(editor.token)).send({ nameEs: "Capilla" }).expect(200);
+    expect((await prisma.cause.findUniqueOrThrow({ where: { id } })).budgetCents).toBe(400_000);
+  });
+
+  test("una causa sin destino del dinero o sin partidas no se crea", async () => {
+    const editor = await signUpAs("editor");
+    const { fundsUseEs: _f, ...noFunds } = causeBody(1);
+    expect((await request(app).post("/api/admin/causes").set(bearer(editor.token)).send(noFunds)).status).toBe(400);
+    expect((await request(app).post("/api/admin/causes").set(bearer(editor.token)).send({ ...causeBody(1), budgetItems: [] })).status).toBe(400);
+  });
+
+  test("una causa inexistente o de otro estado desconocido da 404", async () => {
+    expect((await request(app).get("/api/causes/no-existe")).status).toBe(404);
+  });
+
   test("una causa en votación no se puede editar", async () => {
     const { editor, ids } = await setupVoting();
-    const res = await request(app).patch(`/api/admin/causes/${ids[0]}`).set(bearer(editor.token)).send({ budgetCents: 1 });
+    const res = await request(app).patch(`/api/admin/causes/${ids[0]}`).set(bearer(editor.token)).send({ nameEs: "Otra" });
     expect(res.status).toBe(409);
   });
 

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { CANDLE_TYPES, easterSunday, impactCents, isVotingOpen, liturgicalSeason } from "./domain.ts";
-import { causeUpdateSchema, dailyContentInputSchema, lightCandleSchema, massUpdateSchema, onboardingSchema, profileUpdateSchema, saintUpdateSchema } from "./schemas.ts";
+import { budgetTotalCents, CANDLE_TYPES, easterSunday, impactCents, isVotingOpen, liturgicalSeason } from "./domain.ts";
+import { causeInputSchema, causeUpdateSchema, dailyContentInputSchema, lightCandleSchema, massUpdateSchema, onboardingSchema, profileUpdateSchema, saintUpdateSchema } from "./schemas.ts";
 import { scrubEvent } from "./sentry.ts";
 
 test("el 20 % de cada tier de vela se calcula en céntimos", () => {
@@ -123,4 +123,29 @@ test("la oración del día es opcional, pero en los dos idiomas o en ninguno", (
   assert.equal(dailyContentInputSchema.safeParse({ ...base, morningPrayerEs: "Señor", morningPrayerEn: "" }).success, false);
   assert.equal(dailyContentInputSchema.safeParse({ ...base, nightAudioUrlEs: "https://cdn.example.com/a.mp3" }).success, false);
   assert.equal(dailyContentInputSchema.safeParse({ ...base, nightPrayerEs: "Señor", nightPrayerEn: "Lord" }).success, true);
+});
+
+// Ficha de causa: presupuesto desglosado; el total es la suma de las partidas.
+test("una causa necesita destino del dinero y al menos una partida; el total es la suma", () => {
+  const base = {
+    month: "2026-11",
+    nameEs: "Pozo",
+    nameEn: "Well",
+    location: "Oaxaca",
+    responsible: "Parroquia",
+    descriptionEs: "d",
+    descriptionEn: "d",
+    fundsUseEs: "Perforar y equipar el pozo",
+    fundsUseEn: "Drill and equip the well",
+    timeline: "3 meses",
+  };
+  const items = [
+    { conceptEs: "Perforación", conceptEn: "Drilling", amountCents: 600_000 },
+    { conceptEs: "Bomba", conceptEn: "Pump", amountCents: 250_050 },
+  ];
+  assert.equal(causeInputSchema.safeParse({ ...base, budgetItems: items }).success, true);
+  assert.equal(causeInputSchema.safeParse({ ...base, budgetItems: [] }).success, false);
+  assert.equal(causeInputSchema.safeParse({ ...base, fundsUseEs: " ", budgetItems: items }).success, false);
+  assert.equal(causeInputSchema.safeParse({ ...base, budgetItems: [{ ...items[0], amountCents: 0 }] }).success, false);
+  assert.equal(budgetTotalCents(items), 850_050);
 });

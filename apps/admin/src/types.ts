@@ -42,7 +42,10 @@ export type Cause = {
   location: string;
   responsible: string;
   description: Localized;
+  // Destino del dinero; null en causas creadas antes de existir el campo.
+  fundsUse: Localized | null;
   budgetCents: number;
+  budgetItems: { concept: Localized; amountCents: number }[];
   photos: string[];
   timeline: string;
   status: "candidate" | "voting" | "won" | "funded" | "archived";
