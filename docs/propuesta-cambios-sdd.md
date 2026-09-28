@@ -137,6 +137,7 @@ Los pendientes de abril (caché de audio, duración de la vela) siguen abiertos.
   - Apple Sign-In.
   - Migración del backend al nuevo stack.
 - Las historias concretas se redactan después de aprobar SDD-02.
+- **Cambio del 28-sep-2026** (aprobado por el fundador y aplicado en Notion ese día): nueva **US-24, recuperar la contraseña** con un código por email, en la Épica 1 (`docs/recuperar-contrasena.md`).
 
 ---
 
