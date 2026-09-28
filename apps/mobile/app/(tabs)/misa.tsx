@@ -15,6 +15,7 @@ import type { CommunityCandles, Mass } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
+import { useMiniPlayerInset } from "@/src/audio-state";
 import { track } from "@/src/analytics";
 
 const HERO = "https://images.unsplash.com/photo-1465848059293-208e11dfea17?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080";
@@ -31,7 +32,7 @@ export default function Misa() {
   const insets = useSafeAreaInsets();
   const { t, loc, lang } = useI18n();
   const toast = useToast();
-  const bottomChrome = usesNativeTabs ? insets.bottom : 0;
+  const bottomChrome = (usesNativeTabs ? insets.bottom : 0) + useMiniPlayerInset(usesNativeTabs);
 
   // El estado de la misa lo decide el servidor; se refresca cada minuto.
   const { data: mass, isLoading } = useQuery({

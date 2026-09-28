@@ -16,6 +16,7 @@ import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
 import { CandleFlame } from "@/src/components/CandleFlame";
 import { usesNativeTabs } from "@/src/navigation";
+import { useMiniPlayerInset } from "@/src/audio-state";
 
 export default function Altar() {
   const styles = useStyles();
@@ -24,7 +25,7 @@ export default function Altar() {
   const router = useRouter();
   const { t, loc } = useI18n();
   const { user } = useAuth();
-  const bottomChrome = usesNativeTabs ? insets.bottom : 0;
+  const bottomChrome = (usesNativeTabs ? insets.bottom : 0) + useMiniPlayerInset(usesNativeTabs);
 
   const { data: daily } = useQuery({
     queryKey: ["daily"],

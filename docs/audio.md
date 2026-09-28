@@ -21,7 +21,15 @@ Estado: reproductor listo. Falta el audio: lo graba el equipo (CLAUDE.md, nunca 
   - Android: servicio en primer plano de reproducción.
 - **Pantalla de bloqueo y centro de control:** título, "Mi Sagrado Corazón", imagen del santo, reproducir/pausar y ±15 s.
   - En Android, estos controles son además los que mantienen el audio más de unos 3 minutos en segundo plano (limitación del sistema).
-- **Al salir de la pantalla** el audio se detiene. El reproductor pertenece a cada pantalla; no hay reproductor flotante.
+- **Un solo reproductor para toda la app** (`apps/mobile/src/audio.tsx`). Al salir de la pantalla el audio **sigue sonando**.
+- **Mini-player** (SDD-07: "el mini-player aparece al navegar"):
+  - aparece sobre la barra de pestañas en cuanto se pulsa reproducir;
+  - muestra el título y una barra de progreso;
+  - permite pausar o reanudar, volver a la pantalla del audio (tocando el título) y cerrarlo;
+  - al cerrarlo, el audio se para y se quitan los controles de la pantalla de bloqueo;
+  - en iOS 26, con las pestañas nativas, va en el hueco que iOS reserva sobre la barra de pestañas (`NativeTabs.BottomAccessory`); en el resto, en una barra propia;
+  - al cerrar sesión o borrar la cuenta, el audio se para.
+- **Entrar en otra pantalla con audio** no corta el que suena: el nuevo empieza al pulsar su botón de reproducir.
 - **Si el audio no carga en 20 s**, muestra un aviso con "Reintentar".
 - **Permisos:** ninguno de micrófono. El plugin de `expo-audio` va configurado sin grabación (`microphonePermission: false`, `recordAudioAndroid: false`).
 
@@ -38,4 +46,9 @@ Estado: reproductor listo. Falta el audio: lo graba el equipo (CLAUDE.md, nunca 
   - reproducción automática al llegar con `autoplay=1`;
   - el reproductor en el evangelio;
   - un fiel en inglés no ve el audio en español.
-- **No verificado:** segundo plano y pantalla de bloqueo en iPhone y Android. Hace falta un build de EAS.
+- **Mini-player en web (Chromium):** el audio sigue al volver a las pestañas; pausar, volver y cerrar.
+- **No verificado:**
+  - segundo plano y pantalla de bloqueo en iPhone y Android;
+  - el mini-player en el hueco nativo de iOS 26.
+
+  Hace falta un build de EAS.

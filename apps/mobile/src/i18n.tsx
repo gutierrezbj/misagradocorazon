@@ -34,6 +34,10 @@ const dict = {
   audioForward15: { es: "Avanzar 15 segundos", en: "Forward 15 seconds" },
   audioProgress: { es: "Progreso del audio", en: "Audio progress" },
   audioError: { es: "No se pudo cargar el audio.", en: "The audio could not be loaded." },
+  miniPlayerOpen: { es: "Volver al audio", en: "Back to the audio" },
+  miniPlayerPlaying: { es: "Sonando", en: "Playing" },
+  miniPlayerPaused: { es: "En pausa", en: "Paused" },
+  miniPlayerClose: { es: "Cerrar el audio", en: "Close the audio" },
   privateIntentions: { es: "Mis intenciones privadas", en: "My private intentions" },
   privateIntentionsShort: { es: "Por quién rezo · solo tú las ves", en: "Who I pray for · only you see them" },
   privateIntentionsNote: {

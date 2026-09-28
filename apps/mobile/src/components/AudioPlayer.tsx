@@ -1,30 +1,18 @@
 // Reproductor de audio devocional (SDD-05 US-05, US-06, US-08, US-09).
-// Sigue sonando con la app en segundo plano o el teléfono bloqueado y muestra controles en la
-// pantalla de bloqueo. El audio lo graba el equipo (CLAUDE.md): aquí solo se reproduce una URL.
+// Controla el reproductor único de la app (src/audio.tsx): el audio sigue sonando al salir de la
+// pantalla, con la app en segundo plano o con el teléfono bloqueado, y queda en el mini-player.
+// El audio lo graba el equipo (CLAUDE.md): aquí solo se reproduce una URL.
 import { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, Text, View, type LayoutChangeEvent } from "react-native";
-import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
-import { track, type AnalyticsEvents } from "@/src/analytics";
+import { type AnalyticsEvents } from "@/src/analytics";
+import { useAudio, type AudioTrack } from "@/src/audio-state";
 import { useI18n } from "@/src/i18n";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { Icon } from "@/src/components/ui";
 
 const SKIP_SECONDS = 15;
 const LOAD_TIMEOUT_MS = 20_000;
-
-// Una sola vez por sesión. "doNotMix" es obligatorio para los controles de la pantalla de bloqueo.
-let audioModeReady: Promise<void> | null = null;
-function ensureAudioMode() {
-  audioModeReady ??= setAudioModeAsync({
-    playsInSilentMode: true,
-    shouldPlayInBackground: true,
-    interruptionMode: "doNotMix",
-  }).catch(() => {
-    audioModeReady = null;
-  });
-  return audioModeReady;
-}
 
 function mmss(seconds: number) {
   const s = Math.max(0, Math.floor(seconds));
@@ -33,9 +21,11 @@ function mmss(seconds: number) {
 
 type Props = {
   url: string;
-  /** Título en la pantalla de bloqueo (p. ej. "Oración de la mañana"). */
+  /** Título en el mini-player y en la pantalla de bloqueo (p. ej. "Oración de la mañana"). */
   title: string;
   artworkUrl?: string;
+  /** Pantalla a la que vuelve el mini-player. */
+  route: string;
   /** Empieza a sonar al cargar (al llegar desde una notificación, SDD flujos 1 y 2). */
   autoPlay?: boolean;
   /** "altar": fondo oscuro de las oraciones; "surface": fondo claro de las fichas. */
@@ -45,83 +35,69 @@ type Props = {
   testID?: string;
 };
 
-export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "surface", analyticsContent, testID = "audio-player" }: Props) {
+// Idle: lo que se muestra mientras en el reproductor único hay otra pista.
+const IDLE = { isLoaded: true, isBuffering: false, playing: false, currentTime: 0, duration: 0 };
+
+export function AudioPlayer({ url, title, artworkUrl, route, autoPlay = false, tone = "surface", analyticsContent, testID = "audio-player" }: Props) {
   const { t } = useI18n();
   const { colors } = useTheme();
   const styles = useStyles();
-  const player = useAudioPlayer({ uri: url }, { updateInterval: 500 });
-  const status = useAudioPlayerStatus(player);
+  const audio = useAudio();
+  const track: AudioTrack = { url, title, artworkUrl, route, content: analyticsContent };
+  const isCurrent = audio.loaded?.url === url;
+  const status = isCurrent ? audio.status : IDLE;
   const [trackWidth, setTrackWidth] = useState(0);
   const [timedOut, setTimedOut] = useState(false);
   const [attempt, setAttempt] = useState(0);
-  const lockScreenOn = useRef(false);
   const autoPlayed = useRef(false);
-  const tracked = useRef(false);
 
   const fg = tone === "altar" ? colors.onAltar : colors.onSurface;
   const muted = tone === "altar" ? colors.onAltarMuted : colors.muted;
   const accent = tone === "altar" ? colors.gold : colors.brandPrimary;
   const onAccent = tone === "altar" ? colors.altarBg : colors.onBrandPrimary;
 
+  // Se carga para mostrar la duración, salvo que otro audio esté sonando o en el mini-player.
+  useEffect(() => {
+    audio.prepare(track);
+    // Solo al llegar a la pantalla o si cambia el audio.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
+
   // Sin carga en un tiempo razonable (URL rota, sin conexión): se ofrece reintentar.
   useEffect(() => {
-    if (status.isLoaded) return;
+    if (!isCurrent || status.isLoaded) return;
     const timer = setTimeout(() => setTimedOut(true), LOAD_TIMEOUT_MS);
     return () => clearTimeout(timer);
-  }, [status.isLoaded, url, attempt]);
-  const failed = timedOut && !status.isLoaded;
+  }, [isCurrent, status.isLoaded, url, attempt]);
+  const failed = timedOut && isCurrent && !status.isLoaded;
 
-  const play = async () => {
-    await ensureAudioMode();
-    if (status.duration > 0 && status.currentTime >= status.duration - 0.5) await player.seekTo(0);
-    player.play();
-    if (analyticsContent && !tracked.current) {
-      tracked.current = true;
-      track("audio_played", { content: analyticsContent });
-    }
-    if (!lockScreenOn.current) {
-      player.setActiveForLockScreen(
-        true,
-        { title, artist: "Mi Sagrado Corazón", ...(artworkUrl && { artworkUrl }) },
-        { showSeekForward: true, showSeekBackward: true },
-      );
-      lockScreenOn.current = true;
-    }
-  };
+  const play = () => audio.play(track);
 
   useEffect(() => {
-    if (autoPlay && status.isLoaded && !autoPlayed.current) {
+    if (autoPlay && !autoPlayed.current) {
       autoPlayed.current = true;
       void play();
     }
-    // play depende del estado actual; solo interesa el primer momento en que carga.
+    // Solo la primera vez: al llegar desde una notificación.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoPlay, status.isLoaded]);
-
-  // Al salir de la pantalla se quitan los controles de la pantalla de bloqueo (el reproductor lo libera expo-audio).
-  useEffect(
-    () => () => {
-      if (lockScreenOn.current) player.clearLockScreenControls();
-    },
-    [player],
-  );
+  }, [autoPlay]);
 
   const skip = (delta: number) => {
     const next = Math.max(status.currentTime + delta, 0);
     // Si la duración aún no se conoce (0), no se limita por arriba.
     const target = status.duration > 0 ? Math.min(next, status.duration) : next;
-    void player.seekTo(target);
+    audio.seekTo(target);
   };
 
   const onTrackPress = (x: number) => {
-    if (!trackWidth || !status.duration) return;
-    void player.seekTo((x / trackWidth) * status.duration);
+    if (!isCurrent || !trackWidth || !status.duration) return;
+    audio.seekTo((x / trackWidth) * status.duration);
   };
 
   const retry = () => {
     setTimedOut(false);
     setAttempt((n) => n + 1);
-    player.replace({ uri: url });
+    audio.reload();
   };
 
   const progress = status.duration > 0 ? Math.min(status.currentTime / status.duration, 1) : 0;
@@ -144,7 +120,7 @@ export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "
         <Pressable
           testID={`${testID}-back`}
           onPress={() => skip(-SKIP_SECONDS)}
-          disabled={!status.isLoaded}
+          disabled={!isCurrent || !status.isLoaded}
           accessibilityRole="button"
           accessibilityLabel={t("audioBack15")}
           style={styles.skip}
@@ -155,7 +131,7 @@ export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "
 
         <Pressable
           testID={`${testID}-toggle`}
-          onPress={() => (status.playing ? player.pause() : void play())}
+          onPress={() => (status.playing ? audio.pause() : void play())}
           disabled={!status.isLoaded}
           accessibilityRole="button"
           accessibilityLabel={status.playing ? t("audioPause") : t("audioPlay")}
@@ -171,7 +147,7 @@ export function AudioPlayer({ url, title, artworkUrl, autoPlay = false, tone = "
         <Pressable
           testID={`${testID}-forward`}
           onPress={() => skip(SKIP_SECONDS)}
-          disabled={!status.isLoaded}
+          disabled={!isCurrent || !status.isLoaded}
           accessibilityRole="button"
           accessibilityLabel={t("audioForward15")}
           style={styles.skip}
