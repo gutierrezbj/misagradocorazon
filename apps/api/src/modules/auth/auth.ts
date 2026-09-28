@@ -2,9 +2,9 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { bearer } from "better-auth/plugins/bearer";
 
-import { prisma } from "./db.ts";
-import { env } from "./env.ts";
-import { CLIENT_IP_HEADER } from "./middleware/limits.ts";
+import { prisma } from "../../db.ts";
+import { env } from "../../env.ts";
+import { CLIENT_IP_HEADER } from "../../middleware/limits.ts";
 
 // Solo se activan los proveedores con credenciales. Los dos entran por ID token nativo
 // (POST /api/auth/sign-in/social con idToken): sin redirecciones ni cookies, encaja con el token Bearer.

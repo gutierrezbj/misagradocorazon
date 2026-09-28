@@ -5,7 +5,7 @@ import { prisma } from "../src/db.ts";
 import { env } from "../src/env.ts";
 import { decryptText } from "../src/lib/crypto.ts";
 import { openVoting } from "../src/modules/causas/service.ts";
-import { deletedEmail } from "../src/modules/users/delete-account.ts";
+import { deletedEmail } from "../src/modules/auth/delete-account.ts";
 import { app, bearer, resetDb, signUp, signUpAs } from "./helpers.ts";
 
 // Dentro de la ventana de votación, para poder dejar un voto antes de borrar la cuenta.

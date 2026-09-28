@@ -18,10 +18,9 @@ export default defineConfig({
       thresholds: {
         lines: 60,
         statements: 60,
-        "src/auth.ts": { lines: 80, statements: 80 },
         "src/middleware/{require-user,roles}.ts": { lines: 80, statements: 80 },
-        "src/modules/users/**": { lines: 80, statements: 80 },
-        "src/modules/candles/**": { lines: 80, statements: 80 },
+        "src/modules/auth/**": { lines: 80, statements: 80 },
+        "src/modules/ritual/candles.ts": { lines: 80, statements: 80 },
         "src/modules/payments/**": { lines: 80, statements: 80 },
       },
     },

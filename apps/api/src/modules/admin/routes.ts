@@ -25,9 +25,9 @@ import { currentUser } from "../../middleware/require-user.ts";
 import { causeDto, withBudget } from "../causas/service.ts";
 import { getIo, roomOf } from "../misa/chat.ts";
 import { massDto, massStatus } from "../misa/service.ts";
-import { normalizeText } from "../moderation/filter.ts";
+import { normalizeText } from "../../lib/moderation.ts";
 import { reachable } from "../push/service.ts";
-import { computeKpis } from "./kpis.ts";
+import { computeKpis } from "../kpis/kpis.ts";
 
 export const adminRouter = Router();
 

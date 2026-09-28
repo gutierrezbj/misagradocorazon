@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 import { fromNodeHeaders } from "better-auth/node";
 import type { Role } from "@msc/shared";
 
-import { auth } from "../auth.ts";
+import { auth } from "../modules/auth/auth.ts";
 import { prisma } from "../db.ts";
 import { HttpError } from "../http.ts";
 import { currentUser, requireUser } from "./require-user.ts";

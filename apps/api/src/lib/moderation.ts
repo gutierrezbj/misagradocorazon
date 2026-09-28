@@ -1,4 +1,4 @@
-import { prisma } from "../../db.ts";
+import { prisma } from "../db.ts";
 
 // Minúsculas, sin tildes y con espacios colapsados: "Brujería" y "brujeria" son lo mismo.
 export function normalizeText(text: string): string {
