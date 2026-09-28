@@ -178,6 +178,7 @@ Los pendientes de abril (caché de audio, duración de la vela) siguen abiertos.
 - Se añade PostHog: en la nube al principio y en servidor propio si crece.
 - CI con GitHub Actions: `tsc`, lint y tests para las cuatro partes del monorepo.
 - Los costes se revisan cuando esté cerrado SDD-02.
+- **Cambio del 28-sep-2026** (visto bueno del fundador, aplicado en Notion ese día): se resuelven los tres pendientes de decisión de SDD-08 tal como están implementados, que son EAS Update más tiendas, Sentry sin datos personales y backups diarios de Railway con 7 días antes del lanzamiento (`docs/monitorizacion.md`). Se describe también el CI real y se recuerda que el panel es propio, no Retool.
 
 ---
 
