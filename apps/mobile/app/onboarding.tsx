@@ -118,7 +118,9 @@ export default function Onboarding() {
             );
           })}
         </View>
-        <Text style={styles.hint}>{t("secondarySaints")} · {t("longPressHint")}</Text>
+        <Text style={styles.hint}>
+          {t("secondarySaints")} · {t("longPressHint")}
+        </Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t("prayerTimes")}</Text>
@@ -132,15 +134,8 @@ export default function Onboarding() {
           <Text style={styles.sectionTitle}>{t("language")}</Text>
           <View style={styles.langRow}>
             {(["es", "en"] as const).map((l) => (
-              <Pressable
-                key={l}
-                testID={`lang-${l}`}
-                onPress={() => setLang(l)}
-                style={[styles.langChip, lang === l && styles.langChipActive]}
-              >
-                <Text style={[styles.langText, lang === l && { color: colors.onBrandPrimary }]}>
-                  {l === "es" ? "Español" : "English"}
-                </Text>
+              <Pressable key={l} testID={`lang-${l}`} onPress={() => setLang(l)} style={[styles.langChip, lang === l && styles.langChipActive]}>
+                <Text style={[styles.langText, lang === l && { color: colors.onBrandPrimary }]}>{l === "es" ? "Español" : "English"}</Text>
               </Pressable>
             ))}
           </View>

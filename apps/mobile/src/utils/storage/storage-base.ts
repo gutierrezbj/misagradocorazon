@@ -16,10 +16,7 @@ export abstract class StorageBase {
   // raw is whatever AsyncStorage / SecureStore returned: a JSON-encoded string
   // (because setItem always JSON.stringifies) or null if the key was missing.
   // We always JSON.parse so values round-trip correctly across types.
-  protected retrieve<Fallback extends StorageItemValue>(
-    raw: string | null,
-    fallback: Fallback,
-  ): Fallback | null {
+  protected retrieve<Fallback extends StorageItemValue>(raw: string | null, fallback: Fallback): Fallback | null {
     if (raw === null) return fallback;
     try {
       return JSON.parse(raw) as Fallback;
@@ -29,22 +26,10 @@ export abstract class StorageBase {
     }
   }
 
-  abstract getItem<Fallback extends StorageItemValue>(
-    key: string,
-    fallback: Fallback,
-  ): Promise<Fallback | null>;
-  abstract setItem<Value extends StorageItemValue>(
-    key: string,
-    value: Value,
-  ): Promise<boolean>;
+  abstract getItem<Fallback extends StorageItemValue>(key: string, fallback: Fallback): Promise<Fallback | null>;
+  abstract setItem<Value extends StorageItemValue>(key: string, value: Value): Promise<boolean>;
   abstract removeItem(key: string): Promise<boolean>;
-  abstract secureGet<Fallback extends StorageItemValue>(
-    key: string,
-    fallback: Fallback,
-  ): Promise<Fallback | null>;
-  abstract secureSet<Value extends StorageItemValue>(
-    key: string,
-    value: Value,
-  ): Promise<boolean>;
+  abstract secureGet<Fallback extends StorageItemValue>(key: string, fallback: Fallback): Promise<Fallback | null>;
+  abstract secureSet<Value extends StorageItemValue>(key: string, value: Value): Promise<boolean>;
   abstract secureRemove(key: string): Promise<boolean>;
 }

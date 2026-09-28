@@ -58,7 +58,15 @@ export default function Gospel() {
 
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: spacing.md, paddingBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: c.divider,
+  },
   back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onSurface },
   ref: { fontFamily: fonts.bodySemibold, fontSize: 15, color: c.brand, textTransform: "uppercase", letterSpacing: 1 },

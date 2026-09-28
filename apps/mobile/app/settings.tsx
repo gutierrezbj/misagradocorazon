@@ -91,10 +91,22 @@ export default function Settings() {
             <AppButton testID="open-push-settings" variant="outline" label={t("pushOpenSettings")} onPress={openSystemSettings} />
           </View>
         )}
-        <Toggle testID="notify-morning" label={t("morningPrayer")} hint={user?.morningTime} value={!!user?.notifyMorning} onChange={(v) => setPref("notifyMorning", v)} />
+        <Toggle
+          testID="notify-morning"
+          label={t("morningPrayer")}
+          hint={user?.morningTime}
+          value={!!user?.notifyMorning}
+          onChange={(v) => setPref("notifyMorning", v)}
+        />
         <Toggle testID="notify-night" label={t("nightPrayer")} hint={user?.nightTime} value={!!user?.notifyNight} onChange={(v) => setPref("notifyNight", v)} />
         <Toggle testID="notify-saint" label={t("saintOfDay")} hint="07:00" value={!!user?.notifySaint} onChange={(v) => setPref("notifySaint", v)} />
-        <Toggle testID="notify-community" label={t("pushCommunity")} hint={t("pushCommunityHint")} value={!!user?.notifyCommunity} onChange={(v) => setPref("notifyCommunity", v)} />
+        <Toggle
+          testID="notify-community"
+          label={t("pushCommunity")}
+          hint={t("pushCommunityHint")}
+          value={!!user?.notifyCommunity}
+          onChange={(v) => setPref("notifyCommunity", v)}
+        />
         <Toggle
           testID="notify-candle-expiry"
           label={t("notifyCandleExpiry")}
@@ -165,15 +177,40 @@ function Row({ label, value, chevron }: { label: string; value?: string; chevron
 
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: spacing.md, paddingBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: c.divider,
+  },
   back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onSurface },
   sectionTitle: { fontFamily: fonts.displayBold, fontSize: 20, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   langRow: { flexDirection: "row", gap: spacing.sm },
-  langChip: { flex: 1, height: 48, borderRadius: radius.md, borderWidth: 1, borderColor: c.border, alignItems: "center", justifyContent: "center", backgroundColor: c.surfaceSecondary },
+  langChip: {
+    flex: 1,
+    height: 48,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    borderColor: c.border,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: c.surfaceSecondary,
+  },
   langChipActive: { backgroundColor: c.brandPrimary, borderColor: c.brandPrimary },
   langText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurfaceSecondary },
-  row: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: c.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
   rowLabel: { fontFamily: fonts.bodyMedium, fontSize: 16, color: c.onSurface },
   rowValue: { fontFamily: fonts.body, fontSize: 16, color: c.muted },
   rowHint: { fontFamily: fonts.body, fontSize: 14, color: c.muted, marginTop: 2 },

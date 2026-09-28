@@ -50,7 +50,10 @@ const dict = {
   delete: { es: "Borrar", en: "Delete" },
   candleWall: { es: "Muro de velas", en: "Candle wall" },
   candlesLitToday: { es: "{n} velas encendidas hoy", en: "{n} candles lit today" },
-  candleWallLead: { es: "No rezas solo: estas velas arden ahora por las intenciones de la comunidad.", en: "You don't pray alone: these candles are burning now for the community's intentions." },
+  candleWallLead: {
+    es: "No rezas solo: estas velas arden ahora por las intenciones de la comunidad.",
+    en: "You don't pray alone: these candles are burning now for the community's intentions.",
+  },
   wallToday: { es: "hoy", en: "today" },
   wallLitNow: { es: "encendidas ahora", en: "lit now" },
   wallThisWeek: { es: "esta semana", en: "this week" },
@@ -58,7 +61,10 @@ const dict = {
   wallMore: { es: "y {n} velas más", en: "and {n} more candles" },
   shareCandle: { es: "Compartir mi vela", en: "Share my candle" },
   shareTitle: { es: "Reza acompañado", en: "Pray together" },
-  shareSub: { es: "Invita a tu familia a rezar contigo por WhatsApp o en tus estados.", en: "Invite your family to pray with you on WhatsApp or in your stories." },
+  shareSub: {
+    es: "Invita a tu familia a rezar contigo por WhatsApp o en tus estados.",
+    en: "Invite your family to pray with you on WhatsApp or in your stories.",
+  },
   shareLitFor: { es: "He encendido una vela a", en: "I lit a candle to" },
   sharePrayWithMe: { es: "Enciende una vela conmigo", en: "Light a candle with me" },
   shareIncludeIntention: { es: "Incluir mi intención", en: "Include my intention" },
@@ -220,7 +226,10 @@ const dict = {
   terms: { es: "Términos de uso", en: "Terms of use" },
   support: { es: "Soporte", en: "Support" },
   // sin conexión
-  offline: { es: "Sin conexión. Verás lo último que cargaste; se actualizará al volver.", en: "You're offline. You'll see what was last loaded; it will refresh when you're back." },
+  offline: {
+    es: "Sin conexión. Verás lo último que cargaste; se actualizará al volver.",
+    en: "You're offline. You'll see what was last loaded; it will refresh when you're back.",
+  },
   // pantalla de error (fuera del proveedor de i18n)
   errorTitle: { es: "Algo ha fallado", en: "Something went wrong" },
   errorMessage: { es: "Vuelve a abrir la app para continuar.", en: "Please reload the app to continue." },

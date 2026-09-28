@@ -53,13 +53,8 @@ export default function Altar() {
   return (
     <View style={styles.root}>
       <StatusBar style="light" />
-      {patron?.imageUrl && (
-        <Image source={{ uri: patron.imageUrl }} style={styles.bgImage} contentFit="cover" blurRadius={30} />
-      )}
-      <LinearGradient
-        colors={[colors.altarBgDeep + "F2", colors.altarBg + "FA", colors.altarBg]}
-        style={styles.bgOverlay}
-      />
+      {patron?.imageUrl && <Image source={{ uri: patron.imageUrl }} style={styles.bgImage} contentFit="cover" blurRadius={30} />}
+      <LinearGradient colors={[colors.altarBgDeep + "F2", colors.altarBg + "FA", colors.altarBg]} style={styles.bgOverlay} />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: insets.top + spacing.md, paddingBottom: bottomChrome + spacing["2xl"] }}
@@ -68,7 +63,8 @@ export default function Altar() {
         <View style={styles.header}>
           <View style={{ flex: 1 }}>
             <Text style={styles.greeting}>
-              {greeting}{user?.name ? `, ${user.name.split(" ")[0]}` : ""}
+              {greeting}
+              {user?.name ? `, ${user.name.split(" ")[0]}` : ""}
             </Text>
             <View style={styles.streakRow}>
               <Icon name="award" size={16} color={colors.gold} />
@@ -77,7 +73,13 @@ export default function Altar() {
               </Text>
             </View>
           </View>
-          <Pressable testID="profile-button" accessibilityRole="button" accessibilityLabel={t("profile")} onPress={() => router.push("/profile")} style={styles.avatar}>
+          <Pressable
+            testID="profile-button"
+            accessibilityRole="button"
+            accessibilityLabel={t("profile")}
+            onPress={() => router.push("/profile")}
+            style={styles.avatar}
+          >
             <Icon name="user" size={22} color={colors.gold} />
           </Pressable>
         </View>
@@ -107,13 +109,7 @@ export default function Altar() {
 
         {/* Daily cards */}
         <View style={styles.cards}>
-          <GlassCard
-            testID="gospel-card"
-            icon="book-open"
-            title={t("gospelToday")}
-            subtitle={daily?.gospel.ref ?? ""}
-            onPress={() => router.push("/gospel")}
-          />
+          <GlassCard testID="gospel-card" icon="book-open" title={t("gospelToday")} subtitle={daily?.gospel.ref ?? ""} onPress={() => router.push("/gospel")} />
           {saintOfDay && (
             <GlassCard
               testID="saint-of-day-card"

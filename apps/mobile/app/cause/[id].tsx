@@ -28,17 +28,34 @@ export default function CauseScreen() {
   const date = (iso: string) => new Date(iso).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
 
   const back = (
-    <Pressable testID="back-button" accessibilityRole="button" accessibilityLabel={t("back")} onPress={() => router.back()} style={[styles.back, { top: insets.top + spacing.sm }]}>
+    <Pressable
+      testID="back-button"
+      accessibilityRole="button"
+      accessibilityLabel={t("back")}
+      onPress={() => router.back()}
+      style={[styles.back, { top: insets.top + spacing.sm }]}
+    >
       <Icon name="arrow-left" size={22} color="#FDFBF7" />
     </Pressable>
   );
 
-  if (isLoading) return <View style={styles.root}><ActivityIndicator color={colors.brand} style={{ marginTop: 100 }} /></View>;
+  if (isLoading)
+    return (
+      <View style={styles.root}>
+        <ActivityIndicator color={colors.brand} style={{ marginTop: 100 }} />
+      </View>
+    );
   if (isError || !cause) {
     return (
       <View style={[styles.root, { paddingTop: insets.top + 80, paddingHorizontal: spacing.lg }]}>
         <StatusBar style="dark" />
-        <Pressable testID="back-button" accessibilityRole="button" accessibilityLabel={t("back")} onPress={() => router.back()} style={[styles.back, { top: insets.top + spacing.sm, backgroundColor: colors.brand }]}>
+        <Pressable
+          testID="back-button"
+          accessibilityRole="button"
+          accessibilityLabel={t("back")}
+          onPress={() => router.back()}
+          style={[styles.back, { top: insets.top + spacing.sm, backgroundColor: colors.brand }]}
+        >
           <Icon name="arrow-left" size={22} color="#FDFBF7" />
         </Pressable>
         <Text style={styles.sectionText}>{t("causeNotFound")}</Text>
@@ -84,7 +101,9 @@ export default function CauseScreen() {
           {cause.fundsUse && (
             <>
               <Text style={styles.sectionTitle}>{t("fundsUse")}</Text>
-              <Text testID="cause-funds-use" style={styles.sectionText}>{loc(cause.fundsUse)}</Text>
+              <Text testID="cause-funds-use" style={styles.sectionText}>
+                {loc(cause.fundsUse)}
+              </Text>
             </>
           )}
 
@@ -98,7 +117,9 @@ export default function CauseScreen() {
             ))}
             <View style={[styles.budgetRow, styles.budgetTotalRow]}>
               <Text style={styles.budgetTotal}>{t("budgetTotal")}</Text>
-              <Text testID="cause-budget-total" style={styles.budgetTotal}>{usd(cause.budgetCents)}</Text>
+              <Text testID="cause-budget-total" style={styles.budgetTotal}>
+                {usd(cause.budgetCents)}
+              </Text>
             </View>
           </View>
 
@@ -139,7 +160,17 @@ const useStyles = makeStyles((c) => ({
   hero: { height: 300 },
   heroImg: { width: "100%", height: "100%", backgroundColor: c.surfaceTertiary },
   heroScrim: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
-  back: { position: "absolute", left: spacing.md, width: 42, height: 42, borderRadius: 21, backgroundColor: "rgba(0,0,0,0.35)", alignItems: "center", justifyContent: "center", zIndex: 2 },
+  back: {
+    position: "absolute",
+    left: spacing.md,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "rgba(0,0,0,0.35)",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 2,
+  },
   heroText: { position: "absolute", bottom: spacing.lg, left: spacing.md, right: spacing.md },
   name: { fontFamily: fonts.displayBold, fontSize: 30, color: "#FDFBF7" },
   heroSub: { fontFamily: fonts.body, fontSize: 15, color: c.goldSoft },

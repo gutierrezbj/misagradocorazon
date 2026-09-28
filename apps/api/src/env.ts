@@ -10,9 +10,7 @@ const envSchema = z.object({
   // Orígenes web permitidos (panel, web de la app), separados por comas.
   TRUSTED_ORIGINS: z.string().default(""),
   // Clave AES-256 en base64 (32 bytes) para cifrar las intenciones (GDPR art. 9).
-  INTENTIONS_KEY: z
-    .string()
-    .refine((v) => Buffer.from(v, "base64").length === 32, "INTENTIONS_KEY debe ser 32 bytes en base64"),
+  INTENTIONS_KEY: z.string().refine((v) => Buffer.from(v, "base64").length === 32, "INTENTIONS_KEY debe ser 32 bytes en base64"),
   // Login con Google: ID de cliente OAuth de tipo "web". La app nativa pide el ID token con él,
   // así que es la audiencia que se verifica. El secreto no hace falta para el login nativo.
   GOOGLE_CLIENT_ID: z.string().min(1).optional(),

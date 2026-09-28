@@ -96,7 +96,12 @@ describe("registro de auditoría", () => {
     const res = await request(app).get("/api/admin/audit").set(bearer(sa.token));
     expect(res.status).toBe(200);
     const entries = res.body.data.entries as { action: string; entity: string; actor: { name: string; role: string } }[];
-    expect(entries[0]).toMatchObject({ action: "cause.transfer", entity: "cause", entityId: causeId, actor: { name: "Ana Superadmin", role: "superadmin", deleted: false } });
+    expect(entries[0]).toMatchObject({
+      action: "cause.transfer",
+      entity: "cause",
+      entityId: causeId,
+      actor: { name: "Ana Superadmin", role: "superadmin", deleted: false },
+    });
     expect(entries.filter((e) => e.action === "cause.create")).toHaveLength(3);
 
     const causes = await request(app).get("/api/admin/audit?entity=cause").set(bearer(sa.token));
@@ -118,7 +123,9 @@ describe("registro de auditoría", () => {
     const seen: string[] = [];
     let cursor: string | null = null;
     do {
-      const res: request.Response = await request(app).get(`/api/admin/audit${cursor ? `?cursor=${cursor}` : ""}`).set(bearer(sa.token));
+      const res: request.Response = await request(app)
+        .get(`/api/admin/audit${cursor ? `?cursor=${cursor}` : ""}`)
+        .set(bearer(sa.token));
       seen.push(...res.body.data.entries.map((e: { entityId: string }) => e.entityId));
       cursor = res.body.data.nextCursor;
     } while (cursor);

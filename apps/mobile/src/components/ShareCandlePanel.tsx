@@ -44,7 +44,9 @@ export function ShareCandlePanel({ saintName, intention, variant, mourning, onCl
   };
 
   return (
-    <ScrollView contentContainerStyle={{ alignItems: "center", padding: spacing.lg, paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xl }}>
+    <ScrollView
+      contentContainerStyle={{ alignItems: "center", padding: spacing.lg, paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xl }}
+    >
       <Text style={styles.title}>{t("shareTitle")}</Text>
       <Text style={styles.sub}>{t("shareSub")}</Text>
       <View style={styles.cardShadow}>
@@ -81,7 +83,15 @@ const useStyles = makeStyles((c) => ({
   title: { fontFamily: fonts.displayBold, fontSize: 26, color: c.gold, textAlign: "center" },
   sub: { fontFamily: fonts.body, fontSize: 16, color: c.onAltarMuted, textAlign: "center", marginTop: spacing.xs, marginBottom: spacing.lg },
   cardShadow: { borderRadius: 18, borderWidth: 1, borderColor: "rgba(197,160,89,0.35)" },
-  toggleRow: { flexDirection: "row", alignItems: "center", alignSelf: "stretch", marginVertical: spacing.lg, padding: spacing.md, borderRadius: radius.lg, backgroundColor: "rgba(253,251,247,0.06)" },
+  toggleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "stretch",
+    marginVertical: spacing.lg,
+    padding: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: "rgba(253,251,247,0.06)",
+  },
   toggleLabel: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onAltar },
   toggleHint: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, marginTop: 2 },
   close: { alignItems: "center", paddingVertical: spacing.sm },

@@ -21,12 +21,7 @@ const TTL_SECONDS = 2 * 60 * 60;
 // Canal Android creado por la app (src/push.ts).
 const ANDROID_CHANNEL = "default";
 
-export async function deliver(
-  kind: PushKind,
-  ref: string,
-  recipients: Recipient[],
-  contentFor: (r: Recipient) => Content,
-): Promise<number> {
+export async function deliver(kind: PushKind, ref: string, recipients: Recipient[], contentFor: (r: Recipient) => Content): Promise<number> {
   if (recipients.length === 0) return 0;
   const ids = recipients.map((r) => r.id);
 

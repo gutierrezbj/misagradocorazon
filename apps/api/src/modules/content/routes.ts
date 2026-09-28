@@ -130,9 +130,7 @@ function addDays(date: string, n: number) {
 
 // Calendario de los próximos días: qué está listo y qué falta (texto, santo, audio por idioma).
 contentRouter.get("/admin/daily", ...editor, async (req, res) => {
-  const q = z
-    .object({ from: isoDate.optional(), days: z.coerce.number().int().min(1).max(62).default(14) })
-    .parse(req.query);
+  const q = z.object({ from: isoDate.optional(), days: z.coerce.number().int().min(1).max(62).default(14) }).parse(req.query);
   const from = q.from ?? new Date().toISOString().slice(0, 10);
   const to = addDays(from, q.days - 1);
   const rows = await prisma.dailyContent.findMany({

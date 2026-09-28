@@ -17,7 +17,8 @@ export function Users() {
     queryFn: () => api<AdminUser[]>(`/admin/users${search ? `?search=${encodeURIComponent(search)}` : ""}`),
   });
   const patch = useMutation({
-    mutationFn: (v: { id: string; role?: Role; blocked?: boolean }) => api(`/admin/users/${v.id}`, { method: "PATCH", body: { role: v.role, blocked: v.blocked } }),
+    mutationFn: (v: { id: string; role?: Role; blocked?: boolean }) =>
+      api(`/admin/users/${v.id}`, { method: "PATCH", body: { role: v.role, blocked: v.blocked } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
   const fmt = (iso: string) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium" }).format(new Date(iso));
@@ -29,7 +30,13 @@ export function Users() {
           <h1>{t("usersTitle")}</h1>
           <div className="page-sub">{t("usersSub")}</div>
         </div>
-        <input aria-label={t("search")} placeholder={t("search")} value={search} onChange={(e) => setSearch(e.target.value)} style={{ minWidth: 280, border: "1px solid var(--border)", borderRadius: 6, padding: "9px 11px" }} />
+        <input
+          aria-label={t("search")}
+          placeholder={t("search")}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{ minWidth: 280, border: "1px solid var(--border)", borderRadius: 6, padding: "9px 11px" }}
+        />
       </div>
       <section className="card">
         {isLoading && <p className="muted">{t("loading")}</p>}
@@ -54,7 +61,13 @@ export function Users() {
                   </td>
                   <td>{u.email}</td>
                   <td>
-                    <select aria-label={t("role")} value={u.role} disabled={self || patch.isPending} onChange={(e) => patch.mutate({ id: u.id, role: e.target.value as Role })} style={{ border: "1px solid var(--border)", borderRadius: 6, padding: "6px 8px", background: "#fff" }}>
+                    <select
+                      aria-label={t("role")}
+                      value={u.role}
+                      disabled={self || patch.isPending}
+                      onChange={(e) => patch.mutate({ id: u.id, role: e.target.value as Role })}
+                      style={{ border: "1px solid var(--border)", borderRadius: 6, padding: "6px 8px", background: "#fff" }}
+                    >
                       {ROLES.map((r) => (
                         <option key={r} value={r}>
                           {t(`role_${r}` as I18nKey)}

@@ -69,9 +69,7 @@ export default function CandleWall() {
                 ))}
               </View>
             )}
-            {data.active > flames.length && (
-              <Text style={styles.more}>{t("wallMore").replace("{n}", String(data.active - flames.length))}</Text>
-            )}
+            {data.active > flames.length && <Text style={styles.more}>{t("wallMore").replace("{n}", String(data.active - flames.length))}</Text>}
           </>
         )}
       </ScrollView>
@@ -83,7 +81,9 @@ function Stat({ value, label, testID }: { value: number; label: string; testID?:
   const styles = useStyles();
   return (
     <View style={styles.stat}>
-      <Text style={styles.statValue} testID={testID}>{value}</Text>
+      <Text style={styles.statValue} testID={testID}>
+        {value}
+      </Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
@@ -96,7 +96,15 @@ const useStyles = makeStyles((c) => ({
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onAltar },
   lead: { fontFamily: fonts.display, fontSize: 20, lineHeight: 28, color: c.goldSoft, textAlign: "center", fontStyle: "italic", marginBottom: spacing.lg },
   stats: { flexDirection: "row", gap: spacing.sm, marginBottom: spacing.lg },
-  stat: { flex: 1, alignItems: "center", paddingVertical: spacing.md, borderRadius: radius.lg, backgroundColor: "rgba(253,251,247,0.06)", borderWidth: 1, borderColor: "rgba(197,160,89,0.3)" },
+  stat: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: spacing.md,
+    borderRadius: radius.lg,
+    backgroundColor: "rgba(253,251,247,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(197,160,89,0.3)",
+  },
   statValue: { fontFamily: fonts.displayBold, fontSize: 28, color: c.gold, fontVariant: ["lining-nums"] },
   statLabel: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted, marginTop: 2, textAlign: "center" },
   grid: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", rowGap: spacing.md },

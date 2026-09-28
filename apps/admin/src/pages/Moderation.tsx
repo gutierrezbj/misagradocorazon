@@ -10,7 +10,14 @@ function Decision({ onDecide }: { onDecide: (action: "approve" | "hide", reason?
   const [reason, setReason] = useState("");
   return (
     <div className="row">
-      <input aria-label={t("reason")} placeholder={t("reason")} value={reason} onChange={(e) => setReason(e.target.value)} className="field" style={{ border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px", minWidth: 200 }} />
+      <input
+        aria-label={t("reason")}
+        placeholder={t("reason")}
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+        className="field"
+        style={{ border: "1px solid var(--border)", borderRadius: 6, padding: "7px 10px", minWidth: 200 }}
+      />
       <button className="btn btn-primary" type="button" onClick={() => onDecide("approve", reason || undefined)}>
         {t("approve")}
       </button>
@@ -23,8 +30,7 @@ function Decision({ onDecide }: { onDecide: (action: "approve" | "hide", reason?
 
 export function Moderation() {
   const { t, lang } = useI18n();
-  const when = (iso: string) =>
-    new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
+  const when = (iso: string) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
   const qc = useQueryClient();
   const queue = useQuery({ queryKey: ["mod-queue"], queryFn: () => api<Queue>("/admin/moderation/queue"), refetchInterval: 15_000 });
   const words = useQuery({ queryKey: ["mod-words"], queryFn: () => api<string[]>("/admin/moderation/words") });
@@ -101,7 +107,13 @@ export function Moderation() {
               if (newWord.trim()) addWord.mutate(newWord.trim());
             }}
           >
-            <input aria-label={t("newWord")} placeholder={t("newWord")} value={newWord} onChange={(e) => setNewWord(e.target.value)} style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 6, padding: "8px 10px" }} />
+            <input
+              aria-label={t("newWord")}
+              placeholder={t("newWord")}
+              value={newWord}
+              onChange={(e) => setNewWord(e.target.value)}
+              style={{ flex: 1, border: "1px solid var(--border)", borderRadius: 6, padding: "8px 10px" }}
+            />
             <button className="btn btn-primary" type="submit" disabled={addWord.isPending}>
               {t("addWord")}
             </button>

@@ -9,7 +9,9 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "lint": "pnpm -r --if-present lint",
     "test": "pnpm -r --if-present test",
-    "mobile": "pnpm --filter @msc/mobile start"
+    "mobile": "pnpm --filter @msc/mobile start",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "pnpm": {
     "overrides": {
@@ -23,5 +25,8 @@
       "@istanbuljs/load-nyc-config>js-yaml": "3.15.0",
       "shell-quote": "1.9.0"
     }
+  },
+  "devDependencies": {
+    "prettier": "3.8.1"
   }
 }

@@ -12,11 +12,7 @@ describe("consentimiento de analítica (ADR-011)", () => {
     const h = bearer(u.token);
     expect((await request(app).get("/api/me").set(h)).body.data.analyticsConsent).toBe(false);
 
-    await request(app)
-      .put("/api/me/onboarding")
-      .set(h)
-      .send({ patronSaintId: "saint_guadalupe", analyticsConsent: true })
-      .expect(200);
+    await request(app).put("/api/me/onboarding").set(h).send({ patronSaintId: "saint_guadalupe", analyticsConsent: true }).expect(200);
     const given = await prisma.user.findUniqueOrThrow({ where: { id: u.userId } });
     expect(given.analyticsConsent).toBe(true);
     expect(given.analyticsConsentAt).toBeInstanceOf(Date);

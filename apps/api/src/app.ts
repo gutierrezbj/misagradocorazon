@@ -24,7 +24,9 @@ export function createApp({ rateLimits = env.NODE_ENV !== "test" }: { rateLimits
   // Detrás del proxy de Railway: IP y protocolo reales del cliente.
   app.set("trust proxy", 1);
 
-  const origins = env.TRUSTED_ORIGINS.split(",").map((o) => o.trim()).filter(Boolean);
+  const origins = env.TRUSTED_ORIGINS.split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
   app.use(cors({ origin: origins, credentials: true, exposedHeaders: ["set-auth-token"] }));
 
   // Cabeceras básicas: la API solo sirve JSON.

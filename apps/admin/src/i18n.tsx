@@ -14,7 +14,10 @@ const dict = {
   badCredentials: { es: "Correo o contraseña incorrectos", en: "Wrong email or password" },
   logout: { es: "Cerrar sesión", en: "Sign out" },
   forbiddenTitle: { es: "Sin acceso al panel", en: "No panel access" },
-  forbiddenBody: { es: "Tu cuenta no tiene un rol de gestión. Pide acceso a un superadmin.", en: "Your account has no management role. Ask a superadmin for access." },
+  forbiddenBody: {
+    es: "Tu cuenta no tiene un rol de gestión. Pide acceso a un superadmin.",
+    en: "Your account has no management role. Ask a superadmin for access.",
+  },
   language: { es: "Idioma", en: "Language" },
   // nav
   navDashboard: { es: "Resumen", en: "Overview" },
@@ -265,11 +268,17 @@ const dict = {
   },
   seasonCurrent: { es: "Tiempo actual", en: "Current season" },
   seasonUsesOrdinary: { es: "Sin oración propia: se usa la del tiempo ordinario.", en: "No prayer of its own: the Ordinary Time one is used." },
-  seasonNoPrayer: { es: "Sin oración: la app no mostrará texto los días sin oración propia.", en: "No prayer: the app will show no text on days without their own prayer." },
+  seasonNoPrayer: {
+    es: "Sin oración: la app no mostrará texto los días sin oración propia.",
+    en: "No prayer: the app will show no text on days without their own prayer.",
+  },
   editPrayer: { es: "Editar", en: "Edit" },
   addPrayer: { es: "Añadir", en: "Add" },
   prayersTitle: { es: "Oraciones por tiempo litúrgico", en: "Prayers by liturgical season" },
-  prayersSub: { es: "Oraciones rezadas por los fieles en la ventana elegida, con la media por día de cada tiempo.", en: "Prayers said by the faithful in the selected window, with the daily average for each season." },
+  prayersSub: {
+    es: "Oraciones rezadas por los fieles en la ventana elegida, con la media por día de cada tiempo.",
+    en: "Prayers said by the faithful in the selected window, with the daily average for each season.",
+  },
   colSeason: { es: "Tiempo", en: "Season" },
   colDays: { es: "Días", en: "Days" },
   colPrayers: { es: "Oraciones", en: "Prayers" },
@@ -399,8 +408,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = l;
   }, []);
   const t = useCallback(
-    (k: I18nKey, vars?: Record<string, string | number>) =>
-      dict[k][lang].replace(/\{(\w+)\}/g, (_, name: string) => String(vars?.[name] ?? `{${name}}`)),
+    (k: I18nKey, vars?: Record<string, string | number>) => dict[k][lang].replace(/\{(\w+)\}/g, (_, name: string) => String(vars?.[name] ?? `{${name}}`)),
     [lang],
   );
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);

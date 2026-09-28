@@ -19,7 +19,12 @@ import { Users } from "./pages/Users.tsx";
 export function App() {
   const { status, me } = useAuth();
   const { t } = useI18n();
-  if (status === "loading") return <p className="muted" style={{ padding: 32 }}>{t("loading")}</p>;
+  if (status === "loading")
+    return (
+      <p className="muted" style={{ padding: 32 }}>
+        {t("loading")}
+      </p>
+    );
   if (status === "anonymous" || !me) return <Login />;
   if (!isStaff(me.role)) return <Forbidden />;
   // El backend vuelve a comprobar cada permiso: esto solo evita mostrar pantallas que darían 403.

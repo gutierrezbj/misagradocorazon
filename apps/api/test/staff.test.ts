@@ -12,9 +12,7 @@ describe("alta de staff por línea de comandos", () => {
     const r = await ensureStaff({ email: "Fundador@Example.com", name: "Juan", password: "Corazon2026!" });
     expect(r).toMatchObject({ outcome: "created", role: "superadmin" });
 
-    const login = await request(app)
-      .post("/api/auth/sign-in/email")
-      .send({ email: "fundador@example.com", password: "Corazon2026!" });
+    const login = await request(app).post("/api/auth/sign-in/email").send({ email: "fundador@example.com", password: "Corazon2026!" });
     expect(login.status).toBe(200);
     const token = String(login.headers["set-auth-token"]);
     const users = await request(app).get("/api/admin/users").set(bearer(token));

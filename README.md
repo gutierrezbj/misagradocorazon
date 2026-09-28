@@ -59,6 +59,7 @@ El primer superadmin del panel se crea por línea de comandos (`apps/api/README.
 Comprobaciones (las mismas que ejecuta el CI en cada PR):
 
 ```bash
+pnpm format:check   # Prettier (SDD-06); `pnpm format` lo aplica
 pnpm typecheck
 pnpm lint
 pnpm test

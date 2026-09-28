@@ -195,9 +195,7 @@ describe("causa ganadora y limpieza de tokens", () => {
     const a = await faithful({ morningTime: "07:30" });
     const b = await faithful({ morningTime: "07:30" });
     fake.ticketFor = (m, i) =>
-      m.to === a.pushToken
-        ? { status: "error", message: "gone", details: { error: "DeviceNotRegistered" } }
-        : { status: "ok", id: `ticket-${i}` };
+      m.to === a.pushToken ? { status: "error", message: "gone", details: { error: "DeviceNotRegistered" } } : { status: "ok", id: `ticket-${i}` };
     await runReminders(at("2026-10-05T13:30:00Z"));
     expect(await prisma.pushToken.findUnique({ where: { token: a.pushToken } })).toBeNull();
 
@@ -259,7 +257,10 @@ describe("avisos del equipo (panel)", () => {
 
   it("valida longitudes para que no se corten en la pantalla de bloqueo", async () => {
     const editor = await signUpAs("editor");
-    const res = await request(app).post("/api/admin/push/campaigns").set(bearer(editor.token)).send({ ...campaign, titleEs: "x".repeat(61) });
+    const res = await request(app)
+      .post("/api/admin/push/campaigns")
+      .set(bearer(editor.token))
+      .send({ ...campaign, titleEs: "x".repeat(61) });
     expect(res.status).toBe(400);
   });
 });

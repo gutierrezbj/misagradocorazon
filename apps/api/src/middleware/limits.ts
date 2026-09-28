@@ -25,8 +25,7 @@ const common = { windowMs: MINUTE, keyGenerator: clientKey, handler: tooMany, st
 export const apiLimiter = () => rateLimit({ ...common, limit: 300 });
 
 /** Escrituras (POST, PUT, PATCH, DELETE): velas, votos, intenciones, contenido... */
-export const writeLimiter = () =>
-  rateLimit({ ...common, limit: 30, skip: (req) => req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS" });
+export const writeLimiter = () => rateLimit({ ...common, limit: 30, skip: (req) => req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS" });
 
 // Better Auth saca la IP de una cabecera. Con X-Forwarded-For, si el cliente añade la suya propia
 // llegan varias direcciones y Better Auth no se fía de ninguna: todos esos intentos de login

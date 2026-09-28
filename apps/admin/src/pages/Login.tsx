@@ -40,7 +40,11 @@ export function Login() {
           {t("password")}
           <input type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
-        {error && <p className="error" role="alert">{t("badCredentials")}</p>}
+        {error && (
+          <p className="error" role="alert">
+            {t("badCredentials")}
+          </p>
+        )}
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {t("signIn")}
         </button>

@@ -48,7 +48,11 @@ beforeEach(() => {
 
 test("el login recibe solo el ID token y el código va aparte a la API", async () => {
   mockApi.mockImplementation(async (path) => (path === "/me" ? user : { stored: true }));
-  await render(<AuthProvider><Probe /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <Probe />
+    </AuthProvider>,
+  );
   await fireEvent.press(screen.getByTestId("apple"));
   await screen.findByText("u1");
 
@@ -61,7 +65,11 @@ test("si guardar el código falla, la sesión se abre igual", async () => {
     if (path === "/me/apple-authorization") throw new Error("Network request failed");
     return user;
   });
-  await render(<AuthProvider><Probe /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <Probe />
+    </AuthProvider>,
+  );
   await fireEvent.press(screen.getByTestId("apple"));
   expect(await screen.findByText("u1")).toBeTruthy();
 });
@@ -69,7 +77,11 @@ test("si guardar el código falla, la sesión se abre igual", async () => {
 test("si Apple no da código, no se llama a la API", async () => {
   mockCredential = { provider: "apple", idToken: { token: "id-token" } };
   mockApi.mockImplementation(async () => user);
-  await render(<AuthProvider><Probe /></AuthProvider>);
+  await render(
+    <AuthProvider>
+      <Probe />
+    </AuthProvider>,
+  );
   await fireEvent.press(screen.getByTestId("apple"));
   await screen.findByText("u1");
   expect(mockApi.mock.calls.map(([p]) => p)).not.toContain("/me/apple-authorization");

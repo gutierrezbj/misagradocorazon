@@ -75,9 +75,7 @@ async function store(day: string) {
 // Días cerrados (anteriores a hoy) que faltan entre from y ayer, ambos incluidos.
 async function missingDays(from: string, yesterday: string) {
   if (from > yesterday) return [];
-  const have = new Set(
-    (await prisma.kpiDaily.findMany({ where: { day: { gte: from, lte: yesterday } }, select: { day: true } })).map((r) => r.day),
-  );
+  const have = new Set((await prisma.kpiDaily.findMany({ where: { day: { gte: from, lte: yesterday } }, select: { day: true } })).map((r) => r.day));
   const out: string[] = [];
   for (let d = from; d <= yesterday; d = addDays(d, 1)) if (!have.has(d)) out.push(d);
   return out;

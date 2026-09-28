@@ -76,9 +76,18 @@ function SaintForm({ saint, onDone }: { saint: AdminSaint | null; onDone: () => 
     >
       <h2 style={{ marginBottom: 14 }}>{saint ? saint.name : t("newSaint")}</h2>
       <div className="form-grid">
-        <label className="field">{t("saintName")}<input required value={f.name} onChange={set("name")} /></label>
-        <label className="field">{t("feastDate")}<input required pattern="(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])" placeholder="12-12" value={f.feastDate} onChange={set("feastDate")} /></label>
-        <label className="field">{t("sortOrder")}<input type="number" min="0" max="10000" value={f.sortOrder} onChange={set("sortOrder")} /></label>
+        <label className="field">
+          {t("saintName")}
+          <input required value={f.name} onChange={set("name")} />
+        </label>
+        <label className="field">
+          {t("feastDate")}
+          <input required pattern="(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])" placeholder="12-12" value={f.feastDate} onChange={set("feastDate")} />
+        </label>
+        <label className="field">
+          {t("sortOrder")}
+          <input type="number" min="0" max="10000" value={f.sortOrder} onChange={set("sortOrder")} />
+        </label>
         <label className="row" style={{ fontSize: 15, alignSelf: "end" }}>
           <input type="checkbox" checked={f.isPatronCatalog} onChange={(e) => setF({ ...f, isPatronCatalog: e.target.checked })} /> {t("patronCatalog")}
         </label>
@@ -89,17 +98,39 @@ function SaintForm({ saint, onDone }: { saint: AdminSaint | null; onDone: () => 
         <MediaField label={t("audioEn")} kind="audio" value={f.audioUrlEn} onChange={(v) => setF({ ...f, audioUrlEn: v })} testId="saint-audio-en" />
       </div>
       <div className="form-grid" style={{ marginTop: 14 }}>
-        <label className="field">{t("historyEs")}<textarea required value={f.historyEs} onChange={set("historyEs")} /></label>
-        <label className="field">{t("historyEn")}<textarea required value={f.historyEn} onChange={set("historyEn")} /></label>
-        <label className="field">{t("patronagesEs")}<textarea value={f.patronagesEs} onChange={set("patronagesEs")} /></label>
-        <label className="field">{t("patronagesEn")}<textarea value={f.patronagesEn} onChange={set("patronagesEn")} /></label>
-        <label className="field">{t("saintPrayerEs")}<textarea value={f.prayerEs} onChange={set("prayerEs")} /></label>
-        <label className="field">{t("saintPrayerEn")}<textarea value={f.prayerEn} onChange={set("prayerEn")} /></label>
+        <label className="field">
+          {t("historyEs")}
+          <textarea required value={f.historyEs} onChange={set("historyEs")} />
+        </label>
+        <label className="field">
+          {t("historyEn")}
+          <textarea required value={f.historyEn} onChange={set("historyEn")} />
+        </label>
+        <label className="field">
+          {t("patronagesEs")}
+          <textarea value={f.patronagesEs} onChange={set("patronagesEs")} />
+        </label>
+        <label className="field">
+          {t("patronagesEn")}
+          <textarea value={f.patronagesEn} onChange={set("patronagesEn")} />
+        </label>
+        <label className="field">
+          {t("saintPrayerEs")}
+          <textarea value={f.prayerEs} onChange={set("prayerEs")} />
+        </label>
+        <label className="field">
+          {t("saintPrayerEn")}
+          <textarea value={f.prayerEn} onChange={set("prayerEn")} />
+        </label>
       </div>
       {save.isError && <p className="error">{t("genericError")}</p>}
       <div className="form-actions">
-        <button className="btn btn-primary" type="submit" disabled={save.isPending}>{t("save")}</button>
-        <button className="btn" type="button" onClick={onDone}>{t("cancel")}</button>
+        <button className="btn btn-primary" type="submit" disabled={save.isPending}>
+          {t("save")}
+        </button>
+        <button className="btn" type="button" onClick={onDone}>
+          {t("cancel")}
+        </button>
       </div>
     </form>
   );
@@ -131,7 +162,9 @@ export function Saints() {
           <div className="page-sub">{t("saintsSub")}</div>
         </div>
         {!editing && (
-          <button className="btn btn-primary" type="button" onClick={() => setEditing("new")}>{t("newSaint")}</button>
+          <button className="btn btn-primary" type="button" onClick={() => setEditing("new")}>
+            {t("newSaint")}
+          </button>
         )}
       </div>
       {editing && (
@@ -146,7 +179,11 @@ export function Saints() {
           />
         </div>
       )}
-      {inUse && <div className="notice" style={{ marginBottom: 14 }}>{t("saintInUse", { name: inUse })}</div>}
+      {inUse && (
+        <div className="notice" style={{ marginBottom: 14 }}>
+          {t("saintInUse", { name: inUse })}
+        </div>
+      )}
       <section className="card">
         {isLoading && <p className="muted">{t("loading")}</p>}
         {data && (
@@ -163,7 +200,9 @@ export function Saints() {
             <tbody>
               {data.map((s) => (
                 <tr key={s.id} style={s.deletedAt ? { opacity: 0.55 } : undefined}>
-                  <td><img className="thumb" src={s.imageUrl} alt="" /></td>
+                  <td>
+                    <img className="thumb" src={s.imageUrl} alt="" />
+                  </td>
                   <td>
                     <strong>{s.name}</strong>
                     <div className="muted">
@@ -178,7 +217,9 @@ export function Saints() {
                   </td>
                   <td className="num">
                     <div className="row" style={{ justifyContent: "flex-end" }}>
-                      <button className="btn" type="button" onClick={() => setEditing(s)}>{t("edit")}</button>
+                      <button className="btn" type="button" onClick={() => setEditing(s)}>
+                        {t("edit")}
+                      </button>
                       <button className="btn" type="button" disabled={toggle.isPending} onClick={() => toggle.mutate(s)}>
                         {s.deletedAt ? t("restore") : t("hide")}
                       </button>

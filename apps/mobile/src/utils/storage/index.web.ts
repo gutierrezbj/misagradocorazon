@@ -10,10 +10,7 @@ import { AssertNoExtras, StorageBase, StorageItemValue } from "./storage-base";
 
 export class Storage extends StorageBase {
   // General KV — backed by AsyncStorage (its built-in web shim uses IndexedDB).
-  async getItem<Fallback extends StorageItemValue>(
-    key: string,
-    fallback: Fallback,
-  ): Promise<Fallback | null> {
+  async getItem<Fallback extends StorageItemValue>(key: string, fallback: Fallback): Promise<Fallback | null> {
     try {
       const raw = await AsyncStorage.getItem(key);
       return this.retrieve(raw, fallback);
@@ -23,10 +20,7 @@ export class Storage extends StorageBase {
     }
   }
 
-  async setItem<Value extends StorageItemValue>(
-    key: string,
-    value: Value,
-  ): Promise<boolean> {
+  async setItem<Value extends StorageItemValue>(key: string, value: Value): Promise<boolean> {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));
       return true;
@@ -47,17 +41,11 @@ export class Storage extends StorageBase {
   }
 
   // Browsers have no Keychain — secure* helpers fall through to AsyncStorage.
-  async secureGet<Fallback extends StorageItemValue>(
-    key: string,
-    fallback: Fallback,
-  ): Promise<Fallback | null> {
+  async secureGet<Fallback extends StorageItemValue>(key: string, fallback: Fallback): Promise<Fallback | null> {
     return this.getItem(key, fallback);
   }
 
-  async secureSet<Value extends StorageItemValue>(
-    key: string,
-    value: Value,
-  ): Promise<boolean> {
+  async secureSet<Value extends StorageItemValue>(key: string, value: Value): Promise<boolean> {
     return this.setItem(key, value);
   }
 

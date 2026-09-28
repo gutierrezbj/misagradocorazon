@@ -66,7 +66,9 @@ export function Masses() {
                       {m.status === "ended" && <RecordingField mass={m} />}
                       {m.status !== "ended" && (
                         <div className="row" style={{ marginTop: 8 }}>
-                          <button className="btn" type="button" onClick={() => setEditing(m)}>{t("edit")}</button>
+                          <button className="btn" type="button" onClick={() => setEditing(m)}>
+                            {t("edit")}
+                          </button>
                           {m.status === "scheduled" &&
                             (confirmDelete === m.id ? (
                               <>
@@ -74,10 +76,14 @@ export function Masses() {
                                 <button className="btn btn-primary" type="button" disabled={remove.isPending} onClick={() => remove.mutate(m.id)}>
                                   {t("deleteMass")}
                                 </button>
-                                <button className="btn" type="button" onClick={() => setConfirmDelete(null)}>{t("cancel")}</button>
+                                <button className="btn" type="button" onClick={() => setConfirmDelete(null)}>
+                                  {t("cancel")}
+                                </button>
                               </>
                             ) : (
-                              <button className="btn btn-quiet" type="button" onClick={() => setConfirmDelete(m.id)}>{t("deleteMass")}</button>
+                              <button className="btn btn-quiet" type="button" onClick={() => setConfirmDelete(m.id)}>
+                                {t("deleteMass")}
+                              </button>
                             ))}
                         </div>
                       )}
@@ -131,18 +137,39 @@ function MassForm({ mass, onDone }: { mass: Mass | null; onDone: () => void }) {
       }}
     >
       <h2>{mass ? t("editMass") : t("newMass")}</h2>
-      <label className="field">{t("titleEs")}<input required value={f.titleEs} onChange={(e) => setF({ ...f, titleEs: e.target.value })} /></label>
-      <label className="field">{t("titleEn")}<input required value={f.titleEn} onChange={(e) => setF({ ...f, titleEn: e.target.value })} /></label>
-      <label className="field">{t("youtubeUrl")}<input type="url" required value={f.youtubeUrl} onChange={(e) => setF({ ...f, youtubeUrl: e.target.value })} /></label>
-      <label className="field">{t("scheduledAt")}<input type="datetime-local" required value={f.scheduledAt} onChange={(e) => setF({ ...f, scheduledAt: e.target.value })} /></label>
-      <label className="field">{t("duration")}<input type="number" min="15" max="480" required value={f.durationMin} onChange={(e) => setF({ ...f, durationMin: e.target.value })} /></label>
+      <label className="field">
+        {t("titleEs")}
+        <input required value={f.titleEs} onChange={(e) => setF({ ...f, titleEs: e.target.value })} />
+      </label>
+      <label className="field">
+        {t("titleEn")}
+        <input required value={f.titleEn} onChange={(e) => setF({ ...f, titleEn: e.target.value })} />
+      </label>
+      <label className="field">
+        {t("youtubeUrl")}
+        <input type="url" required value={f.youtubeUrl} onChange={(e) => setF({ ...f, youtubeUrl: e.target.value })} />
+      </label>
+      <label className="field">
+        {t("scheduledAt")}
+        <input type="datetime-local" required value={f.scheduledAt} onChange={(e) => setF({ ...f, scheduledAt: e.target.value })} />
+      </label>
+      <label className="field">
+        {t("duration")}
+        <input type="number" min="15" max="480" required value={f.durationMin} onChange={(e) => setF({ ...f, durationMin: e.target.value })} />
+      </label>
       <label className="row" style={{ fontSize: 15 }}>
         <input type="checkbox" checked={f.isSpecial} onChange={(e) => setF({ ...f, isSpecial: e.target.checked })} /> {t("special")}
       </label>
       {save.isError && <p className="error">{t("genericError")}</p>}
       <div className="row">
-        <button className="btn btn-primary" type="submit" disabled={save.isPending}>{t("save")}</button>
-        {mass && <button className="btn" type="button" onClick={onDone}>{t("cancel")}</button>}
+        <button className="btn btn-primary" type="submit" disabled={save.isPending}>
+          {t("save")}
+        </button>
+        {mass && (
+          <button className="btn" type="button" onClick={onDone}>
+            {t("cancel")}
+          </button>
+        )}
       </div>
     </form>
   );
@@ -175,8 +202,16 @@ function RecordingField({ mass }: { mass: Mass }) {
       <button className="btn" type="submit" disabled={!changed || save.isPending} style={{ alignSelf: "flex-end" }}>
         {t("save")}
       </button>
-      {save.isSuccess && !changed && <span className="muted" style={{ alignSelf: "flex-end" }}>{t("saved")}</span>}
-      {save.isError && <span className="error" style={{ alignSelf: "flex-end" }}>{t("genericError")}</span>}
+      {save.isSuccess && !changed && (
+        <span className="muted" style={{ alignSelf: "flex-end" }}>
+          {t("saved")}
+        </span>
+      )}
+      {save.isError && (
+        <span className="error" style={{ alignSelf: "flex-end" }}>
+          {t("genericError")}
+        </span>
+      )}
     </form>
   );
 }

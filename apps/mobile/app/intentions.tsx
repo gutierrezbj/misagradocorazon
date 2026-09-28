@@ -73,8 +73,17 @@ export default function Intentions() {
           maxLength={MAX}
           style={styles.input}
         />
-        <Text style={styles.counter}>{text.length}/{MAX}</Text>
-        <AppButton testID="add-private-intention" label={t("addIntention")} icon="plus" onPress={() => add.mutate(text.trim())} loading={add.isPending} disabled={!text.trim()} />
+        <Text style={styles.counter}>
+          {text.length}/{MAX}
+        </Text>
+        <AppButton
+          testID="add-private-intention"
+          label={t("addIntention")}
+          icon="plus"
+          onPress={() => add.mutate(text.trim())}
+          loading={add.isPending}
+          disabled={!text.trim()}
+        />
 
         <View style={{ height: spacing.lg }} />
         {isLoading && <ActivityIndicator color={colors.brand} />}
@@ -95,7 +104,13 @@ export default function Intentions() {
                 </Pressable>
               </View>
             ) : (
-              <Pressable testID="delete-private-intention" onPress={() => setConfirming(i.id)} accessibilityRole="button" accessibilityLabel={t("delete")} style={styles.trash}>
+              <Pressable
+                testID="delete-private-intention"
+                onPress={() => setConfirming(i.id)}
+                accessibilityRole="button"
+                accessibilityLabel={t("delete")}
+                style={styles.trash}
+              >
                 <Icon name="trash-2" size={18} color={colors.muted} />
               </Pressable>
             )}
@@ -108,15 +123,50 @@ export default function Intentions() {
 
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
-  header: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: spacing.md, paddingBottom: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: c.divider,
+  },
   back: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
   headerTitle: { fontFamily: fonts.displaySemibold, fontSize: 20, color: c.onSurface },
-  privacy: { flexDirection: "row", gap: spacing.sm, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.md },
+  privacy: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    backgroundColor: c.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
   privacyText: { flex: 1, fontFamily: fonts.body, fontSize: 16, lineHeight: 22, color: c.onSurfaceSecondary },
-  input: { minHeight: 110, borderWidth: 1, borderColor: c.border, borderRadius: radius.md, padding: spacing.md, fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: c.onSurface, backgroundColor: c.surfaceSecondary, textAlignVertical: "top" },
+  input: {
+    minHeight: 110,
+    borderWidth: 1,
+    borderColor: c.border,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    fontFamily: fonts.body,
+    fontSize: 16,
+    lineHeight: 24,
+    color: c.onSurface,
+    backgroundColor: c.surfaceSecondary,
+    textAlignVertical: "top",
+  },
   counter: { alignSelf: "flex-end", fontFamily: fonts.body, fontSize: 14, color: c.muted, marginVertical: spacing.xs },
   empty: { fontFamily: fonts.body, fontSize: 16, color: c.muted, textAlign: "center", marginTop: spacing.lg },
-  item: { flexDirection: "row", alignItems: "flex-start", gap: spacing.sm, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
+  item: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+    backgroundColor: c.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
   itemText: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: c.onSurface },
   itemDate: { fontFamily: fonts.body, fontSize: 14, color: c.muted, marginTop: 4 },
   trash: { width: 40, height: 40, alignItems: "center", justifyContent: "center" },

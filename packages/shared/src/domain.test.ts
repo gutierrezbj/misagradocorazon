@@ -2,7 +2,16 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 
 import { budgetTotalCents, CANDLE_TYPES, easterSunday, impactCents, isVotingOpen, liturgicalSeason } from "./domain.ts";
-import { causeInputSchema, causeUpdateSchema, dailyContentInputSchema, lightCandleSchema, massUpdateSchema, onboardingSchema, profileUpdateSchema, saintUpdateSchema } from "./schemas.ts";
+import {
+  causeInputSchema,
+  causeUpdateSchema,
+  dailyContentInputSchema,
+  lightCandleSchema,
+  massUpdateSchema,
+  onboardingSchema,
+  profileUpdateSchema,
+  saintUpdateSchema,
+} from "./schemas.ts";
 import { scrubEvent } from "./sentry.ts";
 
 test("el 20 % de cada tier de vela se calcula en céntimos", () => {

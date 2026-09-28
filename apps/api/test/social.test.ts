@@ -50,7 +50,11 @@ function sign(claims: Claims, iss: string, aud: string) {
 }
 
 const googleToken = (claims: Partial<Claims> = {}, aud = GOOGLE_AUD) =>
-  sign({ sub: randomUUID(), email: `g_${randomUUID()}@gmail.com`, email_verified: true, name: "María Guadalupe", ...claims }, "https://accounts.google.com", aud);
+  sign(
+    { sub: randomUUID(), email: `g_${randomUUID()}@gmail.com`, email_verified: true, name: "María Guadalupe", ...claims },
+    "https://accounts.google.com",
+    aud,
+  );
 
 const appleToken = (claims: Partial<Claims> = {}) =>
   sign({ sub: randomUUID(), email: `${randomUUID()}@privaterelay.appleid.com`, email_verified: "true", ...claims }, "https://appleid.apple.com", APPLE_AUD);
@@ -96,7 +100,9 @@ describe("login con Google (ID token nativo)", () => {
     const first = await social({ provider: "google", idToken: { token: await googleToken({ sub, email }) } });
     await prisma.user.update({ where: { id: first.body.user.id }, data: { blocked: true } });
     const again = await social({ provider: "google", idToken: { token: await googleToken({ sub, email }) } });
-    const me = await request(app).get("/api/me").set(bearer(String(again.headers["set-auth-token"])));
+    const me = await request(app)
+      .get("/api/me")
+      .set(bearer(String(again.headers["set-auth-token"])));
     expect(me.status).toBe(403);
   });
 });
@@ -110,7 +116,9 @@ describe("login con Apple (ID token nativo, iOS)", () => {
       idToken: { token: await appleToken({ nonce: hashed }), nonce, user: { name: { firstName: "José", lastName: "López" } } },
     });
     expect(res.status).toBe(200);
-    const me = await request(app).get("/api/me").set(bearer(String(res.headers["set-auth-token"])));
+    const me = await request(app)
+      .get("/api/me")
+      .set(bearer(String(res.headers["set-auth-token"])));
     expect(me.body.data.name).toBe("José López");
   });
 

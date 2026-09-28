@@ -33,8 +33,7 @@ export function Audit() {
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   });
   const entries = q.data?.pages.flatMap((p) => p.entries) ?? [];
-  const fmt = (iso: string) =>
-    new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
+  const fmt = (iso: string) => new Intl.DateTimeFormat(lang === "en" ? "en-US" : "es-MX", { dateStyle: "medium", timeStyle: "short" }).format(new Date(iso));
   const actionLabel = (a: string) => {
     const key = `audit_${a}` as I18nKey;
     try {
@@ -95,9 +94,13 @@ export function Audit() {
                   </td>
                   <td>
                     {actionLabel(e.action)}
-                    <div className="muted" style={{ wordBreak: "break-all" }}>{e.entityId}</div>
+                    <div className="muted" style={{ wordBreak: "break-all" }}>
+                      {e.entityId}
+                    </div>
                   </td>
-                  <td className="muted" style={{ wordBreak: "break-word" }}>{detail(e.data)}</td>
+                  <td className="muted" style={{ wordBreak: "break-word" }}>
+                    {detail(e.data)}
+                  </td>
                 </tr>
               ))}
             </tbody>

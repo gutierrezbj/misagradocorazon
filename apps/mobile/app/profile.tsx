@@ -75,9 +75,7 @@ export default function Profile() {
               <Icon name="feather" size={18} color={colors.brandSecondary} />
               <View style={{ flex: 1 }}>
                 <Text style={styles.historySaint}>{c.saint.name}</Text>
-                <Text style={styles.historyIntention}>
-                  {c.intention}
-                </Text>
+                <Text style={styles.historyIntention}>{c.intention}</Text>
               </View>
               <Text style={styles.historyPrice}>${(c.priceCents / 100).toFixed(2)}</Text>
             </View>
@@ -117,16 +115,47 @@ function MenuRow({ icon, label, onPress, testID, danger }: any) {
 
 const useStyles = makeStyles((c) => ({
   root: { flex: 1, backgroundColor: c.surface },
-  header: { backgroundColor: c.altarBg, alignItems: "center", paddingBottom: spacing.lg, borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl },
+  header: {
+    backgroundColor: c.altarBg,
+    alignItems: "center",
+    paddingBottom: spacing.lg,
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
+  },
   back: { position: "absolute", left: spacing.md, top: spacing.md, width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center" },
-  avatar: { width: 80, height: 80, borderRadius: 40, backgroundColor: c.altarCard, borderWidth: 2, borderColor: c.gold, alignItems: "center", justifyContent: "center", marginTop: spacing.md },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: c.altarCard,
+    borderWidth: 2,
+    borderColor: c.gold,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: spacing.md,
+  },
   name: { fontFamily: fonts.displayBold, fontSize: 26, color: c.onAltar, marginTop: spacing.sm },
   email: { fontFamily: fonts.body, fontSize: 14, color: c.onAltarMuted },
-  statsRow: { flexDirection: "row", justifyContent: "space-around", backgroundColor: c.surfaceSecondary, borderRadius: radius.lg, padding: spacing.md, marginBottom: spacing.md },
+  statsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: c.surfaceSecondary,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
   stat: { alignItems: "center" },
   statValue: { fontFamily: fonts.displayBold, fontSize: 28, color: c.brand },
   statLabel: { fontFamily: fonts.body, fontSize: 14, color: c.muted, textTransform: "uppercase" },
-  patronCard: { flexDirection: "row", alignItems: "center", gap: spacing.md, backgroundColor: c.surfaceSecondary, borderRadius: radius.lg, padding: spacing.sm, marginBottom: spacing.md },
+  patronCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: c.surfaceSecondary,
+    borderRadius: radius.lg,
+    padding: spacing.sm,
+    marginBottom: spacing.md,
+  },
   patronImg: { width: 56, height: 56, borderRadius: radius.md, backgroundColor: c.surfaceTertiary },
   patronLabel: { fontFamily: fonts.body, fontSize: 14, color: c.muted, textTransform: "uppercase" },
   patronName: { fontFamily: fonts.displaySemibold, fontSize: 19, color: c.onSurface },
@@ -136,6 +165,14 @@ const useStyles = makeStyles((c) => ({
   historySaint: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
   historyIntention: { fontFamily: fonts.body, fontSize: 14, color: c.muted },
   historyPrice: { fontFamily: fonts.displayBold, fontSize: 16, color: c.brandSecondary },
-  menuRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.sm },
+  menuRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: c.surfaceSecondary,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
   menuLabel: { flex: 1, fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
 }));

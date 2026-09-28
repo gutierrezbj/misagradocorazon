@@ -40,7 +40,9 @@ async function userFromToken(token: unknown): Promise<SocketUser | null> {
 }
 
 export function attachChat(httpServer: HttpServer): Server {
-  const origins = env.TRUSTED_ORIGINS.split(",").map((o) => o.trim()).filter(Boolean);
+  const origins = env.TRUSTED_ORIGINS.split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
   io = new Server(httpServer, { cors: { origin: origins }, serveClient: false });
 
   // Se resuelve la sesión antes de "connection" para no perder eventos enviados nada más conectar.

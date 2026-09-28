@@ -24,8 +24,7 @@ type BtnProps = {
 export function AppButton({ label, onPress, variant = "primary", loading, disabled, icon, testID, full = true }: BtnProps) {
   const { colors } = useTheme();
   const styles = useButtonStyles();
-  const bg =
-    variant === "primary" ? colors.brandPrimary : variant === "gold" ? colors.brandSecondary : "transparent";
+  const bg = variant === "primary" ? colors.brandPrimary : variant === "gold" ? colors.brandSecondary : "transparent";
   const fg =
     variant === "primary"
       ? colors.onBrandPrimary
@@ -120,12 +119,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     <ToastCtx.Provider value={show}>
       {children}
       {toast && (
-        <Animated.View
-          entering={FadeInUp}
-          exiting={FadeOutUp}
-          pointerEvents="none"
-          style={[toastStyles.toast, { backgroundColor: bg }]}
-        >
+        <Animated.View entering={FadeInUp} exiting={FadeOutUp} pointerEvents="none" style={[toastStyles.toast, { backgroundColor: bg }]}>
           <Text style={toastStyles.text}>{toast.message}</Text>
         </Animated.View>
       )}

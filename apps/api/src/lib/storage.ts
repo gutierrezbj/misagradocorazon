@@ -33,11 +33,10 @@ export async function createUpload(req: UploadRequest) {
   const month = new Date().toISOString().slice(0, 7);
   const key = `${req.kind}/${month}/${randomUUID()}.${ext}`;
   // El tipo y el tamaño van firmados: R2 rechaza una subida que no coincida.
-  const uploadUrl = await getSignedUrl(
-    r2(),
-    new PutObjectCommand({ Bucket: env.R2_BUCKET, Key: key, ContentType: req.contentType, ContentLength: req.size }),
-    { expiresIn: UPLOAD_TTL_SECONDS, signableHeaders: new Set(["content-type", "content-length"]) },
-  );
+  const uploadUrl = await getSignedUrl(r2(), new PutObjectCommand({ Bucket: env.R2_BUCKET, Key: key, ContentType: req.contentType, ContentLength: req.size }), {
+    expiresIn: UPLOAD_TTL_SECONDS,
+    signableHeaders: new Set(["content-type", "content-length"]),
+  });
   const publicUrl = `${env.R2_PUBLIC_BASE_URL!.replace(/\/$/, "")}/${key}`;
   return { key, uploadUrl, publicUrl, headers: { "Content-Type": req.contentType }, expiresIn: UPLOAD_TTL_SECONDS };
 }

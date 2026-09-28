@@ -59,8 +59,22 @@ describe("santoral", () => {
 
   it("valida fecha y URLs", async () => {
     const ed = await signUpAs("editor");
-    expect((await request(app).post("/api/admin/saints").set(bearer(ed.token)).send({ ...saint, feastDate: "13-40" })).status).toBe(400);
-    expect((await request(app).post("/api/admin/saints").set(bearer(ed.token)).send({ ...saint, imageUrl: "javascript:alert(1)" })).status).toBe(400);
+    expect(
+      (
+        await request(app)
+          .post("/api/admin/saints")
+          .set(bearer(ed.token))
+          .send({ ...saint, feastDate: "13-40" })
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await request(app)
+          .post("/api/admin/saints")
+          .set(bearer(ed.token))
+          .send({ ...saint, imageUrl: "javascript:alert(1)" })
+      ).status,
+    ).toBe(400);
   });
 
   it("no da de baja un santo en uso; la baja lo oculta y se puede deshacer", async () => {
@@ -87,7 +101,10 @@ describe("contenido diario", () => {
       .set(bearer(ed.token))
       .send({ ...daily, saintOfDayId: "saint_guadalupe", morningAudioUrlEs: "https://media.example/m-es.mp3" });
     expect(put.status).toBe(200);
-    const upd = await request(app).put("/api/admin/daily/2026-12-12").set(bearer(ed.token)).send({ ...daily, gospelRef: "Lc 1, 39-48" });
+    const upd = await request(app)
+      .put("/api/admin/daily/2026-12-12")
+      .set(bearer(ed.token))
+      .send({ ...daily, gospelRef: "Lc 1, 39-48" });
     expect(upd.status).toBe(200);
 
     const pub = await request(app).get("/api/daily?date=2026-12-12");
@@ -100,7 +117,10 @@ describe("contenido diario", () => {
 
   it("el calendario marca los días listos y los huecos", async () => {
     const ed = await signUpAs("editor");
-    await request(app).put("/api/admin/daily/2026-12-02").set(bearer(ed.token)).send({ ...daily, nightAudioUrlEn: "https://media.example/n-en.mp3" });
+    await request(app)
+      .put("/api/admin/daily/2026-12-02")
+      .set(bearer(ed.token))
+      .send({ ...daily, nightAudioUrlEn: "https://media.example/n-en.mp3" });
     const cal = await request(app).get("/api/admin/daily?from=2026-12-01&days=3").set(bearer(ed.token));
     expect(cal.body.data.map((d: { date: string; filled: boolean }) => [d.date, d.filled])).toEqual([
       ["2026-12-01", false],
@@ -113,9 +133,23 @@ describe("contenido diario", () => {
   it("rechaza santos dados de baja, fechas inválidas y textos vacíos", async () => {
     const ed = await signUpAs("editor");
     await prisma.saint.update({ where: { id: "saint_teresa" }, data: { deletedAt: new Date() } });
-    expect((await request(app).put("/api/admin/daily/2026-12-01").set(bearer(ed.token)).send({ ...daily, saintOfDayId: "saint_teresa" })).status).toBe(400);
+    expect(
+      (
+        await request(app)
+          .put("/api/admin/daily/2026-12-01")
+          .set(bearer(ed.token))
+          .send({ ...daily, saintOfDayId: "saint_teresa" })
+      ).status,
+    ).toBe(400);
     expect((await request(app).put("/api/admin/daily/2026-13-01").set(bearer(ed.token)).send(daily)).status).toBe(400);
-    expect((await request(app).put("/api/admin/daily/2026-12-01").set(bearer(ed.token)).send({ ...daily, gospelEs: "" })).status).toBe(400);
+    expect(
+      (
+        await request(app)
+          .put("/api/admin/daily/2026-12-01")
+          .set(bearer(ed.token))
+          .send({ ...daily, gospelEs: "" })
+      ).status,
+    ).toBe(400);
   });
 });
 
@@ -125,7 +159,11 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
 
   it("un día sin oración propia sirve la de su tiempo, con su audio; sin set del tiempo, la del ordinario", async () => {
     const ed = await signUpAs("editor");
-    await request(app).put("/api/admin/seasonal-prayers/advent/morning").set(bearer(ed.token)).send(set("Ven, Señor Jesús", "https://media.example/adv-es.mp3")).expect(200);
+    await request(app)
+      .put("/api/admin/seasonal-prayers/advent/morning")
+      .set(bearer(ed.token))
+      .send(set("Ven, Señor Jesús", "https://media.example/adv-es.mp3"))
+      .expect(200);
     await request(app).put("/api/admin/seasonal-prayers/ordinary/morning").set(bearer(ed.token)).send(set("Buenos días, Señor")).expect(200);
     await request(app).put("/api/admin/seasonal-prayers/ordinary/night").set(bearer(ed.token)).send(set("Buenas noches, Señor")).expect(200);
     for (const date of ["2026-12-01", "2026-12-26", "2026-10-01"]) {
@@ -134,7 +172,12 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
 
     const advent = (await request(app).get("/api/daily?date=2026-12-01")).body.data;
     expect(advent.season).toBe("advent");
-    expect(advent.morningPrayer).toEqual({ es: "Ven, Señor Jesús", en: "Ven, Señor Jesús (en)", audioUrl: { es: "https://media.example/adv-es.mp3", en: null }, source: "season" });
+    expect(advent.morningPrayer).toEqual({
+      es: "Ven, Señor Jesús",
+      en: "Ven, Señor Jesús (en)",
+      audioUrl: { es: "https://media.example/adv-es.mp3", en: null },
+      source: "season",
+    });
     // Adviento no tiene oración de noche: se usa la del tiempo ordinario.
     expect(advent.nightPrayer.es).toBe("Buenas noches, Señor");
 
@@ -146,7 +189,11 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
 
   it("la oración propia del día manda sobre la del tiempo, con su propio audio", async () => {
     const ed = await signUpAs("editor");
-    await request(app).put("/api/admin/seasonal-prayers/advent/night").set(bearer(ed.token)).send(set("Maranatha", "https://media.example/adv.mp3")).expect(200);
+    await request(app)
+      .put("/api/admin/seasonal-prayers/advent/night")
+      .set(bearer(ed.token))
+      .send(set("Maranatha", "https://media.example/adv.mp3"))
+      .expect(200);
     await request(app)
       .put("/api/admin/daily/2026-12-08")
       .set(bearer(ed.token))
@@ -167,7 +214,11 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
   it("el calendario del panel dice el tiempo de cada día y de dónde sale la oración", async () => {
     const ed = await signUpAs("editor");
     await request(app).put("/api/admin/seasonal-prayers/advent/morning").set(bearer(ed.token)).send(set("Ven", "https://media.example/a.mp3")).expect(200);
-    await request(app).put("/api/admin/daily/2026-11-29").set(bearer(ed.token)).send({ ...bare, nightPrayerEs: "n", nightPrayerEn: "n" }).expect(200);
+    await request(app)
+      .put("/api/admin/daily/2026-11-29")
+      .set(bearer(ed.token))
+      .send({ ...bare, nightPrayerEs: "n", nightPrayerEn: "n" })
+      .expect(200);
     const cal = (await request(app).get("/api/admin/daily?from=2026-11-28&days=2").set(bearer(ed.token))).body.data;
     expect(cal[0]).toMatchObject({ date: "2026-11-28", season: "ordinary", filled: false });
     expect(cal[1]).toMatchObject({
@@ -187,7 +238,14 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
     expect((await request(app).put("/api/admin/seasonal-prayers/pentecost/morning").set(bearer(ed.token)).send(set("x"))).status).toBe(400);
     expect((await request(app).put("/api/admin/seasonal-prayers/lent/noon").set(bearer(ed.token)).send(set("x"))).status).toBe(400);
     expect((await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send({ textEs: "x" })).status).toBe(400);
-    expect((await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send({ ...set("x"), audioUrlEs: "javascript:alert(1)" })).status).toBe(400);
+    expect(
+      (
+        await request(app)
+          .put("/api/admin/seasonal-prayers/lent/morning")
+          .set(bearer(ed.token))
+          .send({ ...set("x"), audioUrlEs: "javascript:alert(1)" })
+      ).status,
+    ).toBe(400);
 
     await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send(set("Misericordia")).expect(200);
     await request(app).put("/api/admin/seasonal-prayers/lent/morning").set(bearer(ed.token)).send(set("Perdón")).expect(200);
@@ -238,7 +296,10 @@ describe("subidas a R2", () => {
     const ed = await signUpAs("editor");
     const exe = await request(app).post("/api/admin/uploads").set(bearer(ed.token)).send({ kind: "image", contentType: "application/x-msdownload", size: 10 });
     expect(exe.status).toBe(400);
-    const big = await request(app).post("/api/admin/uploads").set(bearer(ed.token)).send({ kind: "image", contentType: "image/jpeg", size: 6 * 1024 * 1024 });
+    const big = await request(app)
+      .post("/api/admin/uploads")
+      .set(bearer(ed.token))
+      .send({ kind: "image", contentType: "image/jpeg", size: 6 * 1024 * 1024 });
     expect(big.status).toBe(400);
   });
 });

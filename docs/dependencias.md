@@ -84,3 +84,7 @@ Desarrollo: jest 29 con jest-expo y @testing-library/react-native, eslint con es
 ## Compartido (`packages/shared`)
 
 Solo zod 4.1.12: constantes de dominio (precios, duraciones, ventana de votación), esquemas de validación y el filtro de datos de Sentry.
+
+## Raíz del monorepo
+
+Solo prettier 3.8.1 (desarrollo): formato del código según SDD-06, con ancho de línea 160 (`.prettierrc.json`). El CI lo comprueba con `pnpm format:check`. La documentación, los JSON y el código generado quedan fuera (`.prettierignore`).

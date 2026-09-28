@@ -1,0 +1,15 @@
+# Generado o de terceros: no se formatea a mano.
+**/generated/**
+**/node_modules/**
+**/dist/**
+**/.expo/**
+**/coverage/**
+pnpm-lock.yaml
+apps/api/prisma/migrations/**
+# Documentación y datos: fuera del alcance del formato de código.
+docs/**
+**/*.md
+**/*.json
+**/*.yml
+**/*.yaml
+**/*.html

@@ -9,7 +9,7 @@
 //             tokens/secrets -> secureGet/secureSet/secureRemove (Keychain).
 // Values are auto JSON-serialized (string|number|boolean|null) in this implementation — never JSON.stringify/parse yourself.
 // Helpers NEVER throw: a miss returns `fallback`, a failed write returns `false` (failures are SILENT).
-// 
+//
 // Use async/await for all storage operations.
 //
 // AUTH TOKENS: use ONE namespace (secure*) + ONE shared key constant, and read/write it the SAME
@@ -25,10 +25,7 @@ import { AssertNoExtras, StorageBase, StorageItemValue } from "./storage-base";
 export class Storage extends StorageBase {
   // General KV — backed by AsyncStorage.
   // `fallback` is required and returned on any miss/parse error — a missing key looks identical to a stored `null`.
-  async getItem<Fallback extends StorageItemValue>(
-    key: string,
-    fallback: Fallback,
-  ): Promise<Fallback | null> {
+  async getItem<Fallback extends StorageItemValue>(key: string, fallback: Fallback): Promise<Fallback | null> {
     try {
       const raw = await AsyncStorage.getItem(key);
       return this.retrieve(raw, fallback);
@@ -38,10 +35,7 @@ export class Storage extends StorageBase {
     }
   }
 
-  async setItem<Value extends StorageItemValue>(
-    key: string,
-    value: Value,
-  ): Promise<boolean> {
+  async setItem<Value extends StorageItemValue>(key: string, value: Value): Promise<boolean> {
     try {
       await AsyncStorage.setItem(key, JSON.stringify(value));
       return true;
@@ -63,10 +57,7 @@ export class Storage extends StorageBase {
 
   // Sensitive values — Keychain (iOS) / EncryptedSharedPreferences (Android).
   // Use these (not getItem) for auth tokens; whatever writes with secureSet must read with secureGet under the same key.
-  async secureGet<Fallback extends StorageItemValue>(
-    key: string,
-    fallback: Fallback,
-  ): Promise<Fallback | null> {
+  async secureGet<Fallback extends StorageItemValue>(key: string, fallback: Fallback): Promise<Fallback | null> {
     try {
       const raw = await SecureStore.getItemAsync(key);
       return this.retrieve(raw, fallback);
@@ -76,10 +67,7 @@ export class Storage extends StorageBase {
     }
   }
 
-  async secureSet<Value extends StorageItemValue>(
-    key: string,
-    value: Value,
-  ): Promise<boolean> {
+  async secureSet<Value extends StorageItemValue>(key: string, value: Value): Promise<boolean> {
     try {
       await SecureStore.setItemAsync(key, JSON.stringify(value));
       return true;
