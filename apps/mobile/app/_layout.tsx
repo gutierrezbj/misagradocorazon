@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ErrorBoundary } from "@/src/components/error-boundary";
 import { queryClient } from "@/src/query-client";
 import { AuthProvider, useAuth } from "@/src/auth";
+import { AudioProvider } from "@/src/audio";
 import { registerForPush, usePushNavigation } from "@/src/push";
 import { OfflineBanner, useQueryOnlineSync } from "@/src/network";
 import { trackScreen } from "@/src/analytics";
@@ -103,12 +104,14 @@ export default function RootLayout() {
           <QueryClientProvider client={queryClient}>
             <I18nProvider>
               <AuthProvider>
-                <ToastProvider>
-                  <KeyboardProvider>
-                    <Gate />
-                    <OfflineBanner />
-                  </KeyboardProvider>
-                </ToastProvider>
+                <AudioProvider>
+                  <ToastProvider>
+                    <KeyboardProvider>
+                      <Gate />
+                      <OfflineBanner />
+                    </KeyboardProvider>
+                  </ToastProvider>
+                </AudioProvider>
               </AuthProvider>
             </I18nProvider>
           </QueryClientProvider>

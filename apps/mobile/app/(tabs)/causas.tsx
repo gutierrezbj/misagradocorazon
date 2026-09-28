@@ -14,6 +14,7 @@ import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
+import { useMiniPlayerInset } from "@/src/audio-state";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
 import { formatUsd } from "@/src/money";
@@ -25,7 +26,7 @@ export default function Causas() {
   const router = useRouter();
   const { t, loc, lang } = useI18n();
   const toast = useToast();
-  const bottomChrome = usesNativeTabs ? insets.bottom : 0;
+  const bottomChrome = (usesNativeTabs ? insets.bottom : 0) + useMiniPlayerInset(usesNativeTabs);
 
   const { data, isLoading } = useQuery({ queryKey: ["causes", "current"], queryFn: () => api<CurrentCauses>("/causes/current") });
   const { data: transp } = useQuery({ queryKey: ["transparency"], queryFn: () => api<Transparency>("/transparency") });

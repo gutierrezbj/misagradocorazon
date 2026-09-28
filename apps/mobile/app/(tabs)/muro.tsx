@@ -13,6 +13,7 @@ import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Chip, Icon, AppButton, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
+import { useMiniPlayerInset } from "@/src/audio-state";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
 
@@ -31,7 +32,7 @@ export default function Muro() {
   const insets = useSafeAreaInsets();
   const { t } = useI18n();
   const toast = useToast();
-  const bottomChrome = usesNativeTabs ? insets.bottom : 0;
+  const bottomChrome = (usesNativeTabs ? insets.bottom : 0) + useMiniPlayerInset(usesNativeTabs);
 
   const [cat, setCat] = useState("all");
   const [modal, setModal] = useState(false);

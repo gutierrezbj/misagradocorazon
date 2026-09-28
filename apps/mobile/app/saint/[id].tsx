@@ -50,7 +50,7 @@ export default function SaintDetail() {
           <View style={styles.body}>
             {!!saint.audioUrl[lang] && (
               <View style={{ marginBottom: spacing.lg }}>
-                <AudioPlayer url={saint.audioUrl[lang]!} title={saint.name} artworkUrl={saint.imageUrl} analyticsContent="saint" autoPlay={autoplay === "1"} />
+                <AudioPlayer url={saint.audioUrl[lang]!} title={saint.name} artworkUrl={saint.imageUrl} route={`/saint/${saint.id}`} analyticsContent="saint" autoPlay={autoplay === "1"} />
               </View>
             )}
             <Section title={t("history")} text={loc(saint.history)} />

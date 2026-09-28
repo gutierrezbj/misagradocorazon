@@ -63,7 +63,7 @@ export default function Prayer() {
           </View>
           {!!audioUrl && (
             <View style={{ marginBottom: spacing.lg }}>
-              <AudioPlayer url={audioUrl} title={isMorning ? t("morningPrayer") : t("nightPrayer")} analyticsContent={isMorning ? "morning" : "night"} autoPlay={autoplay === "1"} tone="altar" />
+              <AudioPlayer url={audioUrl} title={isMorning ? t("morningPrayer") : t("nightPrayer")} route={`/prayer?kind=${isMorning ? "morning" : "night"}`} analyticsContent={isMorning ? "morning" : "night"} autoPlay={autoplay === "1"} tone="altar" />
             </View>
           )}
           {prayer ? <Text style={styles.prayer}>{loc(prayer)}</Text> : <Text style={styles.unavailable}>{t("prayerUnavailable")}</Text>}
