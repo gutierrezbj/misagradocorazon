@@ -4,7 +4,7 @@ import { Pressable, Text, View } from "react-native";
 import { useRouter, type Href } from "expo-router";
 
 import { track } from "@/src/analytics";
-import { MINI_PLAYER_HEIGHT, useAudio } from "@/src/audio-state";
+import { MINI_PLAYER_HEIGHT, useAudio } from "@/src/ritual/audio-state";
 import { useI18n } from "@/src/i18n";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { Icon } from "@/src/components/ui";

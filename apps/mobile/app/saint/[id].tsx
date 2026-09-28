@@ -11,7 +11,7 @@ import { api } from "@/src/api";
 import type { Saint } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon } from "@/src/components/ui";
-import { AudioPlayer } from "@/src/components/AudioPlayer";
+import { AudioPlayer } from "@/src/ritual/AudioPlayer";
 
 export default function SaintDetail() {
   const styles = useStyles();

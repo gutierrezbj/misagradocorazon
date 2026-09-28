@@ -8,7 +8,7 @@ import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, useToast } from "@/src/components/ui";
-import { CandleFlame } from "@/src/components/CandleFlame";
+import { CandleFlame } from "@/src/ritual/CandleFlame";
 import { ApiError } from "@/src/api";
 import { SocialButtons } from "@/src/components/SocialButtons";
 import type { SocialProvider } from "@/src/social";

@@ -5,10 +5,10 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 
 import { track as trackEvent } from "@/src/analytics";
-import { AudioCtx, type AudioCtxValue, type AudioTrack } from "@/src/audio-state";
+import { AudioCtx, type AudioCtxValue, type AudioTrack } from "@/src/ritual/audio-state";
 import { useAuth } from "@/src/auth";
 
-export { MINI_PLAYER_HEIGHT, useAudio, useMiniPlayerInset, type AudioTrack } from "@/src/audio-state";
+export { MINI_PLAYER_HEIGHT, useAudio, useMiniPlayerInset, type AudioTrack } from "@/src/ritual/audio-state";
 
 // Una sola vez por sesión. "doNotMix" es obligatorio para los controles de la pantalla de bloqueo.
 let audioModeReady: Promise<void> | null = null;

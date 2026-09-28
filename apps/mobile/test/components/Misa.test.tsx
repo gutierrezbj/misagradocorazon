@@ -16,11 +16,11 @@ jest.mock("@/src/api", () => ({
 }));
 // Como el hook real, devuelve siempre el mismo array mientras no llegan mensajes.
 const mockChat = { messages: [], send: jest.fn() };
-jest.mock("@/src/chat", () => ({ useMassChat: () => mockChat }));
+jest.mock("@/src/misa/chat", () => ({ useMassChat: () => mockChat }));
 const mockTrack = jest.fn();
 jest.mock("@/src/analytics", () => ({ track: (...args: unknown[]) => mockTrack(...args) }));
 jest.mock("expo-router", () => ({ useFocusEffect: () => undefined }));
-jest.mock("@/src/components/YouTubeEmbed", () => ({
+jest.mock("@/src/misa/YouTubeEmbed", () => ({
   YouTubeEmbed: ({ videoId }: { videoId: string }) => {
     const { Text: RNText } = jest.requireActual<typeof import("react-native")>("react-native");
     return <RNText testID="youtube">{videoId}</RNText>;

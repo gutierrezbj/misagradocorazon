@@ -10,7 +10,7 @@ import type { Daily } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
-import { AudioPlayer } from "@/src/components/AudioPlayer";
+import { AudioPlayer } from "@/src/ritual/AudioPlayer";
 import { track } from "@/src/analytics";
 
 export default function Prayer() {

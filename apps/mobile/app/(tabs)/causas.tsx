@@ -14,10 +14,10 @@ import { queryClient } from "@/src/query-client";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
-import { useMiniPlayerInset } from "@/src/audio-state";
+import { useMiniPlayerInset } from "@/src/ritual/audio-state";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
-import { formatUsd } from "@/src/money";
+import { formatUsd } from "@/src/causas/money";
 
 export default function Causas() {
   const styles = useStyles();

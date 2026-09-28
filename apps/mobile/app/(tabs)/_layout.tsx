@@ -8,8 +8,8 @@ import Feather from "@react-native-vector-icons/feather";
 import { usesNativeTabs } from "@/src/navigation";
 import { useTheme, fonts } from "@/src/theme";
 import { useI18n } from "@/src/i18n";
-import { useAudio } from "@/src/audio-state";
-import { MiniPlayer } from "@/src/components/MiniPlayer";
+import { useAudio } from "@/src/ritual/audio-state";
+import { MiniPlayer } from "@/src/ritual/MiniPlayer";
 
 // En iOS 26 el mini-player va en el hueco nativo sobre la barra de pestañas, que iOS muestra en
 // dos tamaños (normal y en línea al hacer scroll).

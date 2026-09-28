@@ -4,18 +4,18 @@ import { View, Text, Pressable, FlatList, TextInput, ActivityIndicator, Linking 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { YouTubeEmbed } from "@/src/components/YouTubeEmbed";
+import { YouTubeEmbed } from "@/src/misa/YouTubeEmbed";
 import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api } from "@/src/api";
-import { useMassChat } from "@/src/chat";
+import { useMassChat } from "@/src/misa/chat";
 import type { CommunityCandles, Mass } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { Icon, useToast } from "@/src/components/ui";
 import { usesNativeTabs } from "@/src/navigation";
-import { useMiniPlayerInset } from "@/src/audio-state";
+import { useMiniPlayerInset } from "@/src/ritual/audio-state";
 import { track } from "@/src/analytics";
 
 const HERO = "https://images.unsplash.com/photo-1465848059293-208e11dfea17?crop=entropy&cs=srgb&fm=jpg&q=85&w=1080";

@@ -4,11 +4,11 @@ import { useRef, useState } from "react";
 import { Pressable, ScrollView, Switch, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ShareCard } from "@/src/components/ShareCard";
+import { ShareCard } from "@/src/ritual/ShareCard";
 import { AppButton, useToast } from "@/src/components/ui";
-import type { CandleVariant } from "@/src/components/CandleFlame";
+import type { CandleVariant } from "@/src/ritual/CandleFlame";
 import { useI18n } from "@/src/i18n";
-import { shareCard } from "@/src/share";
+import { shareCard } from "@/src/ritual/share";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { track } from "@/src/analytics";
 

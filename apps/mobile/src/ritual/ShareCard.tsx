@@ -5,9 +5,9 @@ import { forwardRef } from "react";
 import { Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
-import { CandleFlame, type CandleVariant } from "@/src/components/CandleFlame";
+import { CandleFlame, type CandleVariant } from "@/src/ritual/CandleFlame";
 import { useI18n } from "@/src/i18n";
-import { SHARE_URL } from "@/src/share";
+import { SHARE_URL } from "@/src/ritual/share";
 import { fonts } from "@/src/theme";
 
 type Props = { saintName: string; intention?: string; variant: Exclude<CandleVariant, "pillar">; mourning: boolean };

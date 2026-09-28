@@ -3,9 +3,9 @@
 import { beforeEach, expect, jest, test } from "@jest/globals";
 import { fireEvent, render, screen } from "@testing-library/react-native";
 
-import { AudioProvider } from "@/src/audio";
-import { AudioPlayer } from "@/src/components/AudioPlayer";
-import { MiniPlayer } from "@/src/components/MiniPlayer";
+import { AudioProvider } from "@/src/ritual/audio";
+import { AudioPlayer } from "@/src/ritual/AudioPlayer";
+import { MiniPlayer } from "@/src/ritual/MiniPlayer";
 import { I18nProvider } from "@/src/i18n";
 
 const mockStatus = { isLoaded: true, isBuffering: false, playing: false, currentTime: 0, duration: 120 };

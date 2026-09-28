@@ -10,7 +10,7 @@ import { api } from "@/src/api";
 import { useI18n } from "@/src/i18n";
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { Icon } from "@/src/components/ui";
-import { CandleFlame } from "@/src/components/CandleFlame";
+import { CandleFlame } from "@/src/ritual/CandleFlame";
 import type { CommunityCandles, Saint } from "@/src/types";
 
 // Cada llama está animada: se muestran como mucho estas para que el muro vaya fluido en móviles modestos.

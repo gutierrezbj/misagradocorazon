@@ -21,7 +21,7 @@ Estado: reproductor listo. Falta el audio: lo graba el equipo (CLAUDE.md, nunca 
   - Android: servicio en primer plano de reproducción.
 - **Pantalla de bloqueo y centro de control:** título, "Mi Sagrado Corazón", imagen del santo, reproducir/pausar y ±15 s.
   - En Android, estos controles son además los que mantienen el audio más de unos 3 minutos en segundo plano (limitación del sistema).
-- **Un solo reproductor para toda la app** (`apps/mobile/src/audio.tsx`). Al salir de la pantalla el audio **sigue sonando**.
+- **Un solo reproductor para toda la app** (`apps/mobile/src/ritual/audio.tsx`). Al salir de la pantalla el audio **sigue sonando**.
 - **Mini-player** (SDD-07: "el mini-player aparece al navegar"):
   - aparece sobre la barra de pestañas en cuanto se pulsa reproducir;
   - muestra el título y una barra de progreso;
