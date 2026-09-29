@@ -48,7 +48,27 @@ Mismas imágenes que Railway, así que el paso posterior no cambia código.
    docker compose exec api tsx src/cli/create-staff.ts --email tu@correo.com --name "Juan"
    ```
 7. **Comprobaciones:** las de `docs/despliegue.md` (health, login en el panel, worker en marcha con `docker compose logs worker`).
-8. **Monitorización** (Protocolo de Kickoff, fase 5): registrar `msc-db`, `msc-api`, `msc-worker` y `msc-admin` en `healthcheck.sh` y el proyecto en SA99 (`vps-staging`, dominio `api-staging.misagradocorazon.com`). `msc-migrate` no: termina tras migrar.
+8. **Monitorización** (Protocolo de Kickoff, fase 5). `msc-migrate` no se registra: termina tras migrar y saldría como caído.
+   - **healthcheck.sh** (Servidor 2, cada 5 min, alerta por Telegram): añadir al array `SERVICES` de `/opt/scripts/healthcheck.sh`:
+     ```bash
+     "MiSagradoCorazon-DB|msc-db|docker"
+     "MiSagradoCorazon-API|msc-api|docker"
+     "MiSagradoCorazon-Worker|msc-worker|docker"
+     "MiSagradoCorazon-Admin|msc-admin|docker"
+     ```
+   - **SA99** (su MongoDB vive en el Servidor 1):
+     ```javascript
+     // ssh root@72.62.41.234 → docker exec -it sa99-mongo mongosh ... → use sa99
+     db.servers.updateOne(
+       { _id: "vps-staging" },
+       { $set: { "projects.MiSagradoCorazon": {
+           containers: ["msc-db", "msc-api", "msc-worker", "msc-admin"],
+           domain: "api-staging.misagradocorazon.com"
+       } } }
+     );
+     ```
+     Después, lo mismo en `SEED_SERVERS` (`service.py` del repo de SA99) y pulsar "Escanear" en Red de Servidores.
+   - **Backups:** no. Los datos de staging son de prueba.
 
 ## Actualizar
 
