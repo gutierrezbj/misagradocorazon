@@ -90,3 +90,18 @@ Solo zod 4.1.12: constantes de dominio (precios, duraciones, ventana de votació
 ## Raíz del monorepo
 
 Solo prettier 3.8.1 (desarrollo): formato del código según SDD-06, con ancho de línea 160 (`.prettierrc.json`). El CI lo comprueba con `pnpm format:check`. La documentación, los JSON y el código generado quedan fuera (`.prettierignore`).
+
+## Vulnerabilidades conocidas (`pnpm audit`)
+
+Las versiones de dependencias indirectas con avisos de seguridad se fijan en `pnpm.overrides` del `package.json` de la raíz, dentro de la misma versión mayor que ya usaba el paquete que las pide cuando es posible. Revisión del 29-sep-2026:
+
+| Paquete | Lo trae | Versión fijada |
+|---|---|---|
+| postcss | vite (build del panel) | 8.5.28 |
+| undici | jsdom (tests del panel) | 6.29.0 |
+| js-yaml | eslint, jest y el CLI de Expo (desarrollo) | 4.3.2 y 3.15.2 |
+| deepmerge-ts | configuración de Prisma (CLI) | 8.0.2, la única versión corregida |
+| mysql2 | CLI de Prisma; la API usa PostgreSQL y no lo carga | 3.24.4 |
+| @opentelemetry/core | Sentry en la API (`instrumentation-http`) | 2.11.0, la misma que ya usa el resto de Sentry |
+
+**Aviso abierto:** `decode-uri-component` 0.2.2, que llega por `expo-router` → `query-string` 7 (moderado: consumo de CPU con URLs mal formadas). La única versión corregida, 0.5.0, solo se puede importar como módulo ES y `query-string` 7 la carga con `require`, así que forzarla rompería la navegación. En la app solo recibe los enlaces que abre el propio fiel en su teléfono. Se cierra cuando `expo-router` actualice `query-string`.
