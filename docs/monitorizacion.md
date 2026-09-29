@@ -38,9 +38,8 @@ Antes de enviar cada error, `packages/shared/src/sentry.ts` (`scrubEvent`) lo li
 - **A qué builds llega cada actualización:** a los de su misma versión de la app (`runtimeVersion` con la política `appVersion`). Al subir la versión de la app se publica un build nuevo en las tiendas.
 - **Canales:** cada perfil de `eas.json` tiene el suyo (`development`, `preview`, `production`). Se publica con `eas update --channel production`.
 - **Activación:**
-  1. Crear el proyecto de EAS con la cuenta del fundador (`eas init`).
-  2. Guardar su id como `EAS_PROJECT_ID` en EAS. `app.config.ts` añade entonces `updates.url` y `extra.eas.projectId`.
-  3. Hacer un build nuevo. Los builds anteriores no reciben actualizaciones.
+  1. Proyecto de EAS creado con la cuenta del fundador (`eas init`, 29-sep-2026): `@gutierrezbj/mi-sagrado-corazon`. Su id está en `apps/mobile/app.json` (`extra.eas.projectId`) y `app.config.ts` añade con él `updates.url`.
+  2. Hacer un build nuevo. Los builds anteriores no reciben actualizaciones.
 - **Apple:** sus normas de revisión permiten actualizar código interpretado si no cambia el propósito de la app. Nada de funciones nuevas que esquiven la revisión.
 
 ## Copias de seguridad

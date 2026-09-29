@@ -9,7 +9,7 @@ Todas las cuentas van a nombre del fundador o de la futura sociedad, nunca del c
 | Servicio | Para qué | Dónde se configura | Sin la cuenta |
 |---|---|---|---|
 | Railway | Hosting de la API, el worker, el panel y PostgreSQL | `docs/despliegue.md` | Solo se ejecuta en local |
-| Expo / EAS | Builds de iOS y Android, actualizaciones EAS Update y servicio de push de Expo | `apps/mobile/eas.json`, `EAS_PROJECT_ID` | No hay builds ni push |
+| Expo / EAS | Builds de iOS y Android, actualizaciones EAS Update y servicio de push de Expo | `apps/mobile/eas.json`, `extra.eas.projectId` en `apps/mobile/app.json` | No hay builds ni push |
 | Apple Developer | App Store, Sign in with Apple (y revocación de tokens) y claves de push (APNs, las crea EAS) | `docs/login-social.md`, `docs/push.md` | Ni iOS ni login con Apple |
 | Google Play Console | Publicación en Android | — | No hay app en Android |
 | Google Cloud (OAuth) | Login con Google | `GOOGLE_CLIENT_ID`, `EXPO_PUBLIC_GOOGLE_*` (`docs/login-social.md`) | El botón de Google no aparece |
