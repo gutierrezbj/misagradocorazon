@@ -45,7 +45,15 @@ Quedan fuera los puntos de arranque (servidor, worker, consola), que solo conect
   - sin referencias prohibidas;
   - permisos nativos mínimos (sin almacenamiento compartido, superposición, Face ID ni micrófono).
 - **`apps/mobile/test/components`** (Jest con `jest-expo` y React Native Testing Library): pantallas renderizadas con los proveedores reales de la app. La API, la autenticación y los módulos nativos (audio, almacenamiento) están simulados.
-- **Lint** (`expo lint --max-warnings 0`): falla con cualquier aviso. Hasta el 29-sep-2026 el CI no lo aplicaba: el `--if-present` del script de la raíz llega a `expo lint` como `npm_config_if_present` y lo deja sin hacer nada. Por eso el script de la raíz es `pnpm -r lint`, sin esa opción.
+## Lint
+
+`pnpm lint` pasa ESLint en las cuatro partes del monorepo (SDD-06 y SDD-08) y falla con cualquier aviso (`--max-warnings 0`). El CI lo ejecuta en cada PR.
+
+- **App:** `expo lint`, con `eslint-config-expo`.
+- **API y `packages/shared`:** reglas recomendadas de ESLint y de typescript-eslint. En la API, un `_` delante de un nombre marca lo que se descarta a propósito.
+- **Panel:** lo mismo más las reglas de hooks de React.
+
+Hasta el 29-sep-2026, el CI no pasaba el lint de la app y las otras tres partes no tenían lint. El `--if-present` del script de la raíz llega a `expo lint` como `npm_config_if_present` y lo deja sin hacer nada. Por eso el script de la raíz es `pnpm -r lint`, sin esa opción.
 
 ## Checklist de SDD-07 adelantada en navegador (27-sep-2026)
 
