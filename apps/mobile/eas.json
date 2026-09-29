@@ -17,7 +17,10 @@
       "env": {
         "EXPO_PUBLIC_BACKEND_URL": "https://api-staging.misagradocorazon.com"
       },
-      "channel": "preview"
+      "channel": "preview",
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "autoIncrement": true,

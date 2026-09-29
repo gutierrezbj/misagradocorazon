@@ -64,6 +64,12 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "56e65a9a-6118-425f-a2ce-4cba0f6adeff"
+      }
+    },
+    "owner": "gutierrezbj"
   }
 }

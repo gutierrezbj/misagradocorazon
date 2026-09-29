@@ -78,7 +78,7 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
   - `development` (con `expo-dev-client`) y `preview` apuntan a la API de staging;
   - `production` apunta a la de producción.
 - **Variables de Google** (`EXPO_PUBLIC_GOOGLE_*`) y **de PostHog** (`EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_POSTHOG_HOST`, ver `docs/kpis.md`): se definen en EAS (*Environment variables*), no en el repositorio.
-- **Antes del primer build:** hace falta `eas init` con la cuenta de Expo del fundador (`docs/push.md`).
+- **Proyecto de EAS:** creado con `eas init` el 29-sep-2026 en la cuenta de Expo del fundador (`gutierrezbj`). El `projectId` y el `owner` están en `apps/mobile/app.json`; no son secretos. `app.config.ts` lo usa para EAS Update, y `EAS_PROJECT_ID` permite apuntar a otro proyecto.
 - **Generar los builds** (desde `apps/mobile`, con `eas-cli` instalado y sesión iniciada con la cuenta del fundador):
   ```bash
   eas build --platform ios --profile development      # para probar en un iPhone (push, audio, Apple)
@@ -93,7 +93,10 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
   - iOS no declara Face ID: la sesión va al llavero sin biometría.
   - Sin micrófono en ninguna plataforma. Audio en segundo plano activado.
   - Lo vigila `apps/mobile/test/native-config.test.mjs`.
-- **Lanzar el build desde una sesión de Claude Code en la nube:** hace falta un token de acceso de Expo creado con la cuenta del fundador, guardado como variable de entorno `EXPO_TOKEN` en la configuración del entorno (nunca en el repositorio). La red del entorno también tiene que permitir `expo.dev` y `api.expo.dev`.
+- **Lanzar el build desde una sesión de Claude Code en la nube:** el token de acceso de Expo del fundador está en *Credenciales de API* del entorno (tipo Bearer, sitios `*.expo.dev`), nunca en el repositorio ni en variables de entorno visibles.
+  - El proxy de la sesión pone el token real en cada petición a Expo. Claude no lo ve.
+  - `eas-cli` solo necesita que exista la variable, así que se lanza con un valor de relleno: `EXPO_TOKEN=placeholder npx eas-cli@latest whoami` devuelve `gutierrezbj`.
+- **Perfil `preview` en Android:** genera un APK (`buildType: apk`) para instalarlo directamente en el teléfono.
 
 ## Decisiones pendientes (SDD-08)
 

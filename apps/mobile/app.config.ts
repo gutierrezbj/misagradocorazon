@@ -21,8 +21,9 @@ export default ({ config }: ConfigContext): ExpoConfig => {
 
   // EAS Update (SDD-08, 27-sep-2026): arreglos de JS sin pasar por las tiendas. Una actualización
   // solo llega a builds con la misma versión de la app (runtimeVersion = versión). La URL sale del
-  // proyecto de EAS del fundador (`eas init`), que aún no existe: sin él no hay actualizaciones.
-  const easProjectId = process.env.EAS_PROJECT_ID;
+  // proyecto de EAS del fundador (`eas init`, cuenta gutierrezbj), guardado en app.json. Sin él no hay
+  // actualizaciones; EAS_PROJECT_ID permite apuntar a otro proyecto sin tocar el fichero.
+  const easProjectId = process.env.EAS_PROJECT_ID ?? (config.extra?.eas?.projectId as string | undefined);
   return {
     ...config,
     name: config.name ?? "Mi Sagrado Corazón",
