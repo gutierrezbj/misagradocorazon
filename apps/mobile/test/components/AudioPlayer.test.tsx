@@ -28,7 +28,8 @@ jest.mock("expo-audio", () => ({
   useAudioPlayerStatus: () => ({ ...mockStatus }),
   setAudioModeAsync: (...args: unknown[]) => mockSetAudioModeAsync(...(args as [])),
 }));
-jest.mock("@/src/auth", () => ({ useAuth: () => ({ user: { id: "u1" } }) }));
+let mockUser: { id: string } | null = { id: "u1" };
+jest.mock("@/src/auth", () => ({ useAuth: () => ({ user: mockUser }) }));
 const mockPush = jest.fn();
 jest.mock("expo-router", () => ({ useRouter: () => ({ push: mockPush }) }));
 const mockTrack = jest.fn();
@@ -46,6 +47,7 @@ const App = ({ onScreen = true }: { onScreen?: boolean }) => (
 
 beforeEach(() => {
   jest.clearAllMocks();
+  mockUser = { id: "u1" };
   Object.assign(mockStatus, { isLoaded: true, isBuffering: false, playing: false, currentTime: 0, duration: 120 });
 });
 
@@ -134,4 +136,18 @@ test("otra pantalla con audio no corta el que está sonando hasta que se pulsa s
   await fireEvent.press(screen.getByTestId("audio-toggle"));
   expect(mockPlayer.replace).toHaveBeenCalledWith({ uri: PRAYER });
   expect(screen.getByText("Oración de la mañana")).toBeTruthy();
+});
+
+test("al cerrar sesión se para el audio y desaparece el mini-player", async () => {
+  const view = await render(<App onScreen={false} />);
+  await view.rerender(<App />);
+  await fireEvent.press(screen.getByTestId("audio-toggle"));
+  await view.rerender(<App onScreen={false} />);
+  expect(screen.getByTestId("mini-player")).toBeTruthy();
+
+  mockUser = null;
+  await view.rerender(<App onScreen={false} />);
+  expect(mockPlayer.pause).toHaveBeenCalled();
+  expect(mockPlayer.clearLockScreenControls).toHaveBeenCalledTimes(1);
+  expect(screen.queryByTestId("mini-player")).toBeNull();
 });

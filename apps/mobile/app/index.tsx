@@ -1,4 +1,4 @@
-import { View, Text, Image } from "react-native";
+import { View, Text } from "react-native";
 import { useTheme, fonts } from "@/src/theme";
 
 export default function Index() {
