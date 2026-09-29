@@ -88,6 +88,12 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
   eas submit --platform android --profile production  # subir a Google Play
   ```
   La primera vez, EAS pide o crea los certificados de firma (`eas credentials`). Los cambios solo de JavaScript se publican sin pasar por las tiendas con `eas update` (`docs/monitorizacion.md`).
+- **Permisos nativos (revisado con `expo prebuild` el 29-sep-2026):**
+  - Android bloquea tres permisos que añade la plantilla y la app no usa: almacenamiento compartido (lectura y escritura) y dibujar sobre otras apps. La tarjeta de la vela se guarda en la caché y se comparte con `expo-sharing`.
+  - iOS no declara Face ID: la sesión va al llavero sin biometría.
+  - Sin micrófono en ninguna plataforma. Audio en segundo plano activado.
+  - Lo vigila `apps/mobile/test/native-config.test.mjs`.
+- **Lanzar el build desde una sesión de Claude Code en la nube:** hace falta un token de acceso de Expo creado con la cuenta del fundador, guardado como variable de entorno `EXPO_TOKEN` en la configuración del entorno (nunca en el repositorio). La red del entorno también tiene que permitir `expo.dev` y `api.expo.dev`.
 
 ## Decisiones pendientes (SDD-08)
 

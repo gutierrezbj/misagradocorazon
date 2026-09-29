@@ -42,8 +42,10 @@ Quedan fuera los puntos de arranque (servidor, worker, consola), que solo conect
   - tamaños mínimos de texto;
   - textos siempre pasados por i18n;
   - etiquetas de accesibilidad;
-  - sin referencias prohibidas.
+  - sin referencias prohibidas;
+  - permisos nativos mínimos (sin almacenamiento compartido, superposición, Face ID ni micrófono).
 - **`apps/mobile/test/components`** (Jest con `jest-expo` y React Native Testing Library): pantallas renderizadas con los proveedores reales de la app. La API, la autenticación y los módulos nativos (audio, almacenamiento) están simulados.
+- **Lint** (`expo lint --max-warnings 0`): falla con cualquier aviso. Hasta el 29-sep-2026 el CI no lo aplicaba: el `--if-present` del script de la raíz llega a `expo lint` como `npm_config_if_present` y lo deja sin hacer nada. Por eso el script de la raíz es `pnpm -r lint`, sin esa opción.
 
 ## Checklist de SDD-07 adelantada en navegador (27-sep-2026)
 

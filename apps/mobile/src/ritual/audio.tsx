@@ -76,18 +76,29 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     [load, player, status.currentTime, status.duration],
   );
 
-  const close = useCallback(() => {
+  const stop = useCallback(() => {
     player.pause();
     if (lockScreenUrl.current) player.clearLockScreenControls();
     lockScreenUrl.current = null;
     trackedUrl.current = null;
-    setActive(false);
   }, [player]);
 
-  // Al cerrar sesión o borrar la cuenta no sigue sonando nada.
+  const close = useCallback(() => {
+    stop();
+    setActive(false);
+  }, [stop]);
+
+  // Al cerrar sesión o borrar la cuenta no sigue sonando nada: el mini-player se oculta en el mismo
+  // render (estado) y el reproductor se para en el efecto (sistema externo).
+  const signedIn = !!user;
+  const [wasSignedIn, setWasSignedIn] = useState(signedIn);
+  if (signedIn !== wasSignedIn) {
+    setWasSignedIn(signedIn);
+    if (!signedIn) setActive(false);
+  }
   useEffect(() => {
-    if (!user) close();
-  }, [user, close]);
+    if (!signedIn) stop();
+  }, [signedIn, stop]);
 
   const value = useMemo<AudioCtxValue>(
     () => ({

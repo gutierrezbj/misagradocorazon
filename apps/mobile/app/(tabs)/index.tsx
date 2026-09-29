@@ -1,4 +1,4 @@
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
@@ -6,7 +6,6 @@ import { useRouter } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 import * as Haptics from "expo-haptics";
-import { Platform } from "react-native";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { api, deviceTimeZone } from "@/src/api";
@@ -23,7 +22,7 @@ export default function Altar() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { t, loc } = useI18n();
+  const { t } = useI18n();
   const { user } = useAuth();
   const bottomChrome = (usesNativeTabs ? insets.bottom : 0) + useMiniPlayerInset(usesNativeTabs);
 
