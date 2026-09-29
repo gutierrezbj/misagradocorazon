@@ -85,7 +85,7 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
 - **Generar los builds** (desde `apps/mobile`, con `eas-cli` instalado y sesión iniciada con la cuenta del fundador):
   ```bash
   eas build --platform ios --profile development      # para probar en un iPhone (push, audio, Apple)
-  eas build --platform android --profile preview      # APK/AAB de prueba interna
+  eas build --platform android --profile preview      # APK instalable para testers (staging)
   eas build --platform all --profile production       # versiones para las tiendas
   eas submit --platform ios --profile production      # subir a App Store Connect
   eas submit --platform android --profile production  # subir a Google Play
