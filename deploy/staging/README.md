@@ -29,11 +29,17 @@ Mismas imágenes que Railway, así que el paso posterior no cambia código.
    docker compose ps          # migrate "exited (0)", api "healthy"
    curl -fsS localhost:18001/api/health
    ```
-5. **Proxy HTTPS del VPS:**
-   - `api-staging…` → `127.0.0.1:18001`, con WebSocket (el chat de misa usa Socket.IO);
+5. **nginx del VPS** (`nginx.conf` de esta carpeta):
+   ```bash
+   sudo cp nginx.conf /etc/nginx/sites-available/msc-staging
+   sudo ln -s /etc/nginx/sites-available/msc-staging /etc/nginx/sites-enabled/
+   sudo nginx -t && sudo systemctl reload nginx
+   sudo certbot --nginx -d api-staging.misagradocorazon.com -d admin-staging.misagradocorazon.com
+   ```
+   - `api-staging…` → `127.0.0.1:18001`, con WebSocket en `/socket.io/` (chat de misa);
    - `admin-staging…` → `127.0.0.1:18080`.
 
-   La API confía en un salto de proxy (`trust proxy` = 1) para leer la IP real en los límites de peticiones.
+   La API confía en un salto de proxy (`trust proxy` = 1): nginx le pasa la IP real en `X-Forwarded-For`.
 6. **Catálogo de santos y primer superadmin:**
    ```bash
    docker compose exec api tsx prisma/seed-catalog.ts
