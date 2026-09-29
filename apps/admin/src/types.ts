@@ -93,6 +93,8 @@ export type AdminSaint = {
   historyEn: string;
   patronagesEs: string;
   patronagesEn: string;
+  iconographyEs: string;
+  iconographyEn: string;
   prayerEs: string;
   prayerEn: string;
   isPatronCatalog: boolean;

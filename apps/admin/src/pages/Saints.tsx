@@ -16,6 +16,8 @@ type Form = {
   historyEn: string;
   patronagesEs: string;
   patronagesEn: string;
+  iconographyEs: string;
+  iconographyEn: string;
   prayerEs: string;
   prayerEn: string;
   isPatronCatalog: boolean;
@@ -32,6 +34,8 @@ const EMPTY: Form = {
   historyEn: "",
   patronagesEs: "",
   patronagesEn: "",
+  iconographyEs: "",
+  iconographyEn: "",
   prayerEs: "",
   prayerEn: "",
   isPatronCatalog: false,
@@ -48,6 +52,8 @@ const toForm = (s: AdminSaint): Form => ({
   historyEn: s.historyEn,
   patronagesEs: s.patronagesEs,
   patronagesEn: s.patronagesEn,
+  iconographyEs: s.iconographyEs,
+  iconographyEn: s.iconographyEn,
   prayerEs: s.prayerEs,
   prayerEn: s.prayerEn,
   isPatronCatalog: s.isPatronCatalog,
@@ -113,6 +119,14 @@ function SaintForm({ saint, onDone }: { saint: AdminSaint | null; onDone: () => 
         <label className="field">
           {t("patronagesEn")}
           <textarea value={f.patronagesEn} onChange={set("patronagesEn")} />
+        </label>
+        <label className="field">
+          {t("iconographyEs")}
+          <textarea value={f.iconographyEs} onChange={set("iconographyEs")} />
+        </label>
+        <label className="field">
+          {t("iconographyEn")}
+          <textarea value={f.iconographyEn} onChange={set("iconographyEn")} />
         </label>
         <label className="field">
           {t("saintPrayerEs")}

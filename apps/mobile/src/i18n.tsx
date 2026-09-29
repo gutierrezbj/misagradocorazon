@@ -24,6 +24,7 @@ const dict = {
   meditation: { es: "Meditación", en: "Meditation" },
   history: { es: "Historia", en: "History" },
   patronages: { es: "Advocaciones", en: "Patronages" },
+  iconography: { es: "Iconografía", en: "Iconography" },
   prayerLabel: { es: "Oración", en: "Prayer" },
   amenComplete: { es: "Amén · Completar", en: "Amen · Complete" },
   candlesLabel: { es: "velas", en: "candles" },

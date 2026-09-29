@@ -219,6 +219,8 @@ model Saint {
   historyEn       String
   patronagesEs    String
   patronagesEn    String
+  iconographyEs   String   @default("") // US-26: cómo se le representa; vacía = no se muestra
+  iconographyEn   String   @default("")
   prayerEs        String
   prayerEn        String
   isPatronCatalog Boolean  @default(false)

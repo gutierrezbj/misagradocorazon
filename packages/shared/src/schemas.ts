@@ -197,6 +197,9 @@ export const saintInputSchema = z.object({
   historyEn: z.string().trim().min(1).max(5000),
   patronagesEs: z.string().trim().max(500).default(""),
   patronagesEn: z.string().trim().max(500).default(""),
+  // Iconografía (SDD-05 US-26): cómo se le representa y sus símbolos. Opcional.
+  iconographyEs: z.string().trim().max(1000).default(""),
+  iconographyEn: z.string().trim().max(1000).default(""),
   prayerEs: z.string().trim().max(3000).default(""),
   prayerEn: z.string().trim().max(3000).default(""),
   isPatronCatalog: z.boolean().default(false),

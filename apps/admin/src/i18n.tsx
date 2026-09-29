@@ -209,6 +209,8 @@ const dict = {
   historyEn: { es: "Historia (EN)", en: "History (EN)" },
   patronagesEs: { es: "Advocaciones (ES)", en: "Patronages (ES)" },
   patronagesEn: { es: "Advocaciones (EN)", en: "Patronages (EN)" },
+  iconographyEs: { es: "Iconografía (ES, opcional)", en: "Iconography (ES, optional)" },
+  iconographyEn: { es: "Iconografía (EN, opcional)", en: "Iconography (EN, optional)" },
   saintPrayerEs: { es: "Oración (ES)", en: "Prayer (ES)" },
   saintPrayerEn: { es: "Oración (EN)", en: "Prayer (EN)" },
   edit: { es: "Editar", en: "Edit" },
