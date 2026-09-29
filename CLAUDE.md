@@ -41,7 +41,7 @@
 - **Chat de misa:** Socket.IO en la API.
 - **Push:** expo-notifications y el servicio de push de Expo.
 - **Medios:** Cloudflare R2.
-- **Hosting:** Railway.
+- **Hosting:** Railway. Mientras no exista la cuenta, staging provisional en el VPS del fundador con las mismas imágenes (aprobado 29-sep-2026, `deploy/staging/README.md`).
 - **Transición cerrada (26-sep-2026):** la app y el panel usan `apps/api`. `backend/` se eliminó con aprobación del fundador; su contrato HTTP está portado a los tests de `apps/api` y el código original queda en el historial de git.
 
 ### Diseño

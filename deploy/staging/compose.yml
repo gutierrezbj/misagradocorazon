@@ -1,0 +1,91 @@
+# Staging provisional en el VPS del fundador (aprobado 29-sep-2026) hasta que exista Railway.
+# Mismos Dockerfiles que Railway. Las imágenes las construye GitHub Actions en cada push a main
+# (.github/workflows/staging-images.yml) y el VPS solo las descarga: no se compila en el servidor.
+# Uso y primer despliegue: deploy/staging/README.md. Se ejecuta desde esta carpeta.
+# Puertos: offset +270 del Catálogo de Infraestructura JRGB (3270 panel, 4270 API, 6270 PostgreSQL),
+# siempre en 127.0.0.1. El worker no tiene HTTP (5270 queda reservado sin uso).
+name: msc-staging
+
+# Las opcionales (Google, R2, SMTP, Sentry...) llegan desde .env con env_file, solo si están
+# definidas: una variable vacía no pasa la validación de la API (apps/api/src/env.ts).
+x-api-env: &api-env
+  NODE_ENV: production
+  DATABASE_URL: postgresql://msc:${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}@db:5432/msc
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?falta BETTER_AUTH_SECRET}
+  BETTER_AUTH_URL: https://${API_DOMAIN:?falta API_DOMAIN}
+  TRUSTED_ORIGINS: https://${ADMIN_DOMAIN:?falta ADMIN_DOMAIN}
+  INTENTIONS_KEY: ${INTENTIONS_KEY:?falta INTENTIONS_KEY}
+  SENTRY_ENVIRONMENT: staging
+
+services:
+  db:
+    image: postgres:16
+    container_name: msc-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: msc
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: msc
+    # Solo en local, para pg_dump o un túnel SSH.
+    ports:
+      - "127.0.0.1:6270:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "msc", "-d", "msc"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # Equivale al preDeployCommand de Railway: si las migraciones fallan, la API no arranca.
+  migrate:
+    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:-staging}
+    container_name: msc-migrate
+    env_file: .env
+    command: ["prisma", "migrate", "deploy"]
+    environment: *api-env
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:-staging}
+    container_name: msc-api
+    env_file: .env
+    restart: unless-stopped
+    environment: *api-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    # Solo en local: se publica con el proxy HTTPS que ya tiene el VPS.
+    ports:
+      - "127.0.0.1:4270:8001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:8001/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  worker:
+    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:-staging}
+    container_name: msc-worker
+    env_file: .env
+    restart: unless-stopped
+    command: ["tsx", "src/jobs/worker.ts"]
+    environment: *api-env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  admin:
+    # Lleva fijada la URL de la API de staging (VITE_API_URL se fija al construir).
+    image: ghcr.io/gutierrezbj/misagradocorazon-admin:${IMAGE_TAG:-staging}
+    container_name: msc-admin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3270:8080"
+
+volumes:
+  db-data:
