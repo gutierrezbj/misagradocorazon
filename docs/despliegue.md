@@ -2,6 +2,8 @@
 
 Plan de SDD-08 (actualización del 26-sep-2026). **Todo a nombre del fundador** (o de la futura sociedad).
 
+> **Staging provisional (29-sep-2026):** hasta que exista la cuenta de Railway, staging corre en el VPS del fundador con las mismas imágenes. Ver `deploy/staging/README.md`.
+
 ## Servicios
 
 Un proyecto de Railway con dos entornos, **staging** y **production**. Cada entorno tiene cuatro servicios:
@@ -78,7 +80,8 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
   - `development` (con `expo-dev-client`) y `preview` apuntan a la API de staging;
   - `production` apunta a la de producción.
 - **Variables de Google** (`EXPO_PUBLIC_GOOGLE_*`) y **de PostHog** (`EXPO_PUBLIC_POSTHOG_KEY`, `EXPO_PUBLIC_POSTHOG_HOST`, ver `docs/kpis.md`): se definen en EAS (*Environment variables*), no en el repositorio.
-- **Antes del primer build:** hace falta `eas init` con la cuenta de Expo del fundador (`docs/push.md`).
+- **Proyecto de EAS:** creado el 29-sep-2026 con la cuenta del fundador (`@gutierrezbj/mi-sagrado-corazon`, id en `app.json`).
+- **Perfil `development`:** el JavaScript lo sirve Metro desde el ordenador de desarrollo, así que la API a la que apunta sale del `.env` local (`EXPO_PUBLIC_BACKEND_URL=http://<IP-de-la-red-local>:8001`), no de `eas.json`.
 - **Generar los builds** (desde `apps/mobile`, con `eas-cli` instalado y sesión iniciada con la cuenta del fundador):
   ```bash
   eas build --platform ios --profile development      # para probar en un iPhone (push, audio, Apple)
@@ -93,7 +96,7 @@ A partir de ahí, cada merge a `main` redespliega solo los servicios afectados.
   - iOS no declara Face ID: la sesión va al llavero sin biometría.
   - Sin micrófono en ninguna plataforma. Audio en segundo plano activado.
   - Lo vigila `apps/mobile/test/native-config.test.mjs`.
-- **Lanzar el build desde una sesión de Claude Code en la nube:** hace falta un token de acceso de Expo creado con la cuenta del fundador, guardado como variable de entorno `EXPO_TOKEN` en la configuración del entorno (nunca en el repositorio). La red del entorno también tiene que permitir `expo.dev` y `api.expo.dev`.
+- **Lanzar el build desde una sesión de Claude Code en la nube:** el token de Expo del fundador está en las credenciales del entorno y lo inyecta el proxy en `*.expo.dev`. eas-cli solo se da por autenticado si existe `EXPO_TOKEN`, así que se le pasa un valor cualquiera que el proxy sustituye: `EXPO_TOKEN=proxy-injected eas build ...`.
 
 ## Decisiones pendientes (SDD-08)
 
