@@ -24,9 +24,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Sesión guardada al abrir el panel: el estado se actualiza cuando responde la API.
   useEffect(() => {
-    if (getToken()) void loadMe();
-  }, [loadMe]);
+    if (!getToken()) return;
+    let cancelled = false;
+    api<Me>("/me").then(
+      (me) => !cancelled && setState({ status: "ready", me }),
+      () => !cancelled && setState({ status: "anonymous", me: null }),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const login = useCallback(
     async (email: string, password: string) => {

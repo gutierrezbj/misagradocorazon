@@ -6,7 +6,7 @@ import request from "supertest";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { prisma } from "../src/db.ts";
-import { app, bearer, discoverRoutes, resetDb, signUp, signUpAs } from "./helpers.ts";
+import { app, bearer, discoverRoutes, resetDb, signUpAs } from "./helpers.ts";
 
 type Role = "user" | "moderator" | "editor" | "superadmin";
 
