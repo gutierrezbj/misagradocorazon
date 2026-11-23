@@ -17,7 +17,12 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ## Cambio propuesto el 23-nov-2026: beta web (PWA) con la vela gratis
 
-Estado: **pendiente de aprobación del fundador.** No se toca código ni Notion hasta su visto bueno.
+Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones abiertas, resueltas con la recomendación:
+- dominio `app.misagradocorazon.com`;
+- apertura el 1-dic, con la novena;
+- beta abierta a cualquiera.
+
+**Pendiente:** pasarlo a Notion (SDD-02, 04, 05, 07 y 08). La edición desde la sesión de código quedó bloqueada por permisos el 23-nov-2026.
 
 **Por qué:** MSC pasa a ser el producto principal (Plan v4.2 de Mi Academia). Publicar en las tiendas lleva semanas: cuentas, revisión de Apple y, en Google, una prueba cerrada de 14 días con al menos 12 testers. Cobrar exige una sociedad que aún no está. La app ya funciona en navegador. Una beta web instalable (PWA) llega a los fieles en días y deja que Meta Ads lleve directo a la app, sin ficha de tienda.
 
