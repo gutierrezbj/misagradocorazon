@@ -65,7 +65,7 @@ describe("KPIs", () => {
     ]);
     expect(k.candles.bySaint).toHaveLength(2);
     expect(k.candles.byDay.at(-1).candles).toBe(2);
-    expect(k.money).toEqual({ simulated: true, revenueCents: 298, impactCents: 60, transferredCents: 0 });
+    expect(k.money).toEqual({ simulated: true, candlesFree: false, revenueCents: 298, impactCents: 60, transferredCents: 0 });
   });
 
   test("retención D7: cohorte de hace 7-37 días con actividad en su segunda semana", async () => {

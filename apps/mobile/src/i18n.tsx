@@ -176,6 +176,13 @@ const dict = {
   candleLit: { es: "Tu vela está encendida", en: "Your candle is lit" },
   candleLitSub: { es: "Tu intención se eleva ahora en el altar", en: "Your intention now rises on the altar" },
   simulatedPayment: { es: "Pago simulado en esta versión de prueba", en: "Simulated payment in this preview" },
+  candleFree: { es: "Gratis", en: "Free" },
+  candleFreeBeta: { es: "Gratis durante la beta", en: "Free during the beta" },
+  transparencyBeta: { es: "Beta abierta", en: "Open beta" },
+  transparencyBetaNote: {
+    es: "Durante la beta las velas son gratis y todavía no hay recaudación. El 20% empezará con la primera vela de pago.",
+    en: "During the beta candles are free, so nothing has been raised yet. The 20% starts with the first paid candle.",
+  },
   impactNote: { es: "El 20% de la facturación mensual se destina a la causa del mes", en: "20% of monthly revenue goes to the cause of the month" },
   forDeceased: { es: "Enciendo esta vela por un difunto", en: "I light this candle for a deceased soul" },
   intentionRequired: { es: "Escribe una intención", en: "Write an intention" },

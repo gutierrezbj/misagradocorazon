@@ -147,12 +147,23 @@ export default function Causas() {
         <View style={styles.transpSection}>
           <Text style={styles.transpTitle}>{t("transparency")}</Text>
           <LinearGradient colors={[colors.brand, colors.brandPrimary]} style={styles.impactCard}>
-            <Text style={styles.impactLabel}>{t("totalImpact")}</Text>
-            <Text style={styles.impactValue}>${(totalTransferredCents / 100).toLocaleString()}</Text>
-            <Text style={styles.impactNote}>{t("impactNote")}</Text>
+            {transp?.beta ? (
+              <>
+                <Text style={styles.impactLabel}>{t("transparencyBeta")}</Text>
+                <Text testID="transparency-beta-note" style={styles.impactBetaNote}>
+                  {t("transparencyBetaNote")}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.impactLabel}>{t("totalImpact")}</Text>
+                <Text style={styles.impactValue}>${(totalTransferredCents / 100).toLocaleString()}</Text>
+                <Text style={styles.impactNote}>{t("impactNote")}</Text>
+              </>
+            )}
           </LinearGradient>
 
-          <Text style={styles.fundedTitle}>{t("fundedCauses")}</Text>
+          {records.length > 0 && <Text style={styles.fundedTitle}>{t("fundedCauses")}</Text>}
           {records.map((r) => (
             <View key={r.month} style={styles.fundedRow}>
               <View style={styles.fundedIcon}>
@@ -250,6 +261,7 @@ const useStyles = makeStyles((c) => ({
   impactLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.goldSoft, textTransform: "uppercase", letterSpacing: 1 },
   impactValue: { fontFamily: fonts.displayBold, fontSize: 48, color: "#FDFBF7", marginVertical: 4 },
   impactNote: { fontFamily: fonts.body, fontSize: 14, color: c.goldSoft },
+  impactBetaNote: { fontFamily: fonts.body, fontSize: 16, lineHeight: 24, color: "#FDFBF7", textAlign: "center", marginTop: spacing.sm },
   fundedTitle: { fontFamily: fonts.displaySemibold, fontSize: 19, color: c.onSurface, marginTop: spacing.lg, marginBottom: spacing.sm },
   fundedRow: { flexDirection: "row", alignItems: "center", gap: spacing.md, paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: c.divider },
   fundedIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: c.brandTertiary, alignItems: "center", justifyContent: "center" },

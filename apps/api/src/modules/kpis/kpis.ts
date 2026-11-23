@@ -6,6 +6,7 @@ import { LITURGICAL_SEASONS, liturgicalSeason, MVP_TARGETS, type MvpGoalKey } fr
 import { prisma } from "../../db.ts";
 import { monthOf } from "../../lib/dates.ts";
 import { ACTIVITY_SQL, dailySeries, isoDay } from "./kpi-daily.ts";
+import { payments } from "../payments/provider.ts";
 
 const n = (v: unknown) => Number(v ?? 0);
 const pct = (num: number, den: number) => (den > 0 ? Math.round((num / den) * 1000) / 10 : null);
@@ -162,8 +163,10 @@ export async function computeKpis(days: number, now = new Date()) {
       })),
     },
     money: {
-      // En el MVP los pagos son simulados: estas cifras no son dinero real.
-      simulated: true,
+      // Sin cobro real todavía: en modo simulado las cifras no son dinero real; en la beta gratis
+      // las velas no generan ingresos (SDD-05 US-28) y se cuentan solo en candles.
+      simulated: payments().name === "simulated",
+      candlesFree: payments().name === "beta_free",
       revenueCents: sumOf("purchase"),
       impactCents: sumOf("impact_allocation"),
       transferredCents: sumOf("transfer"),

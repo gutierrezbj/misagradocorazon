@@ -4,6 +4,7 @@ import { prisma } from "../../db.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { optionalUser } from "../../middleware/roles.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
+import { candlesFree } from "../payments/provider.ts";
 import { causeDto, transparencySummary, voteCounts, votingState, withBudget } from "./service.ts";
 
 export const causasRouter = Router();
@@ -96,5 +97,7 @@ causasRouter.get("/transparency", async (_req, res) => {
   ok(res, {
     totals,
     months: months.map(({ pendingCents: _pendingCents, ...m }) => m),
+    // Beta abierta (US-29): la app explica que aún no hay recaudación en lugar de enseñar ceros.
+    beta: candlesFree(),
   });
 });

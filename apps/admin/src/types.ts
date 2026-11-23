@@ -16,7 +16,7 @@ export type Kpis = {
     byType: { type: "basic" | "solemn" | "permanent"; candles: number }[];
     bySaint: { saintId: string; name: string; candles: number }[];
   };
-  money: { simulated: boolean; revenueCents: number; impactCents: number; transferredCents: number };
+  money: { simulated: boolean; candlesFree: boolean; revenueCents: number; impactCents: number; transferredCents: number };
   voting: { month: string; votes: number; participationRate: number | null };
   mass: { massId: string; scheduledAt: string; attendees: number; chatParticipants: number } | null;
   daily: { day: string; newUsers: number; activeUsers: number; candles: number; revenueCents: number }[];

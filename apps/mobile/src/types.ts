@@ -128,6 +128,8 @@ export type CurrentCauses = {
 };
 
 export type Transparency = {
+  // Beta abierta (US-29): las velas son gratis y aún no hay recaudación.
+  beta: boolean;
   totals: { revenueCents: number; impactCents: number; transferredCents: number };
   months: {
     month: string;

@@ -18,7 +18,8 @@ export type AnalyticsEvents = {
   // Mini-player de las pestañas: volver al audio, pausar/reanudar o cerrarlo.
   mini_player_used: { action: "open" | "toggle" | "close" };
   candle_flow_started: Record<string, never>;
-  candle_lit: { type: CandleType; forDeceased: boolean };
+  // free: vela encendida gratis durante la beta (US-28).
+  candle_lit: { type: CandleType; forDeceased: boolean; free: boolean };
   candle_shared: { withIntention: boolean };
   intention_posted: { category: IntentionCategory; moderated: boolean };
   intention_prayed: Record<string, never>;

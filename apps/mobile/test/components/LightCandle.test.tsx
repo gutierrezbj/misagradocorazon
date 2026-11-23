@@ -100,3 +100,18 @@ test("sin conexión avisa de la conexión, no de un problema con la cuenta", asy
   expect(await screen.findByText(/Sin conexión/)).toBeTruthy();
   expect(screen.queryByText("No pudimos verificar tus datos.")).toBeNull();
 });
+
+test("beta abierta: la vela es gratis, sin precios, y la analítica lo registra (US-28)", async () => {
+  mockApi.mockImplementation(async (path: string) =>
+    path === "/saints" ? SAINTS : path === "/features" ? { passwordReset: false, candlesFree: true } : { saint: { name: "Virgen de Guadalupe" } },
+  );
+  await renderScreen(<LightCandle />);
+  expect(await screen.findByText("Gratis durante la beta")).toBeTruthy();
+  expect(screen.getAllByText("Gratis")).toHaveLength(3);
+  for (const price of ["$0.99", "$1.99", "$2.99"]) expect(screen.queryByText(price)).toBeNull();
+
+  await fireEvent.changeText(screen.getByTestId("candle-intention-input"), "Por mi familia");
+  await fireEvent.press(screen.getByTestId("light-now-button"));
+  const { track } = jest.requireMock("@/src/analytics") as { track: jest.Mock };
+  await waitFor(() => expect(track).toHaveBeenCalledWith("candle_lit", { type: "basic", forDeceased: false, free: true }));
+});

@@ -43,6 +43,9 @@ const envSchema = z.object({
     .regex(/^smtps?:\/\//, "Debe empezar por smtp:// o smtps://")
     .optional(),
   MAIL_FROM: z.string().min(3).optional(),
+  // Pagos (ADR-003): "simulated" confirma sin cobrar y apunta en el libro; "beta_free" (beta abierta,
+  // SDD-05 US-28) enciende la vela gratis y no apunta nada. El cobro real llega con RevenueCat.
+  PAYMENTS_MODE: z.enum(["simulated", "beta_free"]).default("simulated"),
 });
 
 export type Env = z.infer<typeof envSchema>;

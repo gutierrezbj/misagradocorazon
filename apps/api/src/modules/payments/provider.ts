@@ -1,6 +1,8 @@
-// Capa de pagos intercambiable (ADR-003). Hoy: simulada. Con la sociedad constituida: RevenueCat (IAP).
-// Con IAP el cobro lo hace la store en el dispositivo; el servidor solo confirma la compra.
+// Capa de pagos intercambiable (ADR-003). Hoy: simulada o "beta gratis". Con la sociedad constituida:
+// RevenueCat (IAP). Con IAP el cobro lo hace la store en el dispositivo; el servidor solo confirma la compra.
 import { randomUUID } from "node:crypto";
+
+import { env } from "../../env.ts";
 
 export type PurchaseInput = {
   userId: string;
@@ -9,7 +11,8 @@ export type PurchaseInput = {
   // Justificante de la store (RevenueCat). Ausente en modo simulado.
   receipt?: string;
 };
-export type PurchaseResult = { ref: string };
+// chargedCents: lo que se cobró de verdad. Solo lo cobrado entra en el libro de movimientos.
+export type PurchaseResult = { ref: string; chargedCents: number };
 
 export interface PaymentProvider {
   readonly name: string;
@@ -19,9 +22,26 @@ export interface PaymentProvider {
 // No cobra nada: devuelve una referencia única para trazar la operación en el libro de movimientos.
 export const simulatedPayments: PaymentProvider = {
   name: "simulated",
-  async confirmPurchase() {
-    return { ref: `sim_${randomUUID()}` };
+  async confirmPurchase(input) {
+    return { ref: `sim_${randomUUID()}`, chargedCents: input.amountCents };
   },
 };
 
-export const payments: PaymentProvider = simulatedPayments;
+// Beta abierta (SDD-05 US-28, 23-nov-2026): la vela es gratis. No hay compra, así que no entra nada
+// en el libro ni se aparta el 20 %: la transparencia no muestra dinero que no existe (US-29).
+export const betaFreePayments: PaymentProvider = {
+  name: "beta_free",
+  async confirmPurchase() {
+    return { ref: `beta_${randomUUID()}`, chargedCents: 0 };
+  },
+};
+
+let current: PaymentProvider = env.PAYMENTS_MODE === "beta_free" ? betaFreePayments : simulatedPayments;
+
+export const payments = () => current;
+export const candlesFree = () => current.name === betaFreePayments.name;
+
+/** Solo para tests: cambia el proveedor sin reiniciar el proceso. */
+export function setPaymentProvider(provider: PaymentProvider) {
+  current = provider;
+}

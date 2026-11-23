@@ -8,6 +8,7 @@ Requisito de entrega 7. Estado a 28-sep-2026. El código del MVP (los tres pilar
 |---|---|---|
 | **Pagos de la vela** | La capa de pagos (`apps/api/src/modules/payments/provider.ts`) confirma sin cobrar y deja una referencia `sim_…` en el libro de movimientos. El libro, el 20 % y la transparencia funcionan igual que con dinero real | Cuando exista la sociedad: compras dentro de la app con RevenueCat (SDD-04, ADR-003). Solo cambia el proveedor de la capa de pagos |
 | **Cifras del panel y de transparencia** | Salen del libro, pero con compras simuladas | Con los pagos reales |
+| **Beta abierta** | `PAYMENTS_MODE=beta_free`: la vela es gratis, no entra nada en el libro y la transparencia dice que aún no hay recaudación (SDD-05 US-28 y US-29) | Cuando exista la sociedad, se pasa a RevenueCat |
 
 ## Pendiente de cuentas del fundador
 

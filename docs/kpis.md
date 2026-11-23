@@ -38,6 +38,16 @@ El panel muestra los asistentes a la última misa empezada y, aparte, cuántos d
 
 El resumen del panel muestra, para la ventana elegida, cuántas oraciones rezaron los fieles en cada tiempo litúrgico (US-10) y la **media por día** de cada tiempo, que es la cifra comparable: los tiempos duran distinto. Sale de `prayer_log` (día local del fiel) y no cuenta al staff. Sirve para ver si la gente reza más en Cuaresma o en Adviento que en el tiempo ordinario.
 
+## Beta abierta (vela gratis)
+
+Con `PAYMENTS_MODE=beta_free` (SDD-05 US-28):
+- las velas cuentan en el resumen (velas, compradores y conversión);
+- no generan ingresos ni 20 %, porque no entra nada en el libro de movimientos;
+- el panel lo indica bajo los ingresos ("Beta: las velas son gratis");
+- en PostHog, `candle_lit` lleva `free: true`.
+
+La transparencia pública dice que es beta y que aún no hay recaudación (US-29).
+
 ## Objetivos del MVP
 
 El resumen del panel compara las métricas de éxito de la especificación funcional (§10) con sus metas a los meses 1-3 y al mes 6. Son mensuales, así que se miden siempre sobre los **últimos 30 días**, sea cual sea la ventana elegida arriba. Las metas están en un solo sitio: `MVP_TARGETS` en `packages/shared/src/domain.ts`.
@@ -74,7 +84,7 @@ Solo con consentimiento explícito. Al final del onboarding la opción aparece *
   | `gospel_shared` | ninguna. Evangelio compartido desde su pantalla (US-25); en Android cuenta al abrir la hoja de compartir, porque el sistema no dice si se llegó a enviar |
   | `mini_player_used` | volver al audio, pausar/reanudar o cerrar. Dice cuántos escuchan mientras usan otras partes de la app |
   | `candle_flow_started` | ninguna |
-  | `candle_lit` | tipo de vela, por difuntos o no |
+  | `candle_lit` | tipo de vela, por difuntos o no, gratis en la beta o no (US-28) |
   | `candle_shared` | con o sin intención |
   | `intention_posted` | categoría, retenida por moderación o no |
   | `intention_prayed` | ninguna |
