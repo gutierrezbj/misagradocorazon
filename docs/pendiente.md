@@ -49,7 +49,7 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 
 ## Pendiente de contenido y legal
 
-- **Audio:** lo graba el equipo (nunca con IA) y se sube desde el panel (`docs/audio.md`).
+- **Audio:** voces de IA con licencia comercial para el volumen diario e invitados para las piezas especiales, siempre identificadas en la app (decisión del 23-nov-2026, CLAUDE.md). Se sube desde el panel (`docs/audio.md`).
 - **Contenido diario:** evangelio y meditación de cada día, preparados en el panel (`docs/contenido.md`).
 - **Causas creadas antes de la ficha completa:** no tienen "qué se hará con el dinero" y su presupuesto es una partida única. El panel lo marca; hay que completarlas antes de que entren en votación (`docs/contenido.md`).
 - **Oraciones por tiempo litúrgico:** al menos las de tiempo ordinario y las del próximo tiempo fuerte (Adviento empieza el 29-nov-2026), con su audio. Sin ellas, los días sin oración propia se quedan sin oración (`docs/contenido.md`).

@@ -87,6 +87,25 @@ Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones 
   - Sentry.
 - Google Sign-In en la web necesita el cliente web de Google Cloud. Apple Sign-In en la web necesita la cuenta de Apple Developer; si no está a tiempo, en la web va solo email y Google.
 
+### Cambio del 23-nov-2026: voces de IA e invitados en el audio
+
+Aprobado por el fundador el 23-nov-2026. Sustituye la restricción de SDD-02 "audio pregrabado por el equipo (no voz sintética)" y la regla de CLAUDE.md.
+
+- **SDD-02, restricción de audio:**
+  - El audio puede grabarlo una persona (el equipo o un invitado) o generarse con voces de IA (Fish Audio, ElevenLabs) con licencia comercial.
+  - Las voces de IA dan el volumen diario: santo del día y oraciones por tiempo litúrgico.
+  - Los invitados dan las piezas especiales: novenas, oraciones principales y celebraciones.
+- **Condiciones:**
+  - la app siempre identifica la voz ("Voz generada con IA" o el nombre del invitado);
+  - nunca se clona la voz de una persona real sin su consentimiento por escrito;
+  - una persona revisa cada texto antes de generarlo;
+  - el detalle legal (la ley de IA europea pide identificar el audio generado) lo confirma el asesor del fundador.
+- **SDD-05, US-30 — Voz identificada en el reproductor:**
+  - Cada audio guarda su tipo de voz (IA o persona) y, si es una persona, su nombre.
+  - El reproductor lo muestra.
+  - El panel lo pide al subir el audio.
+- **KPI:** `audio_played` lleva el tipo de voz, para comparar la escucha entre voces de IA e invitadas.
+
 ### Decisiones que necesito del fundador
 
 1. Aprobar este cambio para aplicarlo en Notion (SDD-02, 04, 05, 07 y 08).

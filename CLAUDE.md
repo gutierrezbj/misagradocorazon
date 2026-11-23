@@ -24,7 +24,10 @@
 - **Cumplimiento de Apple (guideline 3.2.2.iv), bloqueante:** ninguna pantalla del flujo de compra de la vela, incluida la de confirmación, menciona causas, donaciones ni el 20%. El 20% se comunica fuera del flujo de pago.
 - **Login:** email/contraseña y Google. Apple Sign-In obligatorio antes de publicar en la App Store.
 - **Idioma:** bilingüe ES/EN con i18n desde la base. Ningún texto de la interfaz escrito a mano sin pasar por i18n, tampoco en el panel.
-- **Audio:** el santo del día y las oraciones de mañana y noche llevan reproductor con audio en segundo plano. El audio lo graba el equipo; no se genera con IA.
+- **Audio:** el santo del día y las oraciones de mañana y noche llevan reproductor con audio en segundo plano. Desde el 23-nov-2026 (decisión del fundador), el audio puede grabarse con personas (equipo o invitados) o generarse con voces de IA (Fish Audio, ElevenLabs) con licencia comercial. Condiciones:
+  - La app siempre dice qué voz suena: "Voz generada con IA" o el nombre del invitado.
+  - Nunca se clona la voz de una persona real sin su consentimiento por escrito.
+  - Una persona revisa cada texto antes de generarlo: nombres, latín, pronunciación.
 - **Muro de testimonios:** FUERA hasta v3. No se implementa ni se deja preparado.
 
 ### Arquitectura objetivo (aprobada 26-sep-2026)
