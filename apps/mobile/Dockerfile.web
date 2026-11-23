@@ -1,0 +1,30 @@
+# Beta web instalable (SDD-05 US-27, ADR-016): la app exportada para navegador, servida por Caddy.
+# Contexto: raíz del repo. Las EXPO_PUBLIC_* se fijan al construir (van dentro del bundle).
+FROM node:22-slim AS build
+ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH CI=1
+RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc tsconfig.base.json ./
+COPY packages/shared/package.json packages/shared/
+COPY apps/admin/package.json apps/admin/
+COPY apps/api/package.json apps/api/
+COPY apps/mobile/package.json apps/mobile/
+RUN pnpm install --frozen-lockfile --filter @msc/mobile...
+COPY packages/shared packages/shared
+COPY apps/mobile apps/mobile
+ARG EXPO_PUBLIC_BACKEND_URL
+# Opcionales: sin ellas no hay analítica ni envío de errores.
+ARG EXPO_PUBLIC_POSTHOG_KEY
+ARG EXPO_PUBLIC_POSTHOG_HOST
+ARG EXPO_PUBLIC_SENTRY_DSN
+ARG EXPO_PUBLIC_SENTRY_ENVIRONMENT
+RUN test -n "$EXPO_PUBLIC_BACKEND_URL" || (echo "Falta EXPO_PUBLIC_BACKEND_URL" && exit 1)
+RUN cd apps/mobile && npx expo export --platform web --output-dir dist
+
+FROM caddy:2-alpine
+COPY apps/mobile/Caddyfile.web /etc/caddy/Caddyfile
+COPY --from=build /app/apps/mobile/dist /srv
+ARG EXPO_PUBLIC_BACKEND_URL
+ENV API_ORIGIN=$EXPO_PUBLIC_BACKEND_URL
+# El chat de misa usa WebSocket: su origen es el de la API con wss:// (o ws:// en local).
+CMD ["sh", "-c", "API_WS_ORIGIN=$(echo \"$API_ORIGIN\" | sed 's#^http#ws#') exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile"]

@@ -5,6 +5,7 @@
 //   y sus propiedades son valores cerrados (tipo de vela, categoría...).
 // - Se identifica solo por el id interno. Sin geolocalización por IP, sin grabación de sesiones.
 // - Sin EXPO_PUBLIC_POSTHOG_KEY la analítica está apagada (desarrollo, tests, builds sin cuenta).
+import { Platform } from "react-native";
 import PostHog from "posthog-react-native";
 import type { CandleType, IntentionCategory, LiturgicalSeason } from "@msc/shared";
 
@@ -32,6 +33,8 @@ export type AnalyticsEvents = {
   // Grabación de la última misa (pilar 2): dentro de la app (YouTube) o fuera.
   recording_opened: { inApp: boolean };
   chat_message_sent: Record<string, never>;
+  // Beta web (US-27): el navegador confirma que se instaló la app.
+  pwa_installed: Record<string, never>;
 };
 
 const KEY = process.env.EXPO_PUBLIC_POSTHOG_KEY ?? "";
@@ -68,8 +71,9 @@ function send(item: Pending) {
     if (pending.length < MAX_PENDING) pending.push(item);
     return;
   }
-  if ("screen" in item) void client.screen(item.screen);
-  else client.capture(item.event, item.props);
+  // Plataforma en todos los eventos (web, ios, android): compara la beta web con la app nativa.
+  if ("screen" in item) void client.screen(item.screen, { platform: Platform.OS });
+  else client.capture(item.event, { ...item.props, platform: Platform.OS });
 }
 
 export function track<E extends keyof AnalyticsEvents>(event: E, ...props: AnalyticsEvents[E] extends Record<string, never> ? [] : [AnalyticsEvents[E]]) {

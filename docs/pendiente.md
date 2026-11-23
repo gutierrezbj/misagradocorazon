@@ -48,6 +48,17 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 | Enlace directo al compartir la vela (US-22) | Necesita el dominio y las fichas de las tiendas | `docs/testing.md` |
 | Quitar dependencias sin uso de la app | Cambia el build nativo; mejor con el primer build de EAS | `docs/dependencias.md` |
 
+## Pendiente de la beta web
+
+Antes de abrirla a fieles reales: `docs/beta-web.md`, "Antes de abrir la beta".
+- base de datos limpia;
+- `INTENTIONS_KEY` nueva;
+- copias de seguridad fuera del VPS;
+- aviso de privacidad;
+- DNS de `app.misagradocorazon.com`.
+
+**Logo definitivo:** el icono actual es provisional; sustituye al del constructor.
+
 ## Pendiente de contenido y legal
 
 - **Audio:** voces de IA con licencia comercial para el volumen diario e invitados para las piezas especiales, siempre identificadas en la app (decisión del 23-nov-2026, CLAUDE.md). Se sube desde el panel (`docs/audio.md`).

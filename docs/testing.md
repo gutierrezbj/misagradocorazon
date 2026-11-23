@@ -77,6 +77,11 @@ Dos puntos de la checklist manual se pueden probar ya en la app web con Playwrig
   - los textos que escriben los propios fieles, que se muestran tal como los escribieron: intenciones, mensajes, nombres, palabras filtradas;
   - los nombres propios de los santos.
 
+## Beta web (PWA)
+
+- **CI:** construye la imagen `apps/mobile/Dockerfile.web` en cada PR.
+- **Pruebas manuales:** instalabilidad, service worker, contenedor con CSP y aviso de instalación en iPhone (`docs/beta-web.md`).
+
 ## Pendiente fuera del código
 
 - **US-22, enlace directo a la app o a la tienda al compartir la vela:** hoy el dominio va impreso en la imagen, pero no se puede tocar. Para el enlace hacen falta:

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
+    <title>Mi Sagrado Corazón</title>
+    <meta name="description" content="La comunidad de fe que enciende el mundo" />
+    <!-- Beta web instalable (SDD-05 US-27, ADR-016). -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#8B0000" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Sagrado Corazón" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <!-- Reset de react-native-web: https://necolas.github.io/react-native-web/docs/setup/#root-element -->
+    <style id="expo-reset">
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        overflow: hidden;
+        background-color: #fdfbf7;
+      }
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <noscript>Mi Sagrado Corazón necesita JavaScript.</noscript>
+    <div id="root"></div>
+    <!-- Service worker (beta web instalable). En desarrollo no se registra: ver register-sw.js. -->
+    <script src="/register-sw.js" defer></script>
+  </body>
+</html>

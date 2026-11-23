@@ -16,6 +16,7 @@ import { Icon } from "@/src/components/ui";
 import { CandleFlame } from "@/src/ritual/CandleFlame";
 import { usesNativeTabs } from "@/src/navigation";
 import { useMiniPlayerInset } from "@/src/ritual/audio-state";
+import { InstallHint } from "@/src/pwa";
 
 export default function Altar() {
   const styles = useStyles();
@@ -105,6 +106,8 @@ export default function Altar() {
             </LinearGradient>
           </Pressable>
         </View>
+
+        <InstallHint />
 
         {/* Daily cards */}
         <View style={styles.cards}>

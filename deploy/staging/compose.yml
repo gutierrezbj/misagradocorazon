@@ -2,8 +2,8 @@
 # Mismos Dockerfiles que Railway. Las imágenes las construye GitHub Actions en cada push a main
 # (.github/workflows/staging-images.yml) y el VPS solo las descarga: no se compila en el servidor.
 # Uso y primer despliegue: deploy/staging/README.md. Se ejecuta desde esta carpeta.
-# Puertos: offset +270 del Catálogo de Infraestructura JRGB (3270 panel, 4270 API, 6270 PostgreSQL),
-# siempre en 127.0.0.1. El worker no tiene HTTP (5270 queda reservado sin uso).
+# Puertos: offset +270 del Catálogo de Infraestructura JRGB (3270 panel, 4270 API, 5270 beta web,
+# 6270 PostgreSQL), siempre en 127.0.0.1. El worker no tiene HTTP.
 name: msc-staging
 
 # Las opcionales (Google, R2, SMTP, Sentry...) llegan desde .env con env_file, solo si están
@@ -13,7 +13,7 @@ x-api-env: &api-env
   DATABASE_URL: postgresql://msc:${POSTGRES_PASSWORD:?falta POSTGRES_PASSWORD}@db:5432/msc
   BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?falta BETTER_AUTH_SECRET}
   BETTER_AUTH_URL: https://${API_DOMAIN:?falta API_DOMAIN}
-  TRUSTED_ORIGINS: https://${ADMIN_DOMAIN:?falta ADMIN_DOMAIN}
+  TRUSTED_ORIGINS: https://${ADMIN_DOMAIN:?falta ADMIN_DOMAIN},https://${APP_DOMAIN:?falta APP_DOMAIN}
   INTENTIONS_KEY: ${INTENTIONS_KEY:?falta INTENTIONS_KEY}
   SENTRY_ENVIRONMENT: staging
 
@@ -86,6 +86,14 @@ services:
     restart: unless-stopped
     ports:
       - "127.0.0.1:3270:8080"
+
+  web:
+    # Beta web instalable (SDD-05 US-27). Lleva fijada la URL de la API de staging (se fija al construir).
+    image: ghcr.io/gutierrezbj/misagradocorazon-web:${IMAGE_TAG:-staging}
+    container_name: msc-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5270:8080"
 
 volumes:
   db-data:

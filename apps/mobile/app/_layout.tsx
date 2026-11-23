@@ -15,6 +15,7 @@ import { AudioProvider } from "@/src/ritual/audio";
 import { registerForPush, usePushNavigation } from "@/src/push";
 import { OfflineBanner, useQueryOnlineSync } from "@/src/network";
 import { trackScreen } from "@/src/analytics";
+import { watchPwaInstall } from "@/src/pwa";
 import { I18nProvider } from "@/src/i18n";
 import { ToastProvider } from "@/src/components/ui";
 import { useTheme } from "@/src/theme";
@@ -34,6 +35,8 @@ function Gate() {
   useEffect(() => {
     if (ready) registerForPush({ ask: false }).catch(() => undefined);
   }, [ready]);
+
+  useEffect(() => watchPwaInstall(), []);
 
   // Pantallas por su ruta genérica (p. ej. "saint/[id]"): sin ids ni datos de la persona.
   const route = segments.join("/") || "index";
