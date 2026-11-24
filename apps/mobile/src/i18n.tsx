@@ -176,6 +176,8 @@ const dict = {
   candleLit: { es: "Tu vela está encendida", en: "Your candle is lit" },
   candleLitSub: { es: "Tu intención se eleva ahora en el altar", en: "Your intention now rises on the altar" },
   simulatedPayment: { es: "Pago simulado en esta versión de prueba", en: "Simulated payment in this preview" },
+  voiceAi: { es: "Voz generada con IA", en: "AI-generated voice" },
+  voiceBy: { es: "Voz de", en: "Voice:" },
   installTitle: { es: "Llévala en tu pantalla de inicio", en: "Keep it on your home screen" },
   installApp: { es: "Instalar la app", en: "Install the app" },
   installIos: { es: "En Safari, toca Compartir y después «Añadir a pantalla de inicio».", en: "In Safari, tap Share and then “Add to Home Screen”." },

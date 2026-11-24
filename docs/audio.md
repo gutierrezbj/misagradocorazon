@@ -2,6 +2,18 @@
 
 Estado: reproductor listo. Falta el audio: desde el 23-nov-2026 puede grabarlo una persona (el equipo o un invitado) o generarse con voces de IA con licencia comercial, siempre identificado en la app (CLAUDE.md). Se sube cuando exista la gestión de contenido del panel, con los ficheros en Cloudflare R2.
 
+## Quién pone la voz (US-30)
+
+Decisión del fundador del 23-nov-2026 (CLAUDE.md). Cada audio guarda, en su idioma, quién pone la voz:
+- `ai` si es una voz generada con IA (Fish Audio, ElevenLabs, con licencia comercial);
+- el nombre de la persona si es del equipo o un invitado. Nunca se clona la voz de una persona real sin su consentimiento por escrito.
+
+Cómo funciona:
+- **Panel:** al poner un audio, el editor tiene que elegir "Voz generada con IA" o "Una persona" y escribir el nombre. Sin eso no se guarda; la API también lo comprueba.
+- **App:** el reproductor lo muestra debajo de los controles: "Voz generada con IA" o "Voz de <nombre>".
+- **Analítica:** `audio_played` lleva la voz, para comparar cuánto se escuchan las voces de IA y las de personas (`docs/kpis.md`).
+- **Revisión:** antes de generar un audio, una persona revisa el texto (nombres, latín, pronunciación).
+
 ## Dónde suena
 
 | Pantalla | Campo en la API | Historia |

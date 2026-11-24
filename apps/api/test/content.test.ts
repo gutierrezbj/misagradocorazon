@@ -46,11 +46,12 @@ describe("santoral", () => {
     const patched = await request(app)
       .patch("/api/admin/saints/saint_santa_rosa_de_lima")
       .set(bearer(ed.token))
-      .send({ audioUrlEs: "https://media.example/rosa-es.mp3" });
+      .send({ audioUrlEs: "https://media.example/rosa-es.mp3", audioVoiceEs: "ai" });
     expect(patched.status).toBe(200);
 
     const pub = await request(app).get("/api/saints/saint_santa_rosa_de_lima");
     expect(pub.body.data.audioUrl).toEqual({ es: "https://media.example/rosa-es.mp3", en: null });
+    expect(pub.body.data.audioVoice).toEqual({ es: { kind: "ai" }, en: null });
     // Solo cambia lo enviado: el resto de la ficha sigue igual (regresión del 27-sep-2026).
     const stored = await prisma.saint.findUniqueOrThrow({ where: { id: "saint_santa_rosa_de_lima" } });
     expect(stored).toMatchObject({ isPatronCatalog: true, prayerEs: "Santa Rosa, ruega por nosotros.", sortOrder: 7 });
@@ -122,7 +123,7 @@ describe("contenido diario", () => {
     const put = await request(app)
       .put("/api/admin/daily/2026-12-12")
       .set(bearer(ed.token))
-      .send({ ...daily, saintOfDayId: "saint_guadalupe", morningAudioUrlEs: "https://media.example/m-es.mp3" });
+      .send({ ...daily, saintOfDayId: "saint_guadalupe", morningAudioUrlEs: "https://media.example/m-es.mp3", morningAudioVoiceEs: "Padre Miguel" });
     expect(put.status).toBe(200);
     const upd = await request(app)
       .put("/api/admin/daily/2026-12-12")
@@ -134,6 +135,7 @@ describe("contenido diario", () => {
     expect(pub.body.data.gospel.ref).toBe("Lc 1, 39-48");
     expect(pub.body.data.saintOfDay.id).toBe("saint_guadalupe");
     expect(pub.body.data.morningPrayer.audioUrl).toEqual({ es: "https://media.example/m-es.mp3", en: null });
+    expect(pub.body.data.morningPrayer.audioVoice).toEqual({ es: { kind: "person", name: "Padre Miguel" }, en: null });
     const actions = await prisma.adminAuditLog.findMany({ where: { entity: "daily_content" }, orderBy: { createdAt: "asc" } });
     expect(actions.map((a) => a.action)).toEqual(["daily.create", "daily.update"]);
   });
@@ -143,7 +145,7 @@ describe("contenido diario", () => {
     await request(app)
       .put("/api/admin/daily/2026-12-02")
       .set(bearer(ed.token))
-      .send({ ...daily, nightAudioUrlEn: "https://media.example/n-en.mp3" });
+      .send({ ...daily, nightAudioUrlEn: "https://media.example/n-en.mp3", nightAudioVoiceEn: "ai" });
     const cal = await request(app).get("/api/admin/daily?from=2026-12-01&days=3").set(bearer(ed.token));
     expect(cal.body.data.map((d: { date: string; filled: boolean }) => [d.date, d.filled])).toEqual([
       ["2026-12-01", false],
@@ -178,7 +180,7 @@ describe("contenido diario", () => {
 
 describe("oraciones por tiempo litúrgico (US-10)", () => {
   const bare = { gospelRef: "Mt 5, 1-12", gospelEs: "g", gospelEn: "g", meditationEs: "m", meditationEn: "m" };
-  const set = (textEs: string, audioUrlEs?: string) => ({ textEs, textEn: `${textEs} (en)`, ...(audioUrlEs && { audioUrlEs }) });
+  const set = (textEs: string, audioUrlEs?: string) => ({ textEs, textEn: `${textEs} (en)`, ...(audioUrlEs && { audioUrlEs, audioVoiceEs: "ai" }) });
 
   it("un día sin oración propia sirve la de su tiempo, con su audio; sin set del tiempo, la del ordinario", async () => {
     const ed = await signUpAs("editor");
@@ -199,6 +201,7 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
       es: "Ven, Señor Jesús",
       en: "Ven, Señor Jesús (en)",
       audioUrl: { es: "https://media.example/adv-es.mp3", en: null },
+      audioVoice: { es: { kind: "ai" }, en: null },
       source: "season",
     });
     // Adviento no tiene oración de noche: se usa la del tiempo ordinario.
@@ -223,7 +226,13 @@ describe("oraciones por tiempo litúrgico (US-10)", () => {
       .send({ ...bare, nightPrayerEs: "Inmaculada", nightPrayerEn: "Immaculate" })
       .expect(200);
     const day = (await request(app).get("/api/daily?date=2026-12-08")).body.data;
-    expect(day.nightPrayer).toEqual({ es: "Inmaculada", en: "Immaculate", audioUrl: { es: null, en: null }, source: "day" });
+    expect(day.nightPrayer).toEqual({
+      es: "Inmaculada",
+      en: "Immaculate",
+      audioUrl: { es: null, en: null },
+      audioVoice: { es: null, en: null },
+      source: "day",
+    });
   });
 
   it("sin oración propia ni sets, la oración llega vacía en vez de romper", async () => {
@@ -324,5 +333,46 @@ describe("subidas a R2", () => {
       .set(bearer(ed.token))
       .send({ kind: "image", contentType: "image/jpeg", size: 6 * 1024 * 1024 });
     expect(big.status).toBe(400);
+  });
+});
+
+// Voz identificada (CLAUDE.md 23-nov-2026, SDD-05 US-30): todo audio dice quién pone la voz.
+describe("voz de cada audio (US-30)", () => {
+  const url = "https://media.example/a.mp3";
+
+  it("sin decir la voz no se guarda el audio, ni en el alta ni al editar", async () => {
+    const ed = await signUpAs("editor");
+    const saint = { name: "San Juan Diego", feastDate: "12-09", imageUrl: "https://media.example/jd.jpg", historyEs: "h", historyEn: "h" };
+    const noVoice = await request(app)
+      .post("/api/admin/saints")
+      .set(bearer(ed.token))
+      .send({ ...saint, audioUrlEs: url });
+    expect(noVoice.status).toBe(400);
+    expect(noVoice.body.error.issues.map((i: { path: string[] }) => i.path.join("."))).toEqual(["audioVoiceEs"]);
+
+    await request(app).post("/api/admin/saints").set(bearer(ed.token)).send(saint).expect(201);
+    const patch = await request(app).patch("/api/admin/saints/saint_san_juan_diego").set(bearer(ed.token)).send({ audioUrlEn: url });
+    expect(patch.status).toBe(400);
+    expect(patch.body.error.issues[0].path).toEqual(["audioVoiceEn"]);
+
+    // Con la voz ya guardada, cambiar solo el audio no la pide de nuevo.
+    await request(app)
+      .patch("/api/admin/saints/saint_san_juan_diego")
+      .set(bearer(ed.token))
+      .send({ audioUrlEn: url, audioVoiceEn: "Hermana Lucía" })
+      .expect(200);
+    await request(app).patch("/api/admin/saints/saint_san_juan_diego").set(bearer(ed.token)).send({ audioUrlEn: "https://media.example/b.mp3" }).expect(200);
+    const pub = (await request(app).get("/api/saints/saint_san_juan_diego")).body.data;
+    expect(pub.audioVoice).toEqual({ es: null, en: { kind: "person", name: "Hermana Lucía" } });
+
+    const day = { gospelRef: "Jn 1", gospelEs: "g", gospelEn: "g", meditationEs: "m", meditationEn: "m", meditationAudioUrlEn: url };
+    expect((await request(app).put("/api/admin/daily/2026-12-03").set(bearer(ed.token)).send(day)).status).toBe(400);
+    await request(app)
+      .put("/api/admin/daily/2026-12-03")
+      .set(bearer(ed.token))
+      .send({ ...day, meditationAudioVoiceEn: "ai" })
+      .expect(200);
+    const daily = (await request(app).get("/api/daily?date=2026-12-03")).body.data;
+    expect(daily.meditation.audioVoice).toEqual({ es: null, en: { kind: "ai" } });
   });
 });

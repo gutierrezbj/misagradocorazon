@@ -62,7 +62,7 @@ export function AudioProvider({ children }: { children: ReactNode }) {
       player.play();
       if (t.content && trackedUrl.current !== t.url) {
         trackedUrl.current = t.url;
-        trackEvent("audio_played", { content: t.content });
+        trackEvent("audio_played", { content: t.content, voice: t.voice ?? "unknown" });
       }
       if (lockScreenUrl.current !== t.url) {
         player.setActiveForLockScreen(

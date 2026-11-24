@@ -100,8 +100,8 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  role    Role    @default(user)
-  blocked Boolean @default(false)
+  role      Role      @default(user)
+  blocked   Boolean   @default(false)
   // Cuenta borrada por su titular (SDD-02, GDPR art. 17): datos personales fuera, fila anonimizada.
   deletedAt DateTime?
 
@@ -116,19 +116,19 @@ model User {
   nightTime         String   @default("21:30")
 
   // Preferencias de notificación (SDD-05, épica 5). Las de oración van a la hora local de arriba.
-  notifyMorning   Boolean @default(true)
-  notifyNight     Boolean @default(true)
-  notifySaint     Boolean @default(true) // santo del día, 07:00 local
-  notifyCommunity Boolean @default(true) // causa ganadora y avisos del equipo
+  notifyMorning      Boolean @default(true)
+  notifyNight        Boolean @default(true)
+  notifySaint        Boolean @default(true) // santo del día, 07:00 local
+  notifyCommunity    Boolean @default(true) // causa ganadora y avisos del equipo
   notifyCandleExpiry Boolean @default(false) // vela permanente apagada: opt-in (Apple 4.5.4)
 
   // Analítica de uso (ADR-011): solo con consentimiento explícito. Se guarda cuándo se dio o retiró.
   analyticsConsent   Boolean   @default(false)
   analyticsConsentAt DateTime?
 
-  patronSaint Saint?      @relation("PatronSaint", fields: [patronSaintId], references: [id])
-  sessions    Session[]
-  accounts    Account[]
+  patronSaint       Saint?             @relation("PatronSaint", fields: [patronSaintId], references: [id])
+  sessions          Session[]
+  accounts          Account[]
   candles           Candle[]
   prayerLogs        PrayerLog[]
   intentions        Intention[]
@@ -209,25 +209,28 @@ model AppleRevocation {
 // ---------------------------------------------------------------------------
 
 model Saint {
-  id              String   @id
+  id              String    @id
   name            String
-  feastDate       String   // MM-DD
+  feastDate       String // MM-DD
   imageUrl        String
   audioUrlEs      String?
   audioUrlEn      String?
+  // Quién pone la voz (CLAUDE.md, 23-nov-2026): "ai" o el nombre de la persona. Nulo sin audio.
+  audioVoiceEs    String?
+  audioVoiceEn    String?
   historyEs       String
   historyEn       String
   patronagesEs    String
   patronagesEn    String
-  iconographyEs   String   @default("") // US-26: cómo se le representa; vacía = no se muestra
-  iconographyEn   String   @default("")
+  iconographyEs   String    @default("") // US-26: cómo se le representa; vacía = no se muestra
+  iconographyEn   String    @default("")
   prayerEs        String
   prayerEn        String
-  isPatronCatalog Boolean  @default(false)
-  sortOrder       Int      @default(100)
+  isPatronCatalog Boolean   @default(false)
+  sortOrder       Int       @default(100)
   deletedAt       DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   patronOf   User[]         @relation("PatronSaint")
   candles    Candle[]
@@ -237,25 +240,32 @@ model Saint {
 }
 
 model DailyContent {
-  date              String  @id // YYYY-MM-DD
-  saintOfDayId      String?
-  gospelRef         String
-  gospelEs          String
-  gospelEn          String
-  meditationEs      String
-  meditationEn      String
+  date                   String   @id // YYYY-MM-DD
+  saintOfDayId           String?
+  gospelRef              String
+  gospelEs               String
+  gospelEn               String
+  meditationEs           String
+  meditationEn           String
   // Audio por idioma (SDD-05 US-07): el fiel escucha el de su idioma.
-  meditationAudioUrlEs String?
-  meditationAudioUrlEn String?
-  morningPrayerEs   String? // vacía = la del tiempo litúrgico (US-10)
-  morningPrayerEn   String? // vacía = la del tiempo litúrgico (US-10)
-  nightPrayerEs     String? // vacía = la del tiempo litúrgico (US-10)
-  nightPrayerEn     String? // vacía = la del tiempo litúrgico (US-10)
-  morningAudioUrlEs String?
-  morningAudioUrlEn String?
-  nightAudioUrlEs   String?
-  nightAudioUrlEn   String?
-  updatedAt         DateTime @updatedAt
+  meditationAudioUrlEs   String?
+  meditationAudioUrlEn   String?
+  // Quién pone la voz de cada audio (CLAUDE.md, 23-nov-2026): "ai" o el nombre de la persona.
+  meditationAudioVoiceEs String?
+  meditationAudioVoiceEn String?
+  morningPrayerEs        String? // vacía = la del tiempo litúrgico (US-10)
+  morningPrayerEn        String? // vacía = la del tiempo litúrgico (US-10)
+  nightPrayerEs          String? // vacía = la del tiempo litúrgico (US-10)
+  nightPrayerEn          String? // vacía = la del tiempo litúrgico (US-10)
+  morningAudioUrlEs      String?
+  morningAudioUrlEn      String?
+  nightAudioUrlEs        String?
+  nightAudioUrlEn        String?
+  morningAudioVoiceEs    String?
+  morningAudioVoiceEn    String?
+  nightAudioVoiceEs      String?
+  nightAudioVoiceEn      String?
+  updatedAt              DateTime @updatedAt
 
   saintOfDay Saint? @relation(fields: [saintOfDayId], references: [id])
 
@@ -265,13 +275,15 @@ model DailyContent {
 // Oración de mañana o de noche de un tiempo litúrgico (US-10). Se sirve los días sin oración propia.
 // Sin set para un tiempo, se usa el del tiempo ordinario.
 model SeasonalPrayer {
-  season     LiturgicalSeason
-  kind       PrayerKind
-  textEs     String
-  textEn     String
-  audioUrlEs String?
-  audioUrlEn String?
-  updatedAt  DateTime @updatedAt
+  season       LiturgicalSeason
+  kind         PrayerKind
+  textEs       String
+  textEn       String
+  audioUrlEs   String?
+  audioUrlEn   String?
+  audioVoiceEs String? // "ai" o el nombre de la persona (CLAUDE.md, 23-nov-2026)
+  audioVoiceEn String?
+  updatedAt    DateTime         @updatedAt
 
   @@id([season, kind])
   @@map("seasonal_prayer")
@@ -280,7 +292,7 @@ model SeasonalPrayer {
 model PrayerLog {
   id        String     @id @default(uuid())
   userId    String
-  localDate String     // YYYY-MM-DD en la zona horaria del usuario
+  localDate String // YYYY-MM-DD en la zona horaria del usuario
   kind      PrayerKind
   createdAt DateTime   @default(now())
 
@@ -299,7 +311,7 @@ model Candle {
   id                 String         @id @default(uuid())
   userId             String
   saintId            String
-  intentionEncrypted String         // AES-256-GCM (GDPR art. 9)
+  intentionEncrypted String // AES-256-GCM (GDPR art. 9)
   type               CandleType
   category           CandleCategory @default(general)
   priceCents         Int
@@ -322,7 +334,7 @@ model LedgerEntry {
   id          String          @id @default(uuid())
   type        LedgerEntryType
   amountCents Int
-  month       String          // YYYY-MM
+  month       String // YYYY-MM
   candleId    String?
   causeId     String?
   note        String?
@@ -342,7 +354,7 @@ model LedgerEntry {
 model Intention {
   id        String            @id @default(uuid())
   userId    String
-  text      String            // Pública por decisión del autor; no se cifra.
+  text      String // Pública por decisión del autor; no se cifra.
   category  IntentionCategory @default(general)
   status    ModerationStatus
   createdAt DateTime          @default(now())
@@ -481,7 +493,7 @@ model ChatMessage {
 
 model Cause {
   id            String      @id @default(uuid())
-  month         String      // YYYY-MM en que se vota
+  month         String // YYYY-MM en que se vota
   nameEs        String
   nameEn        String
   location      String
@@ -560,7 +572,7 @@ model Vote {
 model PushToken {
   token     String   @id
   userId    String
-  platform  String   // ios | android
+  platform  String // ios | android
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

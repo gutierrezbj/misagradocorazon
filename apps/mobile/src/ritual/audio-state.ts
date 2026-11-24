@@ -14,6 +14,8 @@ export type AudioTrack = {
   route: string;
   /** Qué se escucha, para la analítica (solo con consentimiento). */
   content?: AnalyticsEvents["audio_played"]["content"];
+  /** Quién pone la voz (US-30), para la analítica. */
+  voice?: AnalyticsEvents["audio_played"]["voice"];
 };
 
 export type AudioCtxValue = {

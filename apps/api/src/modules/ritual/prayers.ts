@@ -1,15 +1,17 @@
 // Oraciones de mañana y noche según el tiempo litúrgico (SDD-05 US-10).
 // Un día con oración propia la usa (texto y audio). Si no, la del tiempo litúrgico de esa fecha y,
 // si ese tiempo aún no tiene set, la del tiempo ordinario.
-import { liturgicalSeason, type LiturgicalSeason } from "@msc/shared";
+import { liturgicalSeason, type LiturgicalSeason, type VoiceCredit } from "@msc/shared";
 
 import { prisma } from "../../db.ts";
 import type { DailyContent, PrayerKind, SeasonalPrayer } from "../../generated/prisma/client.ts";
+import { audioVoice } from "./serializers.ts";
 
 export type ResolvedPrayer = {
   es: string;
   en: string;
   audioUrl: { es: string | null; en: string | null };
+  audioVoice: { es: VoiceCredit | null; en: VoiceCredit | null };
   source: "day" | "season";
 };
 
@@ -31,6 +33,10 @@ type DayPrayers = Pick<
   | "morningAudioUrlEn"
   | "nightAudioUrlEs"
   | "nightAudioUrlEn"
+  | "morningAudioVoiceEs"
+  | "morningAudioVoiceEn"
+  | "nightAudioVoiceEs"
+  | "nightAudioVoiceEn"
 >;
 
 export function resolvePrayers(day: DayPrayers, sets: Map<string, SeasonalPrayer>) {
@@ -39,10 +45,24 @@ export function resolvePrayers(day: DayPrayers, sets: Map<string, SeasonalPrayer
     const es = day[`${kind}PrayerEs`];
     const en = day[`${kind}PrayerEn`];
     if (es && en) {
-      return { es, en, audioUrl: { es: day[`${kind}AudioUrlEs`], en: day[`${kind}AudioUrlEn`] }, source: "day" };
+      const [urlEs, urlEn] = [day[`${kind}AudioUrlEs`], day[`${kind}AudioUrlEn`]];
+      return {
+        es,
+        en,
+        audioUrl: { es: urlEs, en: urlEn },
+        audioVoice: audioVoice(urlEs, day[`${kind}AudioVoiceEs`], urlEn, day[`${kind}AudioVoiceEn`]),
+        source: "day",
+      };
     }
     const set = sets.get(`${season}:${kind}`) ?? sets.get(`ordinary:${kind}`);
-    return set ? { es: set.textEs, en: set.textEn, audioUrl: { es: set.audioUrlEs, en: set.audioUrlEn }, source: "season" } : null;
+    if (!set) return null;
+    return {
+      es: set.textEs,
+      en: set.textEn,
+      audioUrl: { es: set.audioUrlEs, en: set.audioUrlEn },
+      audioVoice: audioVoice(set.audioUrlEs, set.audioVoiceEs, set.audioUrlEn, set.audioVoiceEn),
+      source: "season",
+    };
   };
   const [morning, night] = KINDS.map(pick);
   return { season, morning: morning ?? null, night: night ?? null };

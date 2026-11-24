@@ -12,6 +12,8 @@ type Form = {
   imageUrl: string;
   audioUrlEs: string;
   audioUrlEn: string;
+  audioVoiceEs: string;
+  audioVoiceEn: string;
   historyEs: string;
   historyEn: string;
   patronagesEs: string;
@@ -30,6 +32,8 @@ const EMPTY: Form = {
   imageUrl: "",
   audioUrlEs: "",
   audioUrlEn: "",
+  audioVoiceEs: "",
+  audioVoiceEn: "",
   historyEs: "",
   historyEn: "",
   patronagesEs: "",
@@ -48,6 +52,8 @@ const toForm = (s: AdminSaint): Form => ({
   imageUrl: s.imageUrl,
   audioUrlEs: s.audioUrlEs ?? "",
   audioUrlEn: s.audioUrlEn ?? "",
+  audioVoiceEs: s.audioVoiceEs ?? "",
+  audioVoiceEn: s.audioVoiceEn ?? "",
   historyEs: s.historyEs,
   historyEn: s.historyEn,
   patronagesEs: s.patronagesEs,
@@ -66,7 +72,15 @@ function SaintForm({ saint, onDone }: { saint: AdminSaint | null; onDone: () => 
   const set = (k: keyof Form) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
   const save = useMutation({
     mutationFn: () => {
-      const body = { ...f, audioUrlEs: f.audioUrlEs || null, audioUrlEn: f.audioUrlEn || null, sortOrder: Number(f.sortOrder) };
+      // Sin audio en un idioma, tampoco hay voz.
+      const body = {
+        ...f,
+        audioUrlEs: f.audioUrlEs || null,
+        audioUrlEn: f.audioUrlEn || null,
+        audioVoiceEs: (f.audioUrlEs && f.audioVoiceEs) || null,
+        audioVoiceEn: (f.audioUrlEn && f.audioVoiceEn) || null,
+        sortOrder: Number(f.sortOrder),
+      };
       return saint ? api(`/admin/saints/${saint.id}`, { method: "PATCH", body }) : api("/admin/saints", { method: "POST", body });
     },
     onSuccess: onDone,
@@ -100,8 +114,24 @@ function SaintForm({ saint, onDone }: { saint: AdminSaint | null; onDone: () => 
       </div>
       <div className="form-grid" style={{ marginTop: 14 }}>
         <MediaField label={t("image")} kind="image" required value={f.imageUrl} onChange={(v) => setF({ ...f, imageUrl: v })} testId="saint-image" />
-        <MediaField label={t("audioEs")} kind="audio" value={f.audioUrlEs} onChange={(v) => setF({ ...f, audioUrlEs: v })} testId="saint-audio-es" />
-        <MediaField label={t("audioEn")} kind="audio" value={f.audioUrlEn} onChange={(v) => setF({ ...f, audioUrlEn: v })} testId="saint-audio-en" />
+        <MediaField
+          label={t("audioEs")}
+          kind="audio"
+          value={f.audioUrlEs}
+          onChange={(v) => setF({ ...f, audioUrlEs: v })}
+          voice={f.audioVoiceEs}
+          onVoiceChange={(v) => setF((p) => ({ ...p, audioVoiceEs: v }))}
+          testId="saint-audio-es"
+        />
+        <MediaField
+          label={t("audioEn")}
+          kind="audio"
+          value={f.audioUrlEn}
+          onChange={(v) => setF({ ...f, audioUrlEn: v })}
+          voice={f.audioVoiceEn}
+          onVoiceChange={(v) => setF((p) => ({ ...p, audioVoiceEn: v }))}
+          testId="saint-audio-en"
+        />
       </div>
       <div className="form-grid" style={{ marginTop: 14 }}>
         <label className="field">

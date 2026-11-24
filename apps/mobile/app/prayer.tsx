@@ -72,6 +72,7 @@ export default function Prayer() {
                 title={isMorning ? t("morningPrayer") : t("nightPrayer")}
                 route={`/prayer?kind=${isMorning ? "morning" : "night"}`}
                 analyticsContent={isMorning ? "morning" : "night"}
+                voice={prayer?.audioVoice?.[lang]}
                 autoPlay={autoplay === "1"}
                 tone="altar"
               />
