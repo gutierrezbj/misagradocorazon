@@ -22,7 +22,8 @@ candlesRouter.post("/candles", requireUser, async (req, res) => {
   const saint = await prisma.saint.findFirst({ where: { id: input.saintId, deletedAt: null } });
   if (!saint) throw notFound("Santo");
 
-  const purchase = await payments.confirmPurchase({
+  const provider = payments();
+  const purchase = await provider.confirmPurchase({
     userId: user.id,
     productId: `candle_${type}`,
     amountCents: tier.priceCents,
@@ -31,6 +32,8 @@ candlesRouter.post("/candles", requireUser, async (req, res) => {
   const now = new Date();
   const month = monthOf(now);
   // Vela + compra + asignación del 20 % en una sola transacción: o todo o nada.
+  // En la beta gratis no hay cobro: la vela se guarda a precio 0 y el libro no cambia.
+  const charged = purchase.chargedCents;
   const candle = await prisma.$transaction(async (tx) => {
     const created = await tx.candle.create({
       data: {
@@ -39,19 +42,21 @@ candlesRouter.post("/candles", requireUser, async (req, res) => {
         intentionEncrypted: encryptText(input.intention, env.INTENTIONS_KEY),
         type,
         category: input.category,
-        priceCents: tier.priceCents,
-        paymentProvider: payments.name,
+        priceCents: charged,
+        paymentProvider: provider.name,
         paymentRef: purchase.ref,
         litAt: now,
         expiresAt: new Date(now.getTime() + tier.durationHours * HOUR_MS),
       },
     });
-    await tx.ledgerEntry.createMany({
-      data: [
-        { type: "purchase", amountCents: tier.priceCents, month, candleId: created.id },
-        { type: "impact_allocation", amountCents: impactCents(tier.priceCents), month, candleId: created.id },
-      ],
-    });
+    if (charged > 0) {
+      await tx.ledgerEntry.createMany({
+        data: [
+          { type: "purchase", amountCents: charged, month, candleId: created.id },
+          { type: "impact_allocation", amountCents: impactCents(charged), month, candleId: created.id },
+        ],
+      });
+    }
     return created;
   });
 

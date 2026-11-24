@@ -4,14 +4,14 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useRouter } from "expo-router";
-import { useQuery } from "@tanstack/react-query";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, useToast } from "@/src/components/ui";
 import { CandleFlame } from "@/src/ritual/CandleFlame";
-import { api, ApiError } from "@/src/api";
+import { ApiError } from "@/src/api";
+import { useFeatures } from "@/src/features";
 import { SocialButtons } from "@/src/components/SocialButtons";
 import type { SocialProvider } from "@/src/social";
 import { errorKey } from "@/src/errors";
@@ -25,11 +25,7 @@ export default function LoginScreen() {
   const { login, register, loginWithProvider } = useAuth();
   const router = useRouter();
   // Recuperar contraseña (US-24) solo si el servidor tiene email configurado.
-  const { data: features } = useQuery({
-    queryKey: ["features"],
-    queryFn: () => api<{ passwordReset: boolean }>("/features"),
-    staleTime: Infinity,
-  });
+  const features = useFeatures();
 
   const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");

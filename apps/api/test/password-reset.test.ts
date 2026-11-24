@@ -115,8 +115,8 @@ describe("GET /api/features", () => {
   afterEach(() => Object.assign(env, saved));
 
   test("dice si la app puede ofrecer recuperar la contraseña", async () => {
-    expect((await request(app).get("/api/features")).body.data).toEqual({ passwordReset: true });
+    expect((await request(app).get("/api/features")).body.data).toEqual({ passwordReset: true, candlesFree: false });
     Object.assign(env, { SMTP_URL: undefined });
-    expect((await request(app).get("/api/features")).body.data).toEqual({ passwordReset: false });
+    expect((await request(app).get("/api/features")).body.data).toEqual({ passwordReset: false, candlesFree: false });
   });
 });

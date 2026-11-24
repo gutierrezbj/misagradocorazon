@@ -57,7 +57,11 @@ export function Dashboard() {
             <Tile label={t("kpiD30")} value={pctText(k.retention.d30.rate)} hint={t("kpiCohort", { n: k.retention.d30.cohort })} />
             <Tile label={t("kpiCandles")} value={formatNumber(k.candles.total, lang)} hint={t("lastDays", { n: k.windowDays })} />
             <Tile label={t("kpiConversion")} value={pctText(k.candles.conversionRate)} hint={t("kpiConversionHint", { n: k.candles.buyers })} />
-            <Tile label={t("kpiRevenue")} value={formatUsd(k.money.revenueCents, lang)} hint={k.money.simulated ? t("kpiSimulated") : undefined} />
+            <Tile
+              label={t("kpiRevenue")}
+              value={formatUsd(k.money.revenueCents, lang)}
+              hint={k.money.candlesFree ? t("kpiCandlesFree") : k.money.simulated ? t("kpiSimulated") : undefined}
+            />
             <Tile label={t("kpiImpact")} value={formatUsd(k.money.impactCents, lang)} hint={k.money.simulated ? t("kpiSimulated") : undefined} />
             <Tile label={t("kpiVoting")} value={pctText(k.voting.participationRate)} hint={t("kpiVotes", { n: k.voting.votes, m: k.voting.month })} />
             <Tile

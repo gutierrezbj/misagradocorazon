@@ -51,6 +51,7 @@ const dict = {
   kpiRevenue: { es: "Ingresos", en: "Revenue" },
   kpiImpact: { es: "20 % para la causa", en: "20% for the cause" },
   kpiSimulated: { es: "Simulado: sin cobro real", en: "Simulated: no real charges" },
+  kpiCandlesFree: { es: "Beta: las velas son gratis", en: "Beta: candles are free" },
   goalsTitle: { es: "Objetivos del MVP", en: "MVP goals" },
   goalsSub: {
     es: "Métricas de éxito de la especificación (§10). Son mensuales: se comparan con los últimos 30 días.",

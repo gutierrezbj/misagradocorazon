@@ -8,6 +8,7 @@ Requisito de entrega 7. Estado a 28-sep-2026. El código del MVP (los tres pilar
 |---|---|---|
 | **Pagos de la vela** | La capa de pagos (`apps/api/src/modules/payments/provider.ts`) confirma sin cobrar y deja una referencia `sim_…` en el libro de movimientos. El libro, el 20 % y la transparencia funcionan igual que con dinero real | Cuando exista la sociedad: compras dentro de la app con RevenueCat (SDD-04, ADR-003). Solo cambia el proveedor de la capa de pagos |
 | **Cifras del panel y de transparencia** | Salen del libro, pero con compras simuladas | Con los pagos reales |
+| **Beta abierta** | `PAYMENTS_MODE=beta_free`: la vela es gratis, no entra nada en el libro y la transparencia dice que aún no hay recaudación (SDD-05 US-28 y US-29) | Cuando exista la sociedad, se pasa a RevenueCat |
 
 ## Pendiente de cuentas del fundador
 
@@ -47,9 +48,20 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 | Enlace directo al compartir la vela (US-22) | Necesita el dominio y las fichas de las tiendas | `docs/testing.md` |
 | Quitar dependencias sin uso de la app | Cambia el build nativo; mejor con el primer build de EAS | `docs/dependencias.md` |
 
+## Pendiente de la beta web
+
+Antes de abrirla a fieles reales: `docs/beta-web.md`, "Antes de abrir la beta".
+- base de datos limpia;
+- `INTENTIONS_KEY` nueva;
+- copias de seguridad fuera del VPS;
+- aviso de privacidad;
+- DNS de `app.misagradocorazon.com`.
+
+**Logo definitivo:** el icono actual es provisional; sustituye al del constructor.
+
 ## Pendiente de contenido y legal
 
-- **Audio:** lo graba el equipo (nunca con IA) y se sube desde el panel (`docs/audio.md`).
+- **Audio:** voces de IA con licencia comercial para el volumen diario e invitados para las piezas especiales, siempre identificadas en la app (decisión del 23-nov-2026, CLAUDE.md). Se sube desde el panel (`docs/audio.md`).
 - **Contenido diario:** evangelio y meditación de cada día, preparados en el panel (`docs/contenido.md`).
 - **Causas creadas antes de la ficha completa:** no tienen "qué se hará con el dinero" y su presupuesto es una partida única. El panel lo marca; hay que completarlas antes de que entren en votación (`docs/contenido.md`).
 - **Oraciones por tiempo litúrgico:** al menos las de tiempo ordinario y las del próximo tiempo fuerte (Adviento empieza el 29-nov-2026), con su audio. Sin ellas, los días sin oración propia se quedan sin oración (`docs/contenido.md`).

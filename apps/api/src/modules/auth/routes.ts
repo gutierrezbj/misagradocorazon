@@ -6,6 +6,7 @@ import { isValidTimeZone } from "../../lib/dates.ts";
 import { HttpError, ok } from "../../http.ts";
 import { mailConfigured } from "../../lib/mail.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
+import { candlesFree } from "../payments/provider.ts";
 import { profileDto } from "../ritual/serializers.ts";
 import { currentStreak } from "../ritual/streak.ts";
 import { storeAppleAuthorization } from "./apple-tokens.ts";
@@ -30,7 +31,7 @@ function assertTimeZone(tz: string | undefined) {
 
 // Qué opciones de acceso ofrece la app según lo configurado en el servidor (sin sesión).
 usersRouter.get("/features", (_req, res) => {
-  ok(res, { passwordReset: mailConfigured() });
+  ok(res, { passwordReset: mailConfigured(), candlesFree: candlesFree() });
 });
 
 usersRouter.get("/me", requireUser, async (req, res) => {

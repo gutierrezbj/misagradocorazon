@@ -1,6 +1,6 @@
 # Audio devocional
 
-Estado: reproductor listo. Falta el audio: lo graba el equipo (CLAUDE.md, nunca con IA) y se sube cuando exista la gestión de contenido del panel, con los ficheros en Cloudflare R2.
+Estado: reproductor listo. Falta el audio: desde el 23-nov-2026 puede grabarlo una persona (el equipo o un invitado) o generarse con voces de IA con licencia comercial, siempre identificado en la app (CLAUDE.md). Se sube cuando exista la gestión de contenido del panel, con los ficheros en Cloudflare R2.
 
 ## Dónde suena
 

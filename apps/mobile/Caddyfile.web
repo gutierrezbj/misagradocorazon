@@ -1,0 +1,32 @@
+# Sirve la beta web (PWA) en el puerto que asigna el host (8080 por defecto).
+{
+	admin off
+}
+
+:{$PORT:8080} {
+	root * /srv
+	encode zstd gzip
+
+	header {
+		# La API (y su WebSocket del chat de misa) va en otro dominio. Imágenes y audio vienen de R2 u
+		# otros dominios HTTPS. La misa se ve en el reproductor de YouTube. Sin scripts en línea.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; connect-src 'self' {$API_ORIGIN} {$API_WS_ORIGIN} https://*.posthog.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io; img-src 'self' https: data: blob:; media-src 'self' https: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; frame-src https://www.youtube.com https://www.youtube-nocookie.com; worker-src 'self'; manifest-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	# Ficheros con hash en el nombre: caché larga. El service worker, el manifiesto y la página se
+	# revalidan siempre, para que un despliegue nuevo llegue al momento.
+	@hashed path /_expo/static/* /assets/*
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+	@fresh not path /_expo/static/* /assets/*
+	header @fresh Cache-Control "no-cache"
+	@manifest path /manifest.webmanifest
+	header @manifest Content-Type "application/manifest+json"
+
+	try_files {path} /index.html
+	file_server
+}

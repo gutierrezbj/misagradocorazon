@@ -20,6 +20,7 @@ import { CandleFlame, type CandleVariant } from "@/src/ritual/CandleFlame";
 import { ShareCandlePanel } from "@/src/ritual/ShareCandlePanel";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
+import { useFeatures } from "@/src/features";
 
 // Precios de @msc/shared (céntimos): 0,99 / 1,99 / 2,99 USD, los tiers de las stores.
 const TYPES = [
@@ -39,6 +40,8 @@ export default function LightCandle() {
   const { user } = useAuth();
   // Desde el aviso de vela apagada llega el santo de esa vela (?saint=...).
   const { saint: saintParam } = useLocalSearchParams<{ saint?: string }>();
+  // Beta abierta (US-28): la vela es gratis y no se enseña ningún precio.
+  const free = useFeatures()?.candlesFree ?? false;
 
   const { data } = useQuery({ queryKey: ["saints", "all"], queryFn: () => api<Saint[]>("/saints") });
   const saints = data ?? [];
@@ -58,7 +61,7 @@ export default function LightCandle() {
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
-      track("candle_lit", { type, forDeceased });
+      track("candle_lit", { type, forDeceased, free });
       setDone(true);
     },
     onError: (e) => toast(t(errorKey(e)), "error"),
@@ -172,14 +175,16 @@ export default function LightCandle() {
               <Text style={styles.typeName}>{t(ty.label)}</Text>
               <Text style={styles.typeDesc}>{t(ty.desc)}</Text>
             </View>
-            <Text style={styles.typePrice}>{priceLabel(ty.key)}</Text>
+            <Text style={styles.typePrice}>{free ? t("candleFree") : priceLabel(ty.key)}</Text>
             <View style={[styles.radio, type === ty.key && styles.radioActive]}>{type === ty.key && <View style={styles.radioDot} />}</View>
           </Pressable>
         ))}
       </ScrollView>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + spacing.md }]}>
-        <Text style={styles.simulated}>{t("simulatedPayment")}</Text>
+        <Text testID="candle-payment-note" style={styles.simulated}>
+          {free ? t("candleFreeBeta") : t("simulatedPayment")}
+        </Text>
         <Pressable testID="light-now-button" onPress={submit} style={styles.lightBtn} disabled={lightMut.isPending}>
           <Icon name="feather" size={20} color={colors.gold} />
           <Text style={styles.lightBtnText}>{t("lightNow")}</Text>

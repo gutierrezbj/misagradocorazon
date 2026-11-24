@@ -52,3 +52,16 @@ jobs:
             ${{ env.REGISTRY }}/misagradocorazon-admin:${{ github.sha }}
           cache-from: type=gha,scope=admin
           cache-to: type=gha,mode=max,scope=admin
+      - name: Beta web (apunta a la API de staging)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/mobile/Dockerfile.web
+          push: true
+          build-args: |
+            EXPO_PUBLIC_BACKEND_URL=https://api-staging.misagradocorazon.com
+          tags: |
+            ${{ env.REGISTRY }}/misagradocorazon-web:staging
+            ${{ env.REGISTRY }}/misagradocorazon-web:${{ github.sha }}
+          cache-from: type=gha,scope=web
+          cache-to: type=gha,mode=max,scope=web

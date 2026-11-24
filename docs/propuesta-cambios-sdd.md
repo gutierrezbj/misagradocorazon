@@ -15,6 +15,106 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ---
 
+## Cambio propuesto el 23-nov-2026: beta web (PWA) con la vela gratis
+
+Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones abiertas, resueltas con la recomendación:
+- dominio `app.misagradocorazon.com`;
+- apertura el 1-dic, con la novena;
+- beta abierta a cualquiera.
+
+**Pendiente:** pasarlo a Notion (SDD-02, 04, 05, 07 y 08). La edición desde la sesión de código quedó bloqueada por permisos el 23-nov-2026.
+
+**Por qué:** MSC pasa a ser el producto principal (Plan v4.2 de Mi Academia). Publicar en las tiendas lleva semanas: cuentas, revisión de Apple y, en Google, una prueba cerrada de 14 días con al menos 12 testers. Cobrar exige una sociedad que aún no está. La app ya funciona en navegador. Una beta web instalable (PWA) llega a los fieles en días y deja que Meta Ads lleve directo a la app, sin ficha de tienda.
+
+**Objetivo:** beta abierta en la web para la **novena guadalupana (1–12 dic 2026)**, la fecha de lanzamiento ya aprobada. La app nativa sigue en paralelo hacia las tiendas.
+
+### SDD-02 — Alcance
+
+- **Entra:** versión web instalable de la app (PWA) en su propio dominio, con los tres pilares.
+- **Entra:** vela **gratis durante la beta**. Se enciende igual (santo, intención, tipo y duración), sin pago.
+- **Se mantiene:** compras dentro de la app con RevenueCat cuando exista la sociedad, en las tiendas.
+- **Fuera de la beta web:**
+  - push en el navegador: lo cubre la app nativa;
+  - cobro real.
+
+### SDD-04 — Decisiones técnicas
+
+- **ADR-003 (pagos), ajuste:** la capa de pagos tiene un modo **"beta gratis"**.
+  - La vela se guarda con precio 0 y proveedor `beta_free`.
+  - No genera movimientos en el libro: ni compra ni 20 %.
+  - Se activa con una variable de entorno, y el modo simulado actual desaparece de cara al fiel.
+- **ADR-016 nuevo — PWA con Expo web.**
+  - Se publica la misma app (`expo export` para web) como sitio estático, con manifiesto, iconos y service worker para instalarla y cargar rápido.
+  - Alternativa descartada: una web aparte, que duplicaría pantallas y textos.
+
+### SDD-05 — Backlog
+
+- **US-27 — Beta web instalable.** Como fiel, abro la app desde un enlace, la uso en el navegador y la añado a la pantalla de inicio.
+  - Criterios: carga en móvil, botón o indicación para instalar, funciona en iPhone (Safari) y Android (Chrome), mismos textos ES/EN.
+- **US-28 — Vela gratis durante la beta.** Como fiel, enciendo una vela sin pagar mientras dure la beta.
+  - Criterios:
+    - en el flujo de la vela se lee "Gratis durante la beta" en lugar del precio;
+    - no se menciona ningún pago;
+    - la regla de Apple 3.2.2.iv se sigue cumpliendo: ni causas ni 20 % en ese flujo.
+- **US-29 — Transparencia honesta en la beta.** Como fiel, en transparencia veo que durante la beta no hay recaudación, en lugar de cifras simuladas.
+- **KPIs** (regla del fundador: cada función con su medida):
+  - `pwa_installed`: instalación desde el navegador;
+  - `platform` (web, iOS, Android) en todos los eventos de PostHog;
+  - velas de la beta por día;
+  - fieles activos en web;
+  - conversión de visita a registro.
+  - En el panel, las velas de la beta cuentan como velas, pero no como ingresos.
+
+### SDD-07 — Testing
+
+- Test de que, en modo beta, la vela no crea movimientos en el libro y la transparencia da 0.
+- El test de compliance del flujo de compra se amplía a "Gratis durante la beta".
+- Prueba manual de la PWA en un iPhone y un Android reales: instalar, entrar, rezar, encender la vela, misa con chat y audio.
+
+### SDD-08 — Despliegue
+
+- **Web:** la PWA se sirve desde el VPS, junto al staging (`deploy/staging/`), con su imagen en GHCR y HTTPS.
+  - Dominio propuesto: `app.misagradocorazon.com`.
+- **Con fieles reales, el VPS deja de ser "staging".** Guarda datos personales e intenciones (GDPR art. 9). Antes de abrir la beta:
+  - copias de seguridad diarias de PostgreSQL fuera del VPS;
+  - `INTENTIONS_KEY` guardada fuera del VPS;
+  - base de datos limpia, sin las compras simuladas de prueba;
+  - aviso de privacidad publicado, con la analítica y el tratamiento de las intenciones.
+- **Servicios necesarios para la beta:**
+  - SMTP, para recuperar la contraseña;
+  - R2, para las imágenes y el audio;
+  - PostHog;
+  - Sentry.
+- Google Sign-In en la web necesita el cliente web de Google Cloud. Apple Sign-In en la web necesita la cuenta de Apple Developer; si no está a tiempo, en la web va solo email y Google.
+
+### Cambio del 23-nov-2026: voces de IA e invitados en el audio
+
+Aprobado por el fundador el 23-nov-2026. Sustituye la restricción de SDD-02 "audio pregrabado por el equipo (no voz sintética)" y la regla de CLAUDE.md.
+
+- **SDD-02, restricción de audio:**
+  - El audio puede grabarlo una persona (el equipo o un invitado) o generarse con voces de IA (Fish Audio, ElevenLabs) con licencia comercial.
+  - Las voces de IA dan el volumen diario: santo del día y oraciones por tiempo litúrgico.
+  - Los invitados dan las piezas especiales: novenas, oraciones principales y celebraciones.
+- **Condiciones:**
+  - la app siempre identifica la voz ("Voz generada con IA" o el nombre del invitado);
+  - nunca se clona la voz de una persona real sin su consentimiento por escrito;
+  - una persona revisa cada texto antes de generarlo;
+  - el detalle legal (la ley de IA europea pide identificar el audio generado) lo confirma el asesor del fundador.
+- **SDD-05, US-30 — Voz identificada en el reproductor:**
+  - Cada audio guarda su tipo de voz (IA o persona) y, si es una persona, su nombre.
+  - El reproductor lo muestra.
+  - El panel lo pide al subir el audio.
+- **KPI:** `audio_played` lleva el tipo de voz, para comparar la escucha entre voces de IA e invitadas.
+
+### Decisiones que necesito del fundador
+
+1. Aprobar este cambio para aplicarlo en Notion (SDD-02, 04, 05, 07 y 08).
+2. Dominio de la beta: `app.misagradocorazon.com`, u otro.
+3. Fecha de apertura: el 1-dic (empieza la novena), o antes en privado con un grupo pequeño.
+4. ¿La beta web es abierta a cualquiera desde el primer día, o con invitación?
+
+---
+
 ## SDD-01 — Definición del problema
 
 **Sin cambios.** El problema, la audiencia, los perfiles y la competencia siguen vigentes.
