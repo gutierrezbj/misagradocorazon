@@ -65,3 +65,13 @@ jobs:
             ${{ env.REGISTRY }}/misagradocorazon-web:${{ github.sha }}
           cache-from: type=gha,scope=web
           cache-to: type=gha,mode=max,scope=web
+      - name: Copias de seguridad
+        uses: docker/build-push-action@v6
+        with:
+          context: deploy/staging/backup
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/misagradocorazon-backup:staging
+            ${{ env.REGISTRY }}/misagradocorazon-backup:${{ github.sha }}
+          cache-from: type=gha,scope=backup
+          cache-to: type=gha,mode=max,scope=backup

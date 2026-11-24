@@ -53,7 +53,7 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 Antes de abrirla a fieles reales: `docs/beta-web.md`, "Antes de abrir la beta".
 - base de datos limpia;
 - `INTENTIONS_KEY` nueva;
-- copias de seguridad fuera del VPS;
+- copias de seguridad fuera del VPS: el contenedor `msc-backup` está listo; falta el bucket de R2 y sus credenciales;
 - aviso de privacidad;
 - DNS de `app.misagradocorazon.com`.
 

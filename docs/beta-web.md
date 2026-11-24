@@ -41,7 +41,7 @@ Con la beta abierta, el VPS deja de ser "staging": guarda cuentas e intenciones,
 
 1. **Base de datos limpia:** sin las velas y compras simuladas de las pruebas.
 2. **`INTENTIONS_KEY` nueva**, generada para la beta y guardada fuera del VPS, en el gestor de contraseñas del fundador. La anterior estuvo escrita en Notion.
-3. **Copias de seguridad diarias de PostgreSQL fuera del VPS**, por ejemplo `pg_dump` cifrado a un bucket de R2, con al menos 7 días de retención (SDD-08). Hace falta la cuenta de Cloudflare.
+3. **Copias de seguridad diarias de PostgreSQL fuera del VPS:** el contenedor `msc-backup` ya está listo (cifradas, en R2, 7 días). Falta darlo de alta con la cuenta de Cloudflare del fundador y hacer una restauración de prueba (`deploy/staging/README.md`, "Copias de seguridad").
 4. **Aviso de privacidad publicado y enlazado en la app:** cuenta, intenciones cifradas y analítica con consentimiento.
 5. **DNS y HTTPS** de `app.misagradocorazon.com` (`deploy/staging/README.md`).
 6. **Recomendado:** SMTP (recuperar contraseña), R2 (imágenes y audio propios), PostHog y Sentry.

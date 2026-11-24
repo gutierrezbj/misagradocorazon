@@ -13,7 +13,7 @@ Mismas imágenes que Railway, así que el paso posterior no cambia código.
   Etiquetas: `staging` (último `main`) y el SHA de cada commit. El VPS no compila: tiene 1 CPU y comparte máquina con otros proyectos.
 - **Servicios** (`compose.yml`): `db` (PostgreSQL 16), `migrate` (aplica las migraciones y termina), `api`, `worker`, `admin` y `web`.
 - **Puertos (offset +270 del Catálogo de Infraestructura JRGB):** panel `127.0.0.1:3270`, API `127.0.0.1:4270`, beta web `127.0.0.1:5270`, PostgreSQL `127.0.0.1:6270`. El worker no tiene HTTP. Nada en `0.0.0.0`: lo publica con HTTPS el nginx del VPS.
-- **Contenedores:** `msc-db`, `msc-migrate` (termina tras migrar), `msc-api`, `msc-worker`, `msc-admin` y `msc-web`.
+- **Contenedores:** `msc-db`, `msc-migrate` (termina tras migrar), `msc-api`, `msc-worker`, `msc-admin`, `msc-web` y `msc-backup`.
 - **Consumo estimado:** unos 600 MB de RAM en marcha y 3 GB de disco para las imágenes.
 
 ## Primer despliegue
@@ -58,6 +58,7 @@ Mismas imágenes que Railway, así que el paso posterior no cambia código.
      "MiSagradoCorazon-Worker|msc-worker|docker"
      "MiSagradoCorazon-Admin|msc-admin|docker"
      "MiSagradoCorazon-Web|msc-web|docker"
+     "MiSagradoCorazon-Backup|msc-backup|docker"
      ```
    - **SA99** (su MongoDB vive en el Servidor 1):
      ```javascript
@@ -65,13 +66,47 @@ Mismas imágenes que Railway, así que el paso posterior no cambia código.
      db.servers.updateOne(
        { _id: "vps-staging" },
        { $set: { "projects.MiSagradoCorazon": {
-           containers: ["msc-db", "msc-api", "msc-worker", "msc-admin", "msc-web"],
+           containers: ["msc-db", "msc-api", "msc-worker", "msc-admin", "msc-web", "msc-backup"],
            domain: "api-staging.misagradocorazon.com"
        } } }
      );
      ```
      Después, lo mismo en `SEED_SERVERS` (`service.py` del repo de SA99) y pulsar "Escanear" en Red de Servidores.
-   - **Backups:** mientras sea solo staging, no. **Con la beta abierta a fieles reales, sí:** ver `docs/beta-web.md`, "Antes de abrir la beta".
+   - **Copias de seguridad:** contenedor `msc-backup`, en la sección siguiente. Obligatorias antes de abrir la beta a fieles reales.
+
+## Copias de seguridad
+
+- **Qué hace:** el contenedor `msc-backup` hace cada día a las 03:30 UTC, y una vez al arrancar:
+  1. un `pg_dump` de la base de datos;
+  2. lo cifra con AES-256 y `BACKUP_PASSPHRASE`;
+  3. lo sube a un bucket de Cloudflare R2;
+  4. borra las copias de más de 7 días.
+  - Código en `deploy/staging/backup/`.
+- **Qué recibe:** solo la conexión a la base de datos y lo de R2, nada de los secretos de la API.
+- **Alta (una vez):**
+  1. En Cloudflare, con la cuenta del fundador, crear un bucket **privado** solo para copias (p. ej. `msc-backups`), distinto del de medios.
+  2. Crear un token de R2 con lectura y escritura **solo en ese bucket**.
+  3. Rellenar en `.env` estas variables:
+     - `BACKUP_DEST` (p. ej. `:s3:msc-backups/staging`);
+     - `BACKUP_PASSPHRASE`, generada con `openssl rand -base64 32`;
+     - `BACKUP_S3_ENDPOINT`, `BACKUP_S3_ACCESS_KEY_ID` y `BACKUP_S3_SECRET_ACCESS_KEY`.
+  4. **Guardar `BACKUP_PASSPHRASE` y `INTENTIONS_KEY` fuera del VPS**, en el gestor de contraseñas. Sin la primera la copia no se abre; sin la segunda, las intenciones restauradas no se pueden leer.
+  5. `docker compose up -d backup`, y comprobar en `docker compose logs backup` que aparece `[backup] msc-… subida`.
+- **Vigilancia:** el contenedor pasa a `unhealthy` si la última copia buena tiene más de 26 h. Avisa `healthcheck.sh`.
+- **Restaurar:**
+  ```bash
+  docker compose exec backup restore.sh list                                # copias disponibles
+  docker compose exec backup restore.sh msc-2026-12-01T0330Z.dump.enc --yes # sustituye la base de datos
+  ```
+  Antes de abrir la beta, conviene hacer una restauración de prueba en una base de datos aparte, para saber que las copias sirven: `PGDATABASE=prueba`, creada antes con `createdb`.
+- **Probado (24-nov-2026), con PostgreSQL 16 y rclone en local:**
+  - la copia cifrada no deja leer ningún texto;
+  - la restauración pide `--yes`;
+  - una clave equivocada no restaura nada;
+  - restaurada en una base de datos nueva, tiene los mismos santos, usuarios, velas y migraciones que la original;
+  - si `pg_dump` falla, no se sube nada.
+
+  La imagen no se pudo construir en el entorno de desarrollo (Docker Hub respondió 429); la construye el CI.
 
 ## Actualizar
 
