@@ -9,9 +9,13 @@ import type { AdminSaint, DailyDay, DailyRow } from "../types.ts";
 
 const TEXT_FIELDS = ["gospelEs", "gospelEn", "meditationEs", "meditationEn", "morningPrayerEs", "morningPrayerEn", "nightPrayerEs", "nightPrayerEn"] as const;
 const AUDIO_FIELDS = ["morningAudioUrlEs", "morningAudioUrlEn", "nightAudioUrlEs", "nightAudioUrlEn", "meditationAudioUrlEs", "meditationAudioUrlEn"] as const;
-type Form = Record<(typeof TEXT_FIELDS)[number] | (typeof AUDIO_FIELDS)[number] | "gospelRef" | "saintOfDayId", string>;
+// Quién pone la voz de cada audio (US-30): mismo nombre con "Voice" en lugar de "Url".
+const voiceOf = <K extends (typeof AUDIO_FIELDS)[number]>(k: K) => k.replace("Url", "Voice") as VoiceField;
+type VoiceField = `${"morning" | "night" | "meditation"}AudioVoice${"Es" | "En"}`;
+const VOICE_FIELDS = AUDIO_FIELDS.map(voiceOf);
+type Form = Record<(typeof TEXT_FIELDS)[number] | (typeof AUDIO_FIELDS)[number] | VoiceField | "gospelRef" | "saintOfDayId", string>;
 
-const blank = (): Form => Object.fromEntries(["gospelRef", "saintOfDayId", ...TEXT_FIELDS, ...AUDIO_FIELDS].map((k) => [k, ""])) as Form;
+const blank = (): Form => Object.fromEntries(["gospelRef", "saintOfDayId", ...TEXT_FIELDS, ...AUDIO_FIELDS, ...VOICE_FIELDS].map((k) => [k, ""])) as Form;
 const toForm = (row: DailyRow | null): Form => {
   const f = blank();
   if (!row) return f;
@@ -42,14 +46,23 @@ function DayForm({ date, season, initial, saints, onSaved }: DayProps & { initia
           ...f,
           saintOfDayId: f.saintOfDayId || null,
           ...Object.fromEntries(AUDIO_FIELDS.map((k) => [k, f[k] || null])),
-          ...(!own.morning && { morningAudioUrlEs: null, morningAudioUrlEn: null }),
-          ...(!own.night && { nightAudioUrlEs: null, nightAudioUrlEn: null }),
+          ...Object.fromEntries(AUDIO_FIELDS.map((k) => [voiceOf(k), (f[k] && f[voiceOf(k)]) || null])),
+          ...(!own.morning && { morningAudioUrlEs: null, morningAudioUrlEn: null, morningAudioVoiceEs: null, morningAudioVoiceEn: null }),
+          ...(!own.night && { nightAudioUrlEs: null, nightAudioUrlEn: null, nightAudioVoiceEs: null, nightAudioVoiceEn: null }),
         },
       }),
     onSuccess: onSaved,
   });
   const audio = (k: (typeof AUDIO_FIELDS)[number], label: I18nKey) => (
-    <MediaField label={t(label)} kind="audio" value={f[k]} onChange={(v) => setF({ ...f, [k]: v })} testId={`daily-${k}`} />
+    <MediaField
+      label={t(label)}
+      kind="audio"
+      value={f[k]}
+      onChange={(v) => setF({ ...f, [k]: v })}
+      voice={f[voiceOf(k)]}
+      onVoiceChange={(v) => setF((p) => ({ ...p, [voiceOf(k)]: v }))}
+      testId={`daily-${k}`}
+    />
   );
 
   return (

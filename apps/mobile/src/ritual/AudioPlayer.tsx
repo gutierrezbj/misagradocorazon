@@ -1,8 +1,9 @@
 // Reproductor de audio devocional (SDD-05 US-05, US-06, US-08, US-09).
 // Controla el reproductor único de la app (src/audio.tsx): el audio sigue sonando al salir de la
 // pantalla, con la app en segundo plano o con el teléfono bloqueado, y queda en el mini-player.
-// El audio lo graba el equipo (CLAUDE.md): aquí solo se reproduce una URL.
+// Siempre dice quién pone la voz: "Voz generada con IA" o el nombre de la persona (CLAUDE.md, US-30).
 import { useEffect, useRef, useState } from "react";
+import type { VoiceCredit } from "@msc/shared";
 import { ActivityIndicator, Pressable, Text, View, type LayoutChangeEvent } from "react-native";
 
 import { type AnalyticsEvents } from "@/src/analytics";
@@ -32,18 +33,20 @@ type Props = {
   tone?: "altar" | "surface";
   /** Qué se escucha, para la analítica (solo con consentimiento). */
   analyticsContent?: AnalyticsEvents["audio_played"]["content"];
+  /** Quién pone la voz (US-30). */
+  voice?: VoiceCredit | null;
   testID?: string;
 };
 
 // Idle: lo que se muestra mientras en el reproductor único hay otra pista.
 const IDLE = { isLoaded: true, isBuffering: false, playing: false, currentTime: 0, duration: 0 };
 
-export function AudioPlayer({ url, title, artworkUrl, route, autoPlay = false, tone = "surface", analyticsContent, testID = "audio-player" }: Props) {
+export function AudioPlayer({ url, title, artworkUrl, route, autoPlay = false, tone = "surface", analyticsContent, voice, testID = "audio-player" }: Props) {
   const { t } = useI18n();
   const { colors } = useTheme();
   const styles = useStyles();
   const audio = useAudio();
-  const track: AudioTrack = { url, title, artworkUrl, route, content: analyticsContent };
+  const track: AudioTrack = { url, title, artworkUrl, route, content: analyticsContent, voice: voice?.kind ?? "unknown" };
   const isCurrent = audio.loaded?.url === url;
   const status = isCurrent ? audio.status : IDLE;
   const [trackWidth, setTrackWidth] = useState(0);
@@ -171,6 +174,14 @@ export function AudioPlayer({ url, title, artworkUrl, route, autoPlay = false, t
         </Text>
         <Text style={[styles.time, { color: muted }]}>{status.duration > 0 ? mmss(status.duration) : "–:––"}</Text>
       </View>
+      {voice && (
+        <View style={styles.voiceRow}>
+          <Icon name={voice.kind === "ai" ? "cpu" : "mic"} size={14} color={muted} />
+          <Text testID={`${testID}-voice`} style={[styles.voice, { color: muted }]}>
+            {voice.kind === "ai" ? t("voiceAi") : `${t("voiceBy")} ${voice.name}`}
+          </Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -191,4 +202,6 @@ const useStyles = makeStyles((c) => ({
   error: { fontFamily: fonts.body, fontSize: 16, textAlign: "center" },
   retry: { alignSelf: "center", paddingVertical: spacing.xs, paddingHorizontal: spacing.md },
   retryText: { fontFamily: fonts.bodySemibold, fontSize: 16 },
+  voiceRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6 },
+  voice: { fontFamily: fonts.body, fontSize: 14 },
 }));

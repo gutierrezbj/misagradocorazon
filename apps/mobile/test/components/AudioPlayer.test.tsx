@@ -68,7 +68,7 @@ test("play activa el modo de segundo plano y los controles de la pantalla de blo
     expect.objectContaining({ title: "Santo del día" }),
     expect.objectContaining({ showSeekForward: true, showSeekBackward: true }),
   );
-  expect(mockTrack).toHaveBeenCalledWith("audio_played", { content: "saint" });
+  expect(mockTrack).toHaveBeenCalledWith("audio_played", { content: "saint", voice: "unknown" });
 });
 
 test("mientras suena, el mismo botón pausa", async () => {
@@ -150,4 +150,21 @@ test("al cerrar sesión se para el audio y desaparece el mini-player", async () 
   expect(mockPlayer.pause).toHaveBeenCalled();
   expect(mockPlayer.clearLockScreenControls).toHaveBeenCalledTimes(1);
   expect(screen.queryByTestId("mini-player")).toBeNull();
+});
+
+test("dice qué voz suena y la analítica lo registra (US-30)", async () => {
+  const Voiced = ({ voice }: { voice: { kind: "ai" } | { kind: "person"; name: string } }) => (
+    <I18nProvider>
+      <AudioProvider>
+        <AudioPlayer url={URL} title="Santo del día" route="/saint/s1" analyticsContent="saint" voice={voice} testID="audio" />
+      </AudioProvider>
+    </I18nProvider>
+  );
+  const view = await render(<Voiced voice={{ kind: "ai" }} />);
+  expect(screen.getByTestId("audio-voice")).toHaveTextContent("Voz generada con IA");
+  await fireEvent.press(screen.getByTestId("audio-toggle"));
+  expect(mockTrack).toHaveBeenCalledWith("audio_played", { content: "saint", voice: "ai" });
+
+  await view.rerender(<Voiced voice={{ kind: "person", name: "Padre Miguel" }} />);
+  expect(screen.getByTestId("audio-voice")).toHaveTextContent("Voz de Padre Miguel");
 });

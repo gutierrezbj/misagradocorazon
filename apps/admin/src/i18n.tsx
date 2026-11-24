@@ -191,8 +191,8 @@ const dict = {
   // santoral
   saintsTitle: { es: "Santoral", en: "Saints" },
   saintsSub: {
-    es: "Fichas de los santos con imagen y audio en cada idioma. El audio lo graba el equipo.",
-    en: "Saint profiles with image and audio in each language. The team records the audio.",
+    es: "Fichas de los santos con imagen y audio en cada idioma. Cada audio dice quién pone la voz.",
+    en: "Saint profiles with image and audio in each language. Each audio says whose voice it is.",
   },
   newSaint: { es: "Nuevo santo", en: "New saint" },
   saintName: { es: "Nombre", en: "Name" },
@@ -225,7 +225,12 @@ const dict = {
   uploadFile: { es: "Subir fichero", en: "Upload file" },
   uploading: { es: "Subiendo…", en: "Uploading…" },
   imageHint: { es: "JPG, PNG o WebP, hasta 5 MB.", en: "JPG, PNG or WebP, up to 5 MB." },
-  audioHint: { es: "MP3 o M4A, hasta 50 MB. Grabado por el equipo.", en: "MP3 or M4A, up to 50 MB. Recorded by the team." },
+  audioHint: { es: "MP3 o M4A, hasta 50 MB.", en: "MP3 or M4A, up to 50 MB." },
+  voiceLabel: { es: "Quién pone la voz", en: "Whose voice" },
+  voiceChoose: { es: "¿Quién pone la voz?", en: "Whose voice is it?" },
+  voiceAi: { es: "Voz generada con IA", en: "AI-generated voice" },
+  voicePerson: { es: "Una persona (equipo o invitado)", en: "A person (team or guest)" },
+  voiceName: { es: "Nombre de la persona", en: "Person's name" },
   storageMissing: {
     es: "El almacenamiento (R2) aún no está configurado: pega la URL del fichero.",
     en: "Storage (R2) is not configured yet: paste the file URL.",

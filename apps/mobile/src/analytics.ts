@@ -13,7 +13,8 @@ import type { CandleType, IntentionCategory, LiturgicalSeason } from "@msc/share
 export type AnalyticsEvents = {
   onboarding_completed: { language: "es" | "en"; secondarySaints: number };
   prayer_completed: { kind: "morning" | "night"; season: LiturgicalSeason };
-  audio_played: { content: "saint" | "morning" | "night" | "meditation" };
+  // voice: quién pone la voz (US-30), para comparar la escucha de voces de IA y de personas.
+  audio_played: { content: "saint" | "morning" | "night" | "meditation"; voice: "ai" | "person" | "unknown" };
   // Evangelio compartido desde su pantalla (US-25). En Android cuenta al abrir la hoja de compartir.
   gospel_shared: Record<string, never>;
   // Mini-player de las pestañas: volver al audio, pausar/reanudar o cerrarlo.

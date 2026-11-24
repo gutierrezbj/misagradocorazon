@@ -66,7 +66,13 @@ export default function Gospel() {
           <Text style={styles.medLabel}>{t("meditation")}</Text>
           {!!daily?.meditation.audioUrl[lang] && (
             <View style={{ marginBottom: spacing.md }}>
-              <AudioPlayer url={daily.meditation.audioUrl[lang]!} title={t("meditation")} route="/gospel" analyticsContent="meditation" />
+              <AudioPlayer
+                url={daily.meditation.audioUrl[lang]!}
+                title={t("meditation")}
+                route="/gospel"
+                analyticsContent="meditation"
+                voice={daily.meditation.audioVoice?.[lang]}
+              />
             </View>
           )}
           <Text style={styles.meditation}>{loc(daily?.meditation)}</Text>

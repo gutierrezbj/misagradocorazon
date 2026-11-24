@@ -161,7 +161,7 @@ export type PushCampaignInput = z.infer<typeof pushCampaignSchema>;
 
 // --- Gestión de contenido (panel) -------------------------------------------
 
-// Subidas a R2: tipos y tamaños admitidos. El audio lo graba el equipo (MP3 o M4A).
+// Subidas a R2: tipos y tamaños admitidos. Audio en MP3 o M4A.
 export const UPLOAD_RULES = {
   image: { maxBytes: 5 * 1024 * 1024, types: { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" } },
   audio: {
@@ -187,12 +187,43 @@ export type UploadRequest = z.infer<typeof uploadRequestSchema>;
 const httpsUrl = z.url({ protocol: /^https?$/ });
 const optionalUrl = httpsUrl.nullable().optional();
 
+// Quién pone la voz a un audio (CLAUDE.md, decisión del 23-nov-2026; SDD-05 US-30): AI_VOICE si es
+// una voz generada con IA, o el nombre de la persona (equipo o invitado). La app siempre lo muestra.
+export const AI_VOICE = "ai";
+// Vacía = sin voz (null). Si el campo no llega, sigue sin llegar: una edición parcial no la borra.
+const optionalVoice = z
+  .string()
+  .trim()
+  .max(80)
+  .nullable()
+  .optional()
+  .transform((s) => (s === undefined ? undefined : s || null));
+export type VoiceCredit = { kind: "ai" } | { kind: "person"; name: string };
+export const voiceCredit = (v: string | null | undefined): VoiceCredit | null => (!v ? null : v === AI_VOICE ? { kind: "ai" } : { kind: "person", name: v });
+
+/**
+ * Campos de audio sin voz: para cada base ("audio", "meditationAudio"...) e idioma, si hay
+ * `<base>Url<Idioma>` tiene que haber `<base>Voice<Idioma>`. Devuelve los campos de voz que faltan.
+ */
+export function missingVoices(d: Record<string, unknown>, bases: readonly string[]): string[] {
+  const missing: string[] = [];
+  for (const base of bases) for (const lang of ["Es", "En"]) if (d[`${base}Url${lang}`] && !d[`${base}Voice${lang}`]) missing.push(`${base}Voice${lang}`);
+  return missing;
+}
+const requireVoices = (bases: readonly string[]) => (d: Record<string, unknown>, ctx: z.RefinementCtx) => {
+  for (const path of missingVoices(d, bases)) ctx.addIssue({ code: "custom", path: [path], message: "Falta decir quién pone la voz" });
+};
+export const SAINT_AUDIO = ["audio"] as const;
+export const DAILY_AUDIO = ["meditationAudio", "morningAudio", "nightAudio"] as const;
+
 export const saintInputSchema = z.object({
   name: z.string().trim().min(1).max(120),
   feastDate: z.string().regex(/^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/, "Formato MM-DD"),
   imageUrl: httpsUrl,
   audioUrlEs: optionalUrl,
   audioUrlEn: optionalUrl,
+  audioVoiceEs: optionalVoice,
+  audioVoiceEn: optionalVoice,
   historyEs: z.string().trim().min(1).max(5000),
   historyEn: z.string().trim().min(1).max(5000),
   patronagesEs: z.string().trim().max(500).default(""),
@@ -206,6 +237,8 @@ export const saintInputSchema = z.object({
   sortOrder: z.number().int().min(0).max(10000).default(100),
 });
 export type SaintInput = z.infer<typeof saintInputSchema>;
+// En el alta se exige la voz de cada audio; en la edición lo comprueba la API con la ficha completa.
+export const saintCreateSchema = saintInputSchema.superRefine(requireVoices(SAINT_AUDIO));
 export const saintUpdateSchema = updateSchemaOf(saintInputSchema);
 
 // Oración del día opcional (US-10): vacía en los dos idiomas = se sirve la del tiempo litúrgico.
@@ -235,6 +268,12 @@ export const dailyContentInputSchema = z
     morningAudioUrlEn: optionalUrl,
     nightAudioUrlEs: optionalUrl,
     nightAudioUrlEn: optionalUrl,
+    meditationAudioVoiceEs: optionalVoice,
+    meditationAudioVoiceEn: optionalVoice,
+    morningAudioVoiceEs: optionalVoice,
+    morningAudioVoiceEn: optionalVoice,
+    nightAudioVoiceEs: optionalVoice,
+    nightAudioVoiceEn: optionalVoice,
   })
   // Una oración propia del día va en los dos idiomas o en ninguno: nunca medio día propio y medio
   // del tiempo. Sin texto propio no hay audio propio (se sirve el del tiempo, no se ignora en silencio).
@@ -250,17 +289,22 @@ export const dailyContentInputSchema = z
         ctx.addIssue({ code: "custom", path: [kind + "Es"], message: "Audio sin texto propio del día" });
       }
     }
+    requireVoices(DAILY_AUDIO)(d, ctx);
   });
 export type DailyContentInput = z.infer<typeof dailyContentInputSchema>;
 
-// Oraciones de mañana y noche de un tiempo litúrgico (US-10). El audio lo graba el equipo.
+// Oraciones de mañana y noche de un tiempo litúrgico (US-10), con su audio y quién pone la voz.
 export const seasonalPrayerKeySchema = z.object({ season: z.enum(LITURGICAL_SEASONS), kind: prayerCompleteSchema.shape.kind });
-export const seasonalPrayerInputSchema = z.object({
-  textEs: z.string().trim().min(1).max(3000),
-  textEn: z.string().trim().min(1).max(3000),
-  audioUrlEs: optionalUrl,
-  audioUrlEn: optionalUrl,
-});
+export const seasonalPrayerInputSchema = z
+  .object({
+    textEs: z.string().trim().min(1).max(3000),
+    textEn: z.string().trim().min(1).max(3000),
+    audioUrlEs: optionalUrl,
+    audioUrlEn: optionalUrl,
+    audioVoiceEs: optionalVoice,
+    audioVoiceEn: optionalVoice,
+  })
+  .superRefine(requireVoices(SAINT_AUDIO));
 export type SeasonalPrayerInput = z.infer<typeof seasonalPrayerInputSchema>;
 
 // Borrado de cuenta (SDD-02, transversal): confirmación explícita desde la app.

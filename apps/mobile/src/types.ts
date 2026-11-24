@@ -1,10 +1,12 @@
 // Tipos de la API (apps/api). Los campos localizados llegan como { es, en } y se muestran con loc().
-import type { CandleCategory, CandleType, IntentionCategory, LiturgicalSeason, Locale, Role } from "@msc/shared";
+import type { CandleCategory, CandleType, IntentionCategory, LiturgicalSeason, Locale, Role, VoiceCredit } from "@msc/shared";
 
 export type Localized = { es: string; en: string };
 
-// Audio grabado por el equipo en cada idioma; null si aún no existe (SDD-05 US-07).
+// Audio en cada idioma; null si aún no existe (SDD-05 US-07).
 export type LocalizedAudio = { es: string | null; en: string | null };
+// Quién pone la voz de cada audio (US-30); null si no hay audio en ese idioma.
+export type LocalizedVoice = { es: VoiceCredit | null; en: VoiceCredit | null };
 
 export type User = {
   id: string;
@@ -35,6 +37,7 @@ export type Saint = {
   feastDate: string;
   imageUrl: string;
   audioUrl: LocalizedAudio;
+  audioVoice?: LocalizedVoice;
   history: Localized;
   patronages: Localized;
   // Cómo se le representa (US-26); vacía si no está escrita.
@@ -44,14 +47,14 @@ export type Saint = {
 };
 
 // Oración ya resuelta por la API: la propia del día o la del tiempo litúrgico (US-10). null si no hay.
-export type DailyPrayer = Localized & { audioUrl: LocalizedAudio; source: "day" | "season" };
+export type DailyPrayer = Localized & { audioUrl: LocalizedAudio; audioVoice?: LocalizedVoice; source: "day" | "season" };
 
 export type Daily = {
   date: string;
   season: LiturgicalSeason;
   saintOfDay: Saint | null;
   gospel: { ref: string } & Localized;
-  meditation: Localized & { audioUrl: LocalizedAudio };
+  meditation: Localized & { audioUrl: LocalizedAudio; audioVoice?: LocalizedVoice };
   morningPrayer: DailyPrayer | null;
   nightPrayer: DailyPrayer | null;
 };

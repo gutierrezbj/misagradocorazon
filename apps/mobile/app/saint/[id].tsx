@@ -62,6 +62,7 @@ export default function SaintDetail() {
                   artworkUrl={saint.imageUrl}
                   route={`/saint/${saint.id}`}
                   analyticsContent="saint"
+                  voice={saint.audioVoice?.[lang]}
                   autoPlay={autoplay === "1"}
                 />
               </View>

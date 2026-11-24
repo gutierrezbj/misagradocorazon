@@ -5,13 +5,15 @@ import {
   dailyContentInputSchema,
   LITURGICAL_SEASONS,
   liturgicalSeason,
-  saintInputSchema,
+  missingVoices,
+  SAINT_AUDIO,
+  saintCreateSchema,
   saintUpdateSchema,
   seasonalPrayerInputSchema,
   seasonalPrayerKeySchema,
   uploadRequestSchema,
 } from "@msc/shared";
-import { z } from "zod";
+import { z, ZodError } from "zod";
 
 import { prisma } from "../../db.ts";
 import { audit } from "../../lib/audit.ts";
@@ -61,7 +63,7 @@ contentRouter.get("/admin/saints", ...editor, async (_req, res) => {
 
 contentRouter.post("/admin/saints", ...editor, async (req, res) => {
   const actor = currentUser(req);
-  const input = saintInputSchema.parse(req.body);
+  const input = saintCreateSchema.parse(req.body);
   const id = await newSaintId(input.name);
   const saint = await prisma.$transaction(async (tx) => {
     const s = await tx.saint.create({ data: { id, ...input } });
@@ -77,6 +79,11 @@ contentRouter.patch("/admin/saints/:id", ...editor, async (req, res) => {
   const saint = await prisma.$transaction(async (tx) => {
     const found = await tx.saint.findUnique({ where: { id: pathParam(req, "id") } });
     if (!found) throw notFound("Santo");
+    // Todo audio dice quién pone la voz (CLAUDE.md, US-30): se comprueba con la ficha como quedaría.
+    const missing = missingVoices({ ...found, ...input }, SAINT_AUDIO);
+    if (missing.length) {
+      throw new ZodError(missing.map((path) => ({ code: "custom" as const, path: [path], message: "Falta decir quién pone la voz", input: undefined })));
+    }
     const s = await tx.saint.update({ where: { id: found.id }, data: input });
     await audit(tx, actor.id, "saint.update", "saint", s.id, { fields: Object.keys(input) });
     return s;

@@ -97,3 +97,4 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 | `20260928084515_seasonal_prayer` | Oraciones por tiempo litúrgico; oraciones del día opcionales |
 | `20260928101941_cause_budget_items` | Destino del dinero y presupuesto desglosado de las causas; las causas existentes pasan a tener una partida única |
 | `20260928223908_saint_iconography` | Iconografía del santo en ES/EN (US-26), vacía por defecto |
+| `20261124123515_audio_voice` | Quién pone la voz de cada audio, ES/EN (US-30): `ai` o el nombre de la persona. En santos, meditación, oraciones del día y oraciones por tiempo |

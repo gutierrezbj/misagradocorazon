@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import { budgetTotalCents, CANDLE_TYPES, easterSunday, impactCents, isVotingOpen, liturgicalSeason } from "./domain.ts";
 import {
+  AI_VOICE,
   causeInputSchema,
   causeUpdateSchema,
   dailyContentInputSchema,
@@ -10,7 +11,10 @@ import {
   massUpdateSchema,
   onboardingSchema,
   profileUpdateSchema,
+  saintCreateSchema,
   saintUpdateSchema,
+  seasonalPrayerInputSchema,
+  voiceCredit,
 } from "./schemas.ts";
 import { scrubEvent } from "./sentry.ts";
 
@@ -157,4 +161,26 @@ test("una causa necesita destino del dinero y al menos una partida; el total es 
   assert.equal(causeInputSchema.safeParse({ ...base, fundsUseEs: " ", budgetItems: items }).success, false);
   assert.equal(causeInputSchema.safeParse({ ...base, budgetItems: [{ ...items[0], amountCents: 0 }] }).success, false);
   assert.equal(budgetTotalCents(items), 850_050);
+});
+
+// Voz identificada (CLAUDE.md 23-nov-2026, SDD-05 US-30): todo audio dice quién pone la voz.
+test("cada audio dice si la voz es de IA o de una persona", () => {
+  const url = "https://cdn.example.com/a.mp3";
+  const day = { gospelRef: "Jn 1", gospelEs: "g", gospelEn: "g", meditationEs: "m", meditationEn: "m" };
+  const noVoice = dailyContentInputSchema.safeParse({ ...day, meditationAudioUrlEs: url });
+  assert.equal(noVoice.success, false);
+  assert.deepEqual(
+    noVoice.error?.issues.map((i) => i.path.join(".")),
+    ["meditationAudioVoiceEs"],
+  );
+  assert.equal(dailyContentInputSchema.safeParse({ ...day, meditationAudioUrlEs: url, meditationAudioVoiceEs: AI_VOICE }).success, true);
+
+  const saint = { name: "San José", feastDate: "03-19", imageUrl: "https://cdn.example.com/j.jpg", historyEs: "h", historyEn: "h" };
+  assert.equal(saintCreateSchema.safeParse({ ...saint, audioUrlEn: url }).success, false);
+  assert.equal(saintCreateSchema.safeParse({ ...saint, audioUrlEn: url, audioVoiceEn: "Padre Miguel" }).success, true);
+  assert.equal(seasonalPrayerInputSchema.safeParse({ textEs: "t", textEn: "t", audioUrlEs: url, audioVoiceEs: "  " }).success, false);
+
+  assert.deepEqual(voiceCredit(AI_VOICE), { kind: "ai" });
+  assert.deepEqual(voiceCredit("Padre Miguel"), { kind: "person", name: "Padre Miguel" });
+  assert.equal(voiceCredit(null), null);
 });

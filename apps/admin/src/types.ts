@@ -89,6 +89,8 @@ export type AdminSaint = {
   imageUrl: string;
   audioUrlEs: string | null;
   audioUrlEn: string | null;
+  audioVoiceEs: string | null;
+  audioVoiceEn: string | null;
   historyEs: string;
   historyEn: string;
   patronagesEs: string;
@@ -115,7 +117,14 @@ export type DailyDay = {
 };
 type PrayerSource = "day" | "season";
 
-export type SeasonalPrayer = { textEs: string; textEn: string; audioUrlEs: string | null; audioUrlEn: string | null };
+export type SeasonalPrayer = {
+  textEs: string;
+  textEn: string;
+  audioUrlEs: string | null;
+  audioUrlEn: string | null;
+  audioVoiceEs: string | null;
+  audioVoiceEn: string | null;
+};
 export type SeasonRow = { season: LiturgicalSeason; current: boolean; morning: SeasonalPrayer | null; night: SeasonalPrayer | null };
 
 export type DailyRow = {
@@ -136,6 +145,12 @@ export type DailyRow = {
   morningAudioUrlEn: string | null;
   nightAudioUrlEs: string | null;
   nightAudioUrlEn: string | null;
+  meditationAudioVoiceEs: string | null;
+  meditationAudioVoiceEn: string | null;
+  morningAudioVoiceEs: string | null;
+  morningAudioVoiceEn: string | null;
+  nightAudioVoiceEs: string | null;
+  nightAudioVoiceEn: string | null;
 };
 
 export type Transparency = {

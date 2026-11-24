@@ -78,12 +78,20 @@ function PrayerForm({ season, kind, initial, onDone }: { season: SeasonRow["seas
     textEn: initial?.textEn ?? "",
     audioUrlEs: initial?.audioUrlEs ?? "",
     audioUrlEn: initial?.audioUrlEn ?? "",
+    audioVoiceEs: initial?.audioVoiceEs ?? "",
+    audioVoiceEn: initial?.audioVoiceEn ?? "",
   });
   const save = useMutation({
     mutationFn: () =>
       api(`/admin/seasonal-prayers/${season}/${kind}`, {
         method: "PUT",
-        body: { ...f, audioUrlEs: f.audioUrlEs || null, audioUrlEn: f.audioUrlEn || null },
+        body: {
+          ...f,
+          audioUrlEs: f.audioUrlEs || null,
+          audioUrlEn: f.audioUrlEn || null,
+          audioVoiceEs: (f.audioUrlEs && f.audioVoiceEs) || null,
+          audioVoiceEn: (f.audioUrlEn && f.audioVoiceEn) || null,
+        },
       }),
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["seasonal-prayers"] });
@@ -113,6 +121,8 @@ function PrayerForm({ season, kind, initial, onDone }: { season: SeasonRow["seas
         kind="audio"
         value={f.audioUrlEs}
         onChange={(v) => setF({ ...f, audioUrlEs: v })}
+        voice={f.audioVoiceEs}
+        onVoiceChange={(v) => setF((p) => ({ ...p, audioVoiceEs: v }))}
         testId={`season-${season}-${kind}-es`}
       />
       <MediaField
@@ -120,6 +130,8 @@ function PrayerForm({ season, kind, initial, onDone }: { season: SeasonRow["seas
         kind="audio"
         value={f.audioUrlEn}
         onChange={(v) => setF({ ...f, audioUrlEn: v })}
+        voice={f.audioVoiceEn}
+        onVoiceChange={(v) => setF((p) => ({ ...p, audioVoiceEn: v }))}
         testId={`season-${season}-${kind}-en`}
       />
       {save.isError && <p className="error">{t("genericError")}</p>}

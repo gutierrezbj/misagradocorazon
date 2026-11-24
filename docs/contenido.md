@@ -45,6 +45,7 @@ Página **Oraciones por tiempo** del panel. Para cada tiempo, una oración de ma
 | Imagen | JPG, PNG, WebP | 5 MB |
 | Audio | MP3, M4A (AAC) | 50 MB |
 
+- **Voz:** cada audio dice quién pone la voz, "Voz generada con IA" o el nombre de la persona. El panel no guarda un audio sin ese dato (US-30, `docs/audio.md`).
 - **Rutas en el bucket:** `image/AAAA-MM/<uuid>.<ext>` y `audio/AAAA-MM/<uuid>.<ext>`. Se guarda la URL pública.
 - **Sin R2 configurado:** el panel lo avisa y permite **pegar la URL** de un fichero ya alojado.
 
