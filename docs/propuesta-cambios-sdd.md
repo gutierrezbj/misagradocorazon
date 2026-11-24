@@ -4,7 +4,7 @@ Fecha: 26-sep-2026. Estado: **aprobada por el fundador y aplicada en Notion el 2
 
 Decisiones tomadas:
 - **Misa en vivo en el MVP:** sí, en versión mínima, con la misa de una parroquia colaboradora mientras no esté fichado el sacerdote definitivo.
-- **Lanzamiento:** se mantiene la novena guadalupana (1–12 dic 2026), con misa y causas en versión mínima.
+- **Lanzamiento:** se mantiene la novena guadalupana (1–12 dic 2026), con misa y causas en versión mínima. *Sustituido el 24-nov-2026: lanzamiento el 10-feb-2027 (ver abajo).*
 - **Precio de la vela:** 0,99 / 1,99 / 2,99 USD.
 - **Notion:** lo actualiza Claude.
 
@@ -14,6 +14,18 @@ Decisiones tomadas:
 Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, lo paso a Notion página por página o lo pasas tú.
 
 ---
+
+## Cambio del 24-nov-2026: lanzamiento en el Miércoles de Ceniza 2027
+
+Decisión del fundador del 24-nov-2026, aplicada en Notion ese mismo día (SDD-02, restricción "Calendario", y página principal).
+
+- El lanzamiento público pasa de la novena guadalupana (1–12 dic 2026) al **Miércoles de Ceniza, 10-feb-2027**.
+- Diciembre 2026: beta web privada con un grupo de confianza y app nativa a las tiendas. Sin campaña.
+- Enero 2027: preparación de contenido y comunidad ("Camino a la Cuaresma").
+- La novena guadalupana queda para diciembre de 2027.
+- Plan de campaña: `docs/campana-lanzamiento.md`.
+
+Las menciones a la novena de 2026 en las secciones de abajo quedan como registro de lo aprobado en su fecha.
 
 ## Cambio propuesto el 23-nov-2026: beta web (PWA) con la vela gratis
 

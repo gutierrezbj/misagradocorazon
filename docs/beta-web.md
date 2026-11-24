@@ -1,6 +1,6 @@
 # Beta web instalable (PWA)
 
-SDD-05 US-27, US-28 y US-29; ADR-016. Aprobado por el fundador el 23-nov-2026 (`docs/propuesta-cambios-sdd.md`). Apertura prevista el 1-dic-2026, con la novena guadalupana, en `app.misagradocorazon.com`, abierta a cualquiera.
+SDD-05 US-27, US-28 y US-29; ADR-016. Aprobado por el fundador el 23-nov-2026 (`docs/propuesta-cambios-sdd.md`). En `app.misagradocorazon.com`, abierta a cualquiera. Calendario (decisión del 24-nov-2026): en diciembre de 2026 se usa en privado con un grupo de confianza, sin campaña; el lanzamiento público es el Miércoles de Ceniza, 10-feb-2027 (`docs/campana-lanzamiento.md`).
 
 ## Qué es
 
