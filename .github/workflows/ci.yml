@@ -54,6 +54,10 @@ jobs:
         run: docker build -f apps/admin/Dockerfile --build-arg VITE_API_URL=https://api.misagradocorazon.com -t msc-admin .
       - name: Imagen de la beta web
         run: docker build -f apps/mobile/Dockerfile.web --build-arg EXPO_PUBLIC_BACKEND_URL=https://api.misagradocorazon.com -t msc-web .
+      - name: Imagen de la web pública (misagradocorazon.com)
+        run: |
+          docker build -f apps/site/Dockerfile -t msc-site .
+          docker run --rm msc-site nginx -t
       - name: La API arranca y aplica migraciones
         run: |
           docker network create msc

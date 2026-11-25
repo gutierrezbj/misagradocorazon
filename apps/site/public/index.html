@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mi Sagrado Corazón · Enciende una luz por quien quieres</title>
+    <meta
+      name="description"
+      content="Enciende una vela por tu intención, reza cada día y elige con la comunidad a qué obra va el 20 %. Empezamos el Miércoles de Ceniza, 10 de febrero."
+    />
+    <link rel="canonical" href="https://misagradocorazon.com/" />
+    <meta name="theme-color" content="#07080B" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Mi Sagrado Corazón" />
+    <meta property="og:url" content="https://misagradocorazon.com/" />
+    <meta property="og:title" content="Mi Sagrado Corazón · Enciende una luz por quien quieres" />
+    <meta
+      property="og:description"
+      content="Una vela por tu intención, la misa del domingo en directo y obras que elige la comunidad. Empezamos el 10 de febrero."
+    />
+    <meta property="og:image" content="https://misagradocorazon.com/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="El Sagrado Corazón sobre cientos de velas encendidas" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preload" href="/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/cabin-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/img/corazon_velas_apagado.webp" as="image" type="image/webp" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/main.js"></script>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://misagradocorazon.com/#organization",
+            "name": "Mi Sagrado Corazón",
+            "url": "https://misagradocorazon.com/",
+            "logo": "https://misagradocorazon.com/apple-touch-icon.png"
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://misagradocorazon.com/#website",
+            "name": "Mi Sagrado Corazón",
+            "url": "https://misagradocorazon.com/",
+            "inLanguage": "es",
+            "publisher": { "@id": "https://misagradocorazon.com/#organization" }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#camino">Saltar al contenido</a>
+
+    <!-- Portada: «Noche de velas» -->
+    <header class="hero" id="portada">
+      <canvas
+        class="hero__canvas"
+        role="img"
+        aria-label="El Sagrado Corazón sobre un velero de cientos de velas que se encienden al pasar la mano"
+      ></canvas>
+      <div class="hero__inner">
+        <div class="hero__bar">
+          <span class="hero__brand">Mi Sagrado Corazón</span>
+          <nav class="hero__nav" aria-label="Secciones">
+            <a href="#vela">La vela</a>
+            <a href="#misa">La misa</a>
+            <a href="#obras">Las obras</a>
+          </nav>
+          <span class="hero__date">Miércoles de Ceniza · 10 de febrero</span>
+        </div>
+
+        <h1 class="hero__title">
+          <span class="sr-only">Enciende una luz por quien quieres.</span>
+          <span class="hero__line" aria-hidden="true">Enciende</span>
+          <span class="hero__line" aria-hidden="true">una luz por</span>
+          <span class="hero__line" aria-hidden="true">quien quieres.</span>
+        </h1>
+
+        <div class="hero__foot">
+          <div class="hero__count">
+            <span class="hero__num" aria-live="polite" aria-atomic="true"
+              ><span data-lit>00</span><span class="sr-only"> velas encendidas por ti</span></span
+            >
+            <span class="hero__numlabel" aria-hidden="true">velas encendidas<br />por ti · pasa la mano</span>
+          </div>
+          <p class="hero__lead">
+            Pide por los tuyos, reza con miles y elige cada mes a quién ayudamos. Una vela desde 0,99 USD; el 20&nbsp;% va a
+            la obra que vote la comunidad.
+          </p>
+          <div class="hero__cta">
+            <a class="btn btn--line" href="#lista">Quiero estar el 10 de febrero</a>
+            <span class="hero__langs">En español y en inglés</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- El camino -->
+    <main class="path" id="camino">
+      <div class="rail" aria-hidden="true"><div class="rail__beam"></div></div>
+
+      <!-- I · La vela -->
+      <section class="sec sec--1" id="vela" aria-labelledby="t-vela">
+        <span class="dot" aria-hidden="true">I</span>
+        <p class="label rv">La vela</p>
+        <h2 class="display rv d1" id="t-vela">Una vela por tu intención</h2>
+        <div class="vela__intro rv d2">
+          <p class="body">
+            Eliges a quién se la dedicas, escribes tu intención y la enciendes. Tu vela queda en el altar y en el muro de
+            la comunidad.
+          </p>
+          <button type="button" class="btn btn--line btn--toggle" aria-pressed="false" data-velas>
+            Encender las velas
+          </button>
+        </div>
+        <div class="grid3 velas rv d3" data-velas-grid>
+          <article class="vela">
+            <div class="vela__img vela__img--1" role="img" aria-label="Vela básica"></div>
+            <div class="vela__row">
+              <h3 class="vela__name">Básica</h3>
+              <span class="vela__time">24 horas</span>
+            </div>
+            <span class="vela__price">0,99 USD</span>
+          </article>
+          <article class="vela">
+            <div class="vela__img vela__img--2" role="img" aria-label="Vela solemne"></div>
+            <div class="vela__row">
+              <h3 class="vela__name">Solemne</h3>
+              <span class="vela__time">72 horas</span>
+            </div>
+            <span class="vela__price">1,99 USD</span>
+          </article>
+          <article class="vela">
+            <div class="vela__img vela__img--3" role="img" aria-label="Vela permanente"></div>
+            <div class="vela__row">
+              <h3 class="vela__name">Permanente</h3>
+              <span class="vela__time">7 días</span>
+            </div>
+            <span class="vela__price">2,99 USD</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- II · Tu día -->
+      <section class="sec sec--2" id="dia" aria-labelledby="t-dia">
+        <span class="dot" aria-hidden="true">II</span>
+        <div class="grid2 dia">
+          <div>
+            <p class="label rv">Tu día</p>
+            <h2 class="display rv d1" id="t-dia">Te acompaña de la mañana a la noche</h2>
+            <ul class="dia__list rv d2" role="list">
+              <li>
+                <button type="button" class="dia__item" aria-pressed="true" data-day="0">
+                  <span class="dia__hour">07:00</span><span class="dia__name">Oración de la mañana</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dia__item" aria-pressed="false" data-day="1">
+                  <span class="dia__hour">09:00</span><span class="dia__name">El santo del día</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dia__item" aria-pressed="false" data-day="2">
+                  <span class="dia__hour">13:00</span><span class="dia__name">El evangelio</span>
+                </button>
+              </li>
+              <li>
+                <button type="button" class="dia__item" aria-pressed="false" data-day="3">
+                  <span class="dia__hour">21:00</span><span class="dia__name">Oración de la noche</span>
+                </button>
+              </li>
+            </ul>
+            <p class="dia__text body rv d3" aria-live="polite" data-day-text>
+              El primer anclaje del día, en audio: suena el aviso, le das al play y te acompaña mientras te preparas.
+            </p>
+            <p class="dia__note rv d3">Horas de ejemplo: en la app las eliges tú.</p>
+          </div>
+          <div class="dia__clock rv d2">
+            <svg viewBox="0 0 400 400" role="img" aria-label="Esfera del día con la oración seleccionada">
+              <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(255,241,224,0.22)" stroke-width="1" />
+              <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(255,241,224,0.12)" stroke-width="1" />
+              <g data-ticks></g>
+              <g data-dots></g>
+              <g class="dia__hand" data-hand>
+                <line x1="200" y1="200" x2="200" y2="58" stroke="#FFC56B" stroke-width="2" />
+                <circle cx="200" cy="58" r="5" fill="#FFC56B" />
+              </g>
+              <circle cx="200" cy="200" r="6" fill="#FFF1E0" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <!-- III · La misa -->
+      <section class="sec sec--3" id="misa" aria-labelledby="t-misa">
+        <span class="dot" aria-hidden="true">III</span>
+        <p class="label rv">La misa</p>
+        <h2 class="display rv d1" id="t-misa">Cada domingo, misa en directo</h2>
+        <div class="grid3 cols rv d2">
+          <div class="col">
+            <h3 class="col__title">Sin salir de la app</h3>
+            <p class="col__text">La retransmisión en vivo, con la cuenta atrás hasta la próxima misa.</p>
+          </div>
+          <div class="col">
+            <h3 class="col__title">Con la comunidad</h3>
+            <p class="col__text">Un chat moderado para rezar juntos y las velas de la semana contándose en directo.</p>
+          </div>
+          <div class="col">
+            <h3 class="col__title">Y si no llegas</h3>
+            <p class="col__text">La grabación queda disponible al terminar.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- IV · Las obras -->
+      <section class="sec sec--4" id="obras" aria-labelledby="t-obras">
+        <span class="dot" aria-hidden="true">IV</span>
+        <p class="label rv">Las obras</p>
+        <div class="grid2 obras">
+          <h2 class="obras__big rv d1" id="t-obras">20&nbsp;%</h2>
+          <p class="obras__lead rv d2">
+            de lo que se recauda cada mes va a la obra que vote la comunidad. Fijo, público y calculado desde el libro de
+            movimientos, nunca tecleado a mano.
+          </p>
+        </div>
+        <ol class="grid3 cols rv d3">
+          <li class="col">
+            <span class="col__num">1–7</span>
+            <span class="col__text"
+              >Cada mes se presentan de tres a cuatro obras con su ficha: dónde, quién la lleva, presupuesto y a qué se
+              destina el dinero. Votas una.</span
+            >
+          </li>
+          <li class="col">
+            <span class="col__num">8</span>
+            <span class="col__text">Se anuncia la obra elegida por la comunidad.</span>
+          </li>
+          <li class="col">
+            <span class="col__num">Mes a mes</span>
+            <span class="col__text"
+              >Ves lo transferido y las fotos del avance, y el histórico de todas las obras financiadas.</span
+            >
+          </li>
+        </ol>
+      </section>
+
+      <!-- V · Rezo por ti -->
+      <section class="sec sec--5" id="rezo" aria-labelledby="t-rezo">
+        <span class="dot" aria-hidden="true">V</span>
+        <p class="label rv">Rezo por ti</p>
+        <h2 class="display rv d1" id="t-rezo">Nadie reza solo</h2>
+        <p class="body rv d2">
+          En el muro de intenciones la comunidad reza por lo que compartes. Pulsa una y súmate.
+        </p>
+        <div class="grid3 wall rv d3" data-wall>
+          <button type="button" class="card" aria-pressed="false" data-n="128">
+            <span class="card__tag">Ejemplo · Salud</span>
+            <span class="card__text">Por mi madre, que entra mañana a quirófano.</span>
+            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>128 rezan</span></span>
+          </button>
+          <button type="button" class="card" aria-pressed="false" data-n="64">
+            <span class="card__tag">Ejemplo · Trabajo</span>
+            <span class="card__text">Por encontrar trabajo antes de fin de mes.</span>
+            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>64 rezan</span></span>
+          </button>
+          <button type="button" class="card" aria-pressed="false" data-n="211">
+            <span class="card__tag">Ejemplo · Familia</span>
+            <span class="card__text">Por mi hijo, que está lejos de casa.</span>
+            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>211 rezan</span></span>
+          </button>
+          <button type="button" class="card" aria-pressed="false" data-n="97">
+            <span class="card__tag">Ejemplo · Difuntos</span>
+            <span class="card__text">Por el alma de mi abuelo Ramón.</span>
+            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>97 rezan</span></span>
+          </button>
+          <button type="button" class="card" aria-pressed="false" data-n="143">
+            <span class="card__tag">Ejemplo · Gracias</span>
+            <span class="card__text">Gracias por el nacimiento de mi nieta.</span>
+            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>143 rezan</span></span>
+          </button>
+          <button type="button" class="card" aria-pressed="false" data-n="76">
+            <span class="card__tag">Ejemplo · Paz</span>
+            <span class="card__text">Por la paz en mi casa.</span>
+            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>76 rezan</span></span>
+          </button>
+        </div>
+        <p class="wall__note">
+          Ejemplos de intenciones. En la app, tus intenciones son privadas salvo que decidas compartirlas.
+        </p>
+      </section>
+
+      <!-- VI · Cierre -->
+      <section class="sec sec--6" id="lista" aria-labelledby="t-lista">
+        <span class="dot" aria-hidden="true">VI</span>
+        <div class="grid2 cierre">
+          <div>
+            <p class="label rv">Miércoles de Ceniza · 10 de febrero</p>
+            <h2 class="display display--xl rv d1" id="t-lista">Empezamos el camino juntos</h2>
+            <form class="form rv d2" data-form novalidate>
+              <label class="form__label" for="c-mail">Tu correo, para avisarte el día del lanzamiento</label>
+              <div class="form__row">
+                <input
+                  class="form__input"
+                  id="c-mail"
+                  name="email"
+                  type="email"
+                  autocomplete="email"
+                  inputmode="email"
+                  required
+                  placeholder="tu@correo.com"
+                />
+                <button type="submit" class="btn btn--solid">Quiero estar el 10 de febrero</button>
+              </div>
+              <label class="form__check">
+                <input type="checkbox" name="consent" required />
+                <span
+                  >Acepto que Mi Sagrado Corazón use mi correo solo para avisarme del lanzamiento. Puedo darme de baja
+                  cuando quiera. [ENLACE A LA POLÍTICA DE PRIVACIDAD]</span
+                >
+              </label>
+              <p class="form__status" role="status" data-form-status></p>
+            </form>
+          </div>
+          <div
+            class="cierre__heart rv d2"
+            role="img"
+            aria-label="El Sagrado Corazón en acuarela, rodeado de luz y de una corona de espinas"
+          ></div>
+        </div>
+        <footer class="foot">
+          <span class="foot__brand">Mi Sagrado Corazón</span>
+          <span>En español y en inglés · San Miguel Arcángel, defiéndenos en la batalla</span>
+        </footer>
+      </section>
+    </main>
+  </body>
+</html>
