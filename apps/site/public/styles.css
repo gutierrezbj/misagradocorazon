@@ -704,6 +704,107 @@ input {
   line-height: 1;
 }
 
+/* IV · Votación de ejemplo */
+.obras__how {
+  margin-top: 64px;
+  align-items: center;
+}
+.obras__steps {
+  margin: 0;
+  padding: 0;
+  border-top: 0;
+}
+.vote {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 32px;
+  border-radius: 8px;
+  background: #fffaf2;
+  color: #2a1a0e;
+  box-shadow: 0 24px 60px rgba(20, 10, 4, 0.35);
+}
+.vote__tag {
+  margin: 0;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b4a2e;
+}
+.vote__title {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(28px, 2.6vw, 36px);
+  line-height: 1.1;
+}
+.vote__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.vote__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+}
+.vote__name {
+  font-weight: 600;
+}
+.vote__pct {
+  font-variant-numeric: tabular-nums;
+}
+.vote__bar {
+  display: block;
+  margin-top: 6px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ece2d3;
+  overflow: hidden;
+}
+.vote__fill {
+  display: block;
+  height: 100%;
+  width: var(--pct, 0%);
+  border-radius: inherit;
+  background: #b98a4e;
+  transition: width 1.6s var(--ease-reveal);
+}
+.vote__item:first-child .vote__fill {
+  background: #e39a2d;
+}
+.vote__note {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #4a3420;
+}
+.vote__fine {
+  margin: 0;
+  font-size: 14px;
+  color: #6b4a2e;
+}
+
+/* Textos según el puntero: ratón o dedo */
+.only-touch {
+  display: none;
+}
+@media (hover: none) and (pointer: coarse) {
+  .only-touch {
+    display: inline;
+  }
+  .only-mouse {
+    display: none;
+  }
+}
+.swipe-hint {
+  display: none;
+}
+
 /* V · Rezamos contigo */
 .sec--5 .body {
   margin-top: 24px;
@@ -1123,8 +1224,37 @@ input {
   .cierre__heart {
     max-width: 360px;
   }
-  .vela__img {
-    max-width: 420px;
+  /* Velas en carrusel horizontal: se deslizan con el dedo, sin mover la página. */
+  .swipe-hint {
+    display: block;
+    margin: 40px 0 0;
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #ddd4c7;
+  }
+  .velas {
+    margin-top: 16px;
+    margin-right: calc(-1 * var(--pad-x));
+    padding-right: var(--pad-x);
+    display: grid;
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 78%;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .velas::-webkit-scrollbar {
+    display: none;
+  }
+  .vela {
+    scroll-snap-align: start;
+  }
+  .vote {
+    padding: 24px;
   }
   .phones {
     padding-left: 15%;

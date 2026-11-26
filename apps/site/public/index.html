@@ -90,7 +90,10 @@
             <span class="hero__num" aria-live="polite" aria-atomic="true"
               ><span data-lit>00</span><span class="sr-only"> velas encendidas por ti</span></span
             >
-            <span class="hero__numlabel" aria-hidden="true">velas encendidas<br />por ti · pasa la mano</span>
+            <span class="hero__numlabel" aria-hidden="true"
+              >velas encendidas<br />por ti · <span class="only-mouse">pasa la mano</span
+              ><span class="only-touch">toca la pantalla</span></span
+            >
           </div>
           <p class="hero__lead">
             Pide por los tuyos, reza con miles y elige cada mes a quién ayudamos. Una vela desde 0,99 USD; el 20&nbsp;% va a
@@ -141,6 +144,7 @@
             <figcaption class="phones__cap">La app, tal como es hoy</figcaption>
           </figure>
         </div>
+        <p class="swipe-hint">Desliza para ver las tres velas</p>
         <div class="grid3 velas rv d3" data-velas-grid>
           <article class="vela">
             <div class="vela__img vela__img--1" role="img" aria-label="Vela básica">
@@ -270,7 +274,28 @@
             movimientos, nunca tecleado a mano.
           </p>
         </div>
-        <ol class="grid3 cols rv d3">
+        <div class="grid2 obras__how">
+          <article class="vote rv d2" data-vote>
+            <p class="vote__tag">Ejemplo · Votación del mes · día 5 de 7</p>
+            <h3 class="vote__title">¿A qué obra va el 20&nbsp;% de este mes?</h3>
+            <ul class="vote__list" role="list">
+              <li class="vote__item" data-pct="46">
+                <span class="vote__row"><span class="vote__name">Comedor infantil</span><span class="vote__pct">46&nbsp;%</span></span>
+                <span class="vote__bar"><span class="vote__fill"></span></span>
+              </li>
+              <li class="vote__item" data-pct="31">
+                <span class="vote__row"><span class="vote__name">Becas de estudio</span><span class="vote__pct">31&nbsp;%</span></span>
+                <span class="vote__bar"><span class="vote__fill"></span></span>
+              </li>
+              <li class="vote__item" data-pct="23">
+                <span class="vote__row"><span class="vote__name">Dispensario rural</span><span class="vote__pct">23&nbsp;%</span></span>
+                <span class="vote__bar"><span class="vote__fill"></span></span>
+              </li>
+            </ul>
+            <p class="vote__note">Cada obra tiene su ficha: dónde, quién la lleva, presupuesto y a qué se destina el dinero.</p>
+            <p class="vote__fine">Ejemplo: estas obras y porcentajes no son reales.</p>
+          </article>
+        <ol class="cols cols--stack obras__steps rv d3">
           <li class="col">
             <span class="col__num">1–7</span>
             <span class="col__text"
@@ -289,6 +314,7 @@
             >
           </li>
         </ol>
+        </div>
       </section>
 
       <!-- V · Rezamos contigo -->

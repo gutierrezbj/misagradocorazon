@@ -51,7 +51,11 @@ pnpm --filter @msc/site test
 - **Acuarela** fundida con el fondo (`mix-blend-mode: multiply`).
 - **Degradado de la V:** marrón cálido hasta el final y paso corto por caramelo a dorado claro.
 
-Propuestos y aún sin hacer: ficha de obra de ejemplo en la IV, carrusel de velas en móvil, «toca la pantalla» en la portada móvil y pie con enlaces legales.
+- **IV · Votación de ejemplo:** tres obras genéricas con barras que crecen al llegar, marcadas como ejemplo, junto al ciclo del mes.
+- **Velas en móvil:** carrusel horizontal que se desliza con el dedo, con la pista «Desliza para ver las tres velas».
+- **Portada en pantallas táctiles:** «toca la pantalla» en lugar de «pasa la mano».
+
+Pendiente: pie con enlaces legales, contacto y redes.
 
 ## Pendiente (`docs/web-publica.md`, apartado 6)
 

@@ -377,6 +377,29 @@
     });
   }
 
+  /* ---------- IV · Votación de ejemplo: las barras crecen al llegar ---------- */
+  function votacion() {
+    var card = $("[data-vote]");
+    if (!card) return;
+    var items = $$(".vote__item", card);
+    function fill() {
+      items.forEach(function (it) {
+        $(".vote__fill", it).style.setProperty("--pct", it.getAttribute("data-pct") + "%");
+      });
+    }
+    if (!("IntersectionObserver" in window)) return fill();
+    var io = new IntersectionObserver(
+      function (es) {
+        if (es[0].isIntersecting) {
+          io.disconnect();
+          setTimeout(fill, 400);
+        }
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(card);
+  }
+
   /* ---------- VI · Cuenta atrás al Miércoles de Ceniza (10-feb-2027, hora local) ---------- */
   function countdown() {
     var el = $("[data-countdown]");
@@ -451,6 +474,7 @@
     stations();
     velas();
     dia();
+    votacion();
     rezamos();
     countdown();
     bar();
