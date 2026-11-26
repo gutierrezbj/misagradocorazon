@@ -39,7 +39,7 @@ pnpm --filter @msc/site test
 - **Portada en móvil vertical:** el titular baja para no tapar el corazón.
 - **Tu día:** se añade la línea «Horas de ejemplo: en la app las eliges tú.».
 - **Menú de la portada:** los enlaces son reales y llevan a su estación. Se ocultan por debajo de 1100 px.
-- **Tarjetas de vela en móvil:** proporción 4:3 en vez de 4:5, para que la sección no ocupe tres pantallas.
+- **Tarjetas de vela en móvil:** mantienen el 4:5 con un ancho máximo de 420 px.
 
 ## Revisión de diseño del 26-nov-2026 (aprobada por el fundador)
 
