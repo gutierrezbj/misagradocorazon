@@ -104,6 +104,12 @@
       </div>
     </header>
 
+    <!-- Barra fija: aparece al pasar la portada y se va al llegar al formulario -->
+    <div class="bar" data-bar>
+      <a class="bar__brand" href="#portada">Mi Sagrado Corazón</a>
+      <a class="btn btn--line bar__cta" href="#lista">Quiero estar el 10 de febrero</a>
+    </div>
+
     <!-- El camino -->
     <main class="path" id="camino">
       <div class="rail" aria-hidden="true"><div class="rail__beam"></div></div>
@@ -111,16 +117,29 @@
       <!-- I · La vela -->
       <section class="sec sec--1" id="vela" aria-labelledby="t-vela">
         <span class="dot" aria-hidden="true">I</span>
-        <p class="label rv">La vela</p>
-        <h2 class="display rv d1" id="t-vela">Una vela por tu intención</h2>
-        <div class="vela__intro rv d2">
-          <p class="body">
-            Eliges a quién se la dedicas, escribes tu intención y la enciendes. Tu vela queda en el altar y en el muro de
-            la comunidad.
-          </p>
-          <button type="button" class="btn btn--line btn--toggle" aria-pressed="false" data-velas>
-            Encender las velas
-          </button>
+        <div class="grid2 head">
+          <div>
+            <p class="label rv">La vela</p>
+            <h2 class="display rv d1" id="t-vela">Una vela por tu intención</h2>
+            <div class="vela__intro rv d2">
+              <p class="body">
+                Eliges a quién se la dedicas, escribes tu intención y la enciendes. Tu vela queda en el altar y en el
+                muro de la comunidad.
+              </p>
+              <button type="button" class="btn btn--line btn--toggle" aria-pressed="false" data-velas>
+                Encender las velas
+              </button>
+            </div>
+          </div>
+          <figure class="phones rv d2">
+            <div class="phone phone--back">
+              <img src="/img/app_vela.webp" alt="La app tras encender una vela: «Tu vela está encendida»" width="585" height="1266" loading="lazy" decoding="async" />
+            </div>
+            <div class="phone">
+              <img src="/img/app_altar.webp" alt="El altar de la app, con la vela del santo patrón y las oraciones del día" width="585" height="1266" loading="lazy" decoding="async" />
+            </div>
+            <figcaption class="phones__cap">La app, tal como es hoy</figcaption>
+          </figure>
         </div>
         <div class="grid3 velas rv d3" data-velas-grid>
           <article class="vela">
@@ -212,9 +231,11 @@
       <!-- III · La misa -->
       <section class="sec sec--3" id="misa" aria-labelledby="t-misa">
         <span class="dot" aria-hidden="true">III</span>
+        <div class="grid2 head">
+          <div>
         <p class="label rv">La misa</p>
         <h2 class="display rv d1" id="t-misa">Cada domingo, misa en directo</h2>
-        <div class="grid3 cols rv d2">
+        <div class="cols cols--stack rv d2">
           <div class="col">
             <h3 class="col__title">Sin salir de la app</h3>
             <p class="col__text">La retransmisión en vivo, con la cuenta atrás hasta la próxima misa.</p>
@@ -227,6 +248,14 @@
             <h3 class="col__title">Y si no llegas</h3>
             <p class="col__text">La grabación queda disponible al terminar.</p>
           </div>
+        </div>
+          </div>
+          <figure class="phones phones--one rv d2">
+            <div class="phone">
+              <img src="/img/app_misa.webp" alt="La pestaña Misa de la app, con la cuenta atrás hasta la misa del domingo y el chat de la comunidad" width="585" height="1266" loading="lazy" decoding="async" />
+            </div>
+            <figcaption class="phones__cap">La app, tal como es hoy</figcaption>
+          </figure>
         </div>
       </section>
 
@@ -262,48 +291,58 @@
         </ol>
       </section>
 
-      <!-- V · Rezo por ti -->
+      <!-- V · Rezamos contigo -->
       <section class="sec sec--5" id="rezo" aria-labelledby="t-rezo">
         <span class="dot" aria-hidden="true">V</span>
-        <p class="label rv">Rezo por ti</p>
+        <p class="label rv">Rezamos contigo</p>
         <h2 class="display rv d1" id="t-rezo">Nadie reza solo</h2>
         <p class="body rv d2">
-          En el muro de intenciones la comunidad reza por lo que compartes. Pulsa una y súmate.
+          Pide que recen contigo por quien quieres. La comunidad se une, con su nombre o en anónimo, desde cualquier
+          país, y tú ves cuántos te acompañan.
         </p>
-        <div class="grid3 wall rv d3" data-wall>
-          <button type="button" class="card" aria-pressed="false" data-n="128">
-            <span class="card__tag">Ejemplo · Salud</span>
-            <span class="card__text">Por mi madre, que entra mañana a quirófano.</span>
-            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>128 rezan</span></span>
-          </button>
-          <button type="button" class="card" aria-pressed="false" data-n="64">
-            <span class="card__tag">Ejemplo · Trabajo</span>
-            <span class="card__text">Por encontrar trabajo antes de fin de mes.</span>
-            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>64 rezan</span></span>
-          </button>
-          <button type="button" class="card" aria-pressed="false" data-n="211">
-            <span class="card__tag">Ejemplo · Familia</span>
-            <span class="card__text">Por mi hijo, que está lejos de casa.</span>
-            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>211 rezan</span></span>
-          </button>
-          <button type="button" class="card" aria-pressed="false" data-n="97">
-            <span class="card__tag">Ejemplo · Difuntos</span>
-            <span class="card__text">Por el alma de mi abuelo Ramón.</span>
-            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>97 rezan</span></span>
-          </button>
-          <button type="button" class="card" aria-pressed="false" data-n="143">
-            <span class="card__tag">Ejemplo · Gracias</span>
-            <span class="card__text">Gracias por el nacimiento de mi nieta.</span>
-            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>143 rezan</span></span>
-          </button>
-          <button type="button" class="card" aria-pressed="false" data-n="76">
-            <span class="card__tag">Ejemplo · Paz</span>
-            <span class="card__text">Por la paz en mi casa.</span>
-            <span class="card__foot"><span data-cta>Rezo por ti</span><span data-count>76 rezan</span></span>
-          </button>
+        <div class="grid2 rc">
+          <article class="rc__card rv d2" data-rc>
+            <p class="rc__tag">Ejemplo · Novena · día 3 de 9</p>
+            <p class="rc__who">Celeste M. pide</p>
+            <p class="rc__text">Por mi padre, que está en el hospital.</p>
+            <div class="rc__lights" aria-hidden="true" data-rc-lights></div>
+            <p class="rc__count" aria-live="polite">
+              <span class="rc__num" data-rc-num>37</span>
+              <span class="rc__numlabel"
+                >personas rezan con Celeste<br />desde <span data-rc-countries>6</span> países</span
+              >
+            </p>
+            <button type="button" class="btn btn--solid rc__join" aria-pressed="false" data-rc-join>
+              Rezo con Celeste
+            </button>
+          </article>
+          <div class="rc__side rv d3">
+            <ol class="rc__steps">
+              <li>
+                <span class="rc__step">Pides</span>
+                <span class="rc__stepText">Escribes tu intención y eliges cuánto dura: un día, una novena o un mes.</span>
+              </li>
+              <li>
+                <span class="rc__step">Se unen</span>
+                <span class="rc__stepText">Quien quiera reza contigo, con su nombre o en anónimo.</span>
+              </li>
+              <li>
+                <span class="rc__step">Te acompañan</span>
+                <span class="rc__stepText">La app te avisa de cuántos rezan contigo y desde dónde.</span>
+              </li>
+            </ol>
+            <div class="push" role="img" aria-label="Ejemplo de aviso de la app: Ya rezan contigo 10 personas desde 4 países">
+              <img class="push__icon" src="/apple-touch-icon.png" alt="" width="40" height="40" />
+              <span class="push__body">
+                <span class="push__app">Mi Sagrado Corazón · hace 2 h</span>
+                <span class="push__text">Ya rezan contigo 10 personas desde 4 países.</span>
+              </span>
+            </div>
+          </div>
         </div>
         <p class="wall__note">
-          Ejemplos de intenciones. En la app, tus intenciones son privadas salvo que decidas compartirlas.
+          Ejemplo: Celeste y su petición no son reales. En la app, tus intenciones son privadas salvo que decidas
+          compartirlas.
         </p>
       </section>
 
@@ -314,6 +353,7 @@
           <div>
             <p class="label rv">Miércoles de Ceniza · 10 de febrero</p>
             <h2 class="display display--xl rv d1" id="t-lista">Empezamos el camino juntos</h2>
+            <p class="countdown rv d2" data-countdown hidden></p>
             <form class="form rv d2" data-form novalidate>
               <label class="form__label" for="c-mail">Tu correo, para avisarte el día del lanzamiento</label>
               <div class="form__row">

@@ -52,9 +52,14 @@ test("las imágenes y el canvas tienen texto alternativo", () => {
   for (const m of html.matchAll(/role="img"(?![^>]*aria-label)/g)) assert.fail('role="img" sin aria-label: ' + m.index);
 });
 
-test("las intenciones de ejemplo van marcadas y con la nota de privacidad", () => {
-  const cards = html.match(/class="card__tag">([^<]+)</g) || [];
-  assert.equal(cards.length, 6);
-  for (const c of cards) assert.match(c, />Ejemplo · /);
-  assert.match(html, /Ejemplos de intenciones\. En la app, tus intenciones son privadas salvo que decidas compartirlas\./);
+test("«Rezamos contigo» va marcado como ejemplo y con la nota de privacidad", () => {
+  assert.match(html, /class="rc__tag">Ejemplo · /);
+  assert.match(html, /Ejemplo: Celeste y su petición no son reales\./);
+  assert.match(html, /En la app, tus intenciones son privadas salvo que decidas\s+compartirlas\./);
+});
+
+test("las pantallas de la app tienen texto alternativo", () => {
+  const phones = [...html.matchAll(/<img src="\/img\/app_[^"]+" alt="([^"]*)"/g)];
+  assert.equal(phones.length, 3);
+  for (const m of phones) assert.ok(m[1].length > 10);
 });

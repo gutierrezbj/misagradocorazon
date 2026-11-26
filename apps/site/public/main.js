@@ -309,19 +309,113 @@
     pick(0);
   }
 
-  /* ---------- V · Rezo por ti: ejemplos, se tachan y suman +1 ---------- */
-  function wall() {
-    $$("[data-wall] .card").forEach(function (card) {
-      var n = Number(card.getAttribute("data-n"));
-      var cta = $("[data-cta]", card);
-      var count = $("[data-count]", card);
-      card.addEventListener("click", function () {
-        var done = card.getAttribute("aria-pressed") !== "true";
-        card.setAttribute("aria-pressed", String(done));
-        cta.textContent = done ? "Rezas por esta intención" : "Rezo por ti";
-        count.textContent = n + (done ? 1 : 0) + " rezan";
+  /* ---------- V · Rezamos contigo: ejemplo que se llena al llegar y suma tu luz ---------- */
+  function rezamos() {
+    var card = $("[data-rc]");
+    if (!card) return;
+    var lightsBox = $("[data-rc-lights]", card);
+    var num = $("[data-rc-num]", card);
+    var countries = $("[data-rc-countries]", card);
+    var join = $("[data-rc-join]", card);
+    var TOTAL = 37;
+    var COUNTRIES = 6;
+    var SLOTS = 48;
+    var lights = [];
+    for (var i = 0; i < SLOTS; i++) {
+      var d = document.createElement("span");
+      d.className = "rc__light";
+      lightsBox.appendChild(d);
+      lights.push(d);
+    }
+    function show(n) {
+      lights.forEach(function (l, j) {
+        l.classList.toggle("is-on", j < Math.min(n, TOTAL));
       });
+      num.textContent = String(n);
+      countries.textContent = String(Math.max(1, Math.round((Math.min(n, TOTAL) / TOTAL) * COUNTRIES)));
+    }
+    // Sin JS el HTML ya dice 37 y 6. Con JS empieza en 0 y se llena al llegar a la tarjeta.
+    show(0);
+    var filled = false;
+    var timer = 0;
+    function fill() {
+      if (filled) return;
+      filled = true;
+      if (reduce) {
+        show(TOTAL);
+        return;
+      }
+      var n = 0;
+      timer = setInterval(function () {
+        n++;
+        show(n);
+        if (n >= TOTAL) clearInterval(timer);
+      }, 55);
+    }
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(
+        function (es) {
+          if (es[0].isIntersecting) {
+            io.disconnect();
+            setTimeout(fill, 500);
+          }
+        },
+        { threshold: 0.5 },
+      );
+      io.observe(card);
+    } else fill();
+
+    join.addEventListener("click", function () {
+      var on = join.getAttribute("aria-pressed") !== "true";
+      filled = true;
+      clearInterval(timer);
+      show(TOTAL);
+      join.setAttribute("aria-pressed", String(on));
+      join.textContent = on ? "Rezas con Celeste" : "Rezo con Celeste";
+      lights[TOTAL].classList.toggle("is-you", on);
+      num.textContent = String(TOTAL + (on ? 1 : 0));
     });
+  }
+
+  /* ---------- VI · Cuenta atrás al Miércoles de Ceniza (10-feb-2027, hora local) ---------- */
+  function countdown() {
+    var el = $("[data-countdown]");
+    if (!el) return;
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var days = Math.round((new Date(2027, 1, 10) - today) / 86400000);
+    if (days < 1) return;
+    el.textContent = "";
+    el.appendChild(document.createTextNode(days === 1 ? "Falta " : "Faltan "));
+    var strong = document.createElement("strong");
+    strong.textContent = String(days);
+    el.appendChild(strong);
+    el.appendChild(document.createTextNode(days === 1 ? " día para empezar." : " días para empezar."));
+    el.hidden = false;
+  }
+
+  /* ---------- Barra fija: tras la portada, y se retira al llegar al formulario ---------- */
+  function bar() {
+    var el = $("[data-bar]");
+    var hero = $(".hero");
+    var lista = $("#lista");
+    if (!el || !hero || !lista || !("IntersectionObserver" in window)) return;
+    var pastHero = false;
+    var atForm = false;
+    function update() {
+      el.classList.toggle("is-on", pastHero && !atForm);
+    }
+    new IntersectionObserver(function (es) {
+      pastHero = !es[0].isIntersecting && es[0].boundingClientRect.top < 0;
+      update();
+    }).observe(hero);
+    new IntersectionObserver(
+      function (es) {
+        atForm = es[0].isIntersecting;
+        update();
+      },
+      { threshold: 0.2 },
+    ).observe(lista);
   }
 
   /* ---------- VI · Lista de espera (maqueta: aún sin destino para los correos) ---------- */
@@ -357,7 +451,9 @@
     stations();
     velas();
     dia();
-    wall();
+    rezamos();
+    countdown();
+    bar();
     form();
   }
 

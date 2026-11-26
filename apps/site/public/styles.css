@@ -350,8 +350,9 @@ input {
   color: #fff6ea;
 }
 .sec--5 {
-  /* Oscuro hasta pasar el texto claro de cabecera; claro tras las tarjetas, donde va la nota. */
-  background-image: linear-gradient(to bottom, #6e4622 0, #6e4622 220px, #7d5532 440px, #e8d2ae 85%);
+  /* Marrón cálido mientras hay texto claro; al final pasa por caramelo a dorado claro, sin tono turbio. */
+  background-image: linear-gradient(to top, #e8d2ae 0, #b9854f 70px, #74492a 160px, #6e4622 100%);
+  padding-bottom: 180px;
   color: #2a1a0e;
 }
 .sec--6 {
@@ -703,69 +704,161 @@ input {
   line-height: 1;
 }
 
-/* V · Rezo por ti */
+/* V · Rezamos contigo */
 .sec--5 .body {
   margin-top: 24px;
   color: #fff1df;
 }
-.wall {
+.rc {
   margin-top: 48px;
-  gap: 20px;
+  align-items: center;
 }
-.card {
+.rc__card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 28px;
-  min-height: 200px;
-  padding: 24px;
-  border-radius: 6px;
-  border: 1px solid rgba(42, 26, 14, 0.18);
-  background: rgba(255, 250, 242, 0.82);
+  gap: 16px;
+  padding: 32px;
+  border-radius: 8px;
+  background: #fffaf2;
   color: #2a1a0e;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background-color 0.4s,
-    border-color 0.4s,
-    transform 0.5s var(--ease-reveal);
+  box-shadow: 0 24px 60px rgba(20, 10, 4, 0.35);
 }
-.card[aria-pressed="true"] {
-  background: #ffe3b3;
-}
-@media (hover: hover) and (pointer: fine) {
-  .card:hover {
-    transform: translateY(-2px);
-    border-color: rgba(42, 26, 14, 0.4);
-  }
-}
-.card__tag {
+.rc__tag {
+  margin: 0;
   font-size: 14px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: #6b4a2e;
 }
-.card__text {
+.rc__who {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+.rc__text {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(30px, 3vw, 40px);
+  line-height: 1.1;
+}
+.rc__lights {
+  display: grid;
+  grid-template-columns: repeat(16, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+.rc__light {
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: #e6dccd;
+  transition:
+    background-color 0.6s,
+    box-shadow 0.6s,
+    transform 0.6s var(--ease-reveal);
+}
+.rc__light.is-on {
+  background: #f2a93b;
+  box-shadow: 0 0 10px 2px rgba(255, 180, 80, 0.55);
+}
+.rc__light.is-you {
+  background: #c7302a;
+  box-shadow: 0 0 12px 3px rgba(199, 48, 42, 0.5);
+  transform: scale(1.25);
+}
+.rc__count {
+  margin: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+}
+.rc__num {
+  font-family: var(--serif);
+  font-size: 72px;
+  line-height: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+.rc__numlabel {
+  font-size: 16px;
+  line-height: 1.35;
+  color: #4a3420;
+}
+.rc__join {
+  align-self: flex-start;
+}
+.rc__join[aria-pressed="true"] {
+  background: #c7302a;
+}
+.rc__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.rc__steps li {
+  counter-increment: step;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  column-gap: 16px;
+  color: #fff1df;
+}
+.rc__steps li::before {
+  content: counter(step);
+  grid-row: span 2;
+  font-family: var(--serif);
+  font-size: 44px;
+  line-height: 1;
+  color: var(--light);
+}
+.rc__step {
   font-family: var(--serif);
   font-size: 30px;
   line-height: 1.1;
+  color: #fff6ea;
 }
-.card[aria-pressed="true"] .card__text {
-  text-decoration: line-through;
-  text-decoration-thickness: 2px;
-  color: rgba(42, 26, 14, 0.6);
+.rc__stepText {
+  font-size: 16px;
+  line-height: 1.5;
 }
-.card__foot {
+.push {
+  margin-top: 32px;
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: center;
+  gap: 14px;
+  max-width: 400px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 250, 242, 0.94);
+  color: #2a1a0e;
+  box-shadow: 0 16px 40px rgba(20, 10, 4, 0.3);
+}
+.push__icon {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+.push__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.push__app {
   font-size: 14px;
+  color: #6b4a2e;
+}
+.push__text {
+  font-size: 16px;
   font-weight: 600;
+  line-height: 1.35;
 }
 .wall__note {
-  margin: 20px 0 0;
+  margin: 28px 0 0;
   font-size: 14px;
-  color: #4a3420;
+  color: #eadcc9;
 }
 
 /* VI · Cierre */
@@ -833,6 +926,21 @@ input {
   aspect-ratio: 9 / 14;
   justify-self: center;
   background: url("/img/corazon_acuarela.webp") 50% 45% / cover no-repeat;
+  /* El papel blanco de la acuarela se funde con el marfil del fondo. */
+  mix-blend-mode: multiply;
+}
+.countdown {
+  margin: 20px 0 0;
+  font-size: 18px;
+  color: #4a3420;
+}
+.countdown strong {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 44px;
+  line-height: 1;
+  color: #2a1a0e;
+  vertical-align: -4px;
 }
 .foot {
   margin-top: 120px;
@@ -849,6 +957,102 @@ input {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+/* ---------- Pantallas de la app ---------- */
+.head {
+  align-items: center;
+}
+.phones {
+  position: relative;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.phone {
+  position: relative;
+  z-index: 1;
+  width: min(280px, 70%);
+  aspect-ratio: 585 / 1266;
+  padding: 10px;
+  border-radius: 44px;
+  background: #1a1410;
+  box-shadow:
+    0 0 0 1px rgba(255, 214, 150, 0.18),
+    0 30px 80px rgba(0, 0, 0, 0.55),
+    0 0 120px rgba(255, 180, 80, 0.12);
+}
+.phone img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 34px;
+}
+.phone--back {
+  position: absolute;
+  z-index: 0;
+  top: 48px;
+  left: 50%;
+  width: min(240px, 60%);
+  transform: translateX(-118%) rotate(-6deg);
+  opacity: 0.85;
+}
+.phones__cap {
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #cbb9a2;
+}
+.cols--stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Barra fija */
+.bar {
+  position: fixed;
+  z-index: 20;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: calc(env(safe-area-inset-top, 0px) + 10px) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px));
+  background: rgba(7, 8, 11, 0.86);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 214, 150, 0.14);
+  color: #fff4e2;
+  transform: translateY(-110%);
+  visibility: hidden;
+  transition:
+    transform 1.25s var(--ease-menu),
+    visibility 0s linear 1.25s;
+}
+.bar.is-on {
+  transform: none;
+  visibility: visible;
+  transition:
+    transform 1.25s var(--ease-menu),
+    visibility 0s;
+}
+.bar__brand {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.bar__cta {
+  min-height: 44px;
+  padding: 0 18px;
 }
 
 /* ---------- Anchos ---------- */
@@ -922,6 +1126,15 @@ input {
   .vela__img {
     max-width: 420px;
   }
+  .phones {
+    padding-left: 15%;
+  }
+  .rc__card {
+    padding: 24px;
+  }
+  .rc__lights {
+    grid-template-columns: repeat(12, 1fr);
+  }
 }
 @media (max-width: 520px) {
   .hero__date {
@@ -932,6 +1145,12 @@ input {
   }
   .form__row .btn {
     width: 100%;
+  }
+  .bar__brand {
+    display: none;
+  }
+  .bar {
+    justify-content: center;
   }
 }
 
@@ -958,14 +1177,19 @@ input {
     --lit: 150%;
     transition: opacity 1s ease;
   }
-  .btn,
-  .card {
+  .btn {
     transition:
       background-color 0.3s,
       color 0.3s;
   }
-  .btn:hover,
-  .card:hover {
+  .btn:hover {
     transform: none !important;
+  }
+  .bar,
+  .bar.is-on {
+    transition: none;
+  }
+  .rc__light {
+    transition: none;
   }
 }
