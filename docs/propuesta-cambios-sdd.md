@@ -15,6 +15,104 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ---
 
+## Cambio propuesto el 26-nov-2026: «Rezamos contigo»
+
+Estado: **pendiente de aprobación del fundador.** Idea del fundador del 26-nov-2026; nombre elegido por él ese mismo día.
+
+**Qué es:** quien publica una intención en el muro puede pedir que recen con ella. Otros fieles se unen, con su nombre o en anónimo, y quien pidió ve cuántos rezan con él y desde cuántos países. Ejemplo: Celeste pide oración por su padre durante una novena; se unen 120 personas de 9 países y ella recibe avisos según crece el número.
+
+**Por qué:**
+- **Producto:** convierte «Nadie reza solo» en algo que la app hace. Es el mismo pilar del ritual, no uno nuevo.
+- **Crecimiento:** quien pide comparte el enlace por WhatsApp con su familia y su parroquia. Es la vía de entrada más natural de fieles nuevos antes y después del 10-feb.
+- **Coste:** se apoya en lo que ya existe en `apps/api`:
+  - el muro de intenciones públicas, con moderación (`Intention`);
+  - el «Rezo por ti» (`IntentionPrayer`);
+  - el push de Expo;
+  - las tareas programadas de pg-boss.
+
+### SDD-02 — Alcance
+
+- **Entra en el MVP:** «Rezamos contigo» sobre el muro de intenciones:
+  - pedir que recen contigo;
+  - unirse con nombre o en anónimo;
+  - contador de personas y países;
+  - avisos a quien pidió;
+  - enlace para compartir.
+- **Después del lanzamiento (fase 2):** grupos privados de oración con enlace de invitación y una persona responsable. Ejemplo: el grupo de rezadoras de una parroquia o de una familia. Fuera del MVP.
+- **Se mantiene fuera hasta v3:** el muro de testimonios. Al cerrar una petición solo se puede dar las gracias con un botón, sin texto libre, para no abrir testimonios por la puerta de atrás.
+
+### SDD-05 — Backlog
+
+- **US-31 — Pedir que recen conmigo.** Como fiel, al publicar una intención en el muro activo «Rezamos contigo» y elijo:
+  - cuánto dura: un día, una novena (9 días) o un mes;
+  - cómo aparezco: «Celeste M.» (como hoy en el muro) o «Anónimo».
+  - **Criterios:**
+    - pasa por la misma moderación que el resto del muro;
+    - al escribir, un aviso pide no poner el nombre completo ni datos de salud identificables de otra persona («Por mi padre», no «Por Juan Pérez, con cáncer de pulmón»);
+    - puedo cerrar la petición antes de tiempo y borrarla cuando quiera.
+- **US-32 — Unirme a rezar.** Como fiel, en una petición activa pulso «Rezo contigo» y elijo si me uno con mi nombre o en anónimo.
+  - **Criterios:**
+    - una vez por persona y petición;
+    - si me uno en anónimo, no aparezco en ninguna lista, tampoco para quien pidió;
+    - si la petición es una novena, puedo activar un recordatorio diario hasta que termine (preferencia nueva, desactivada por defecto).
+- **US-33 — Saber quién reza conmigo.** Como quien pidió, veo cuántas personas rezan conmigo, desde cuántos países y, si quisieron, sus nombres.
+  - **Criterios:**
+    - recibo un push al llegar a 1, 10, 50, 100, 500 y 1.000 personas, y al terminar: «Ya rezan contigo 50 personas desde 7 países.»;
+    - el aviso no lleva el texto de la intención (regla de `docs/push.md`);
+    - preferencia nueva `notifyPrayingWithYou`, activada por defecto porque responde a algo que pidió el propio fiel.
+- **US-34 — Compartir la petición.** Como quien pidió, comparto un enlace a mi petición.
+  - **Criterios:**
+    - quien lo abre ve la intención y el contador, y puede unirse tras registrarse;
+    - la vista previa del enlace (WhatsApp) no muestra el texto de la intención, solo «Celeste te pide que reces con ella» o «Te piden que reces».
+- **Panel:**
+  - las peticiones aparecen en la cola de moderación con su contador;
+  - el moderador puede cerrarlas o retirarlas.
+- **KPIs** (regla del fundador: cada función con su medida):
+  - `prayer_request_created`, con su duración;
+  - `prayer_joined`, con anónimo o con nombre;
+  - `prayer_request_shared`;
+  - registros que llegan por un enlace compartido: la medida de crecimiento;
+  - en el panel: peticiones activas, media de personas por petición y tiempo de moderación.
+
+### Datos y privacidad (GDPR art. 9)
+
+- **Intenciones y uniones:** son datos de creencias religiosas. La intención pública ya lo es por decisión de su autor (como hoy); unirse a rezar también revela creencias, así que se trata igual.
+- **Países sin dato nuevo:** el país sale de la zona horaria que el fiel ya tiene en su perfil (`User.timezone`), sin preguntar nada ni mirar la IP.
+  - Se guarda solo el código de país en la unión y se muestra siempre agregado.
+  - La zona horaria tiene hoy un valor por defecto (`America/Mexico_City`). Hay que confirmar que la app guarda la real del teléfono; si no, los países salen mal.
+- **Datos de terceros:** el padre de Celeste no ha consentido. De ahí el aviso de US-31 y que la moderación retire nombres completos y diagnósticos.
+- **Borrado:** si quien pidió borra la petición o su cuenta, se borran la petición y todas las uniones. Si borra su cuenta quien se unió, se borra su unión y baja el contador.
+- **Aviso de privacidad:** tiene que explicar todo esto antes de abrir la función.
+
+### SDD-07 — Testing
+
+- **Anonimato:**
+  - una unión anónima no aparece en ninguna respuesta de la API, tampoco en la de quien pidió;
+  - el contador sí la cuenta.
+- **Moderación:**
+  - solo se puede unir a peticiones aprobadas y activas (el fallo que la auditoría encontró en el «Rezo por ti» de la entrega, `docs/auditoria-entrega.md`).
+- **Push:**
+  - cada hito sale una sola vez;
+  - ningún aviso lleva el texto de la intención.
+- **Borrado:**
+  - al borrar la petición o una cuenta desaparecen sus uniones.
+- **Prueba manual con dos cuentas en dos teléfonos:** pedir, unirse, recibir el aviso, compartir el enlace y unirse desde él.
+
+### SDD-08 — Despliegue
+
+- Sin servicios nuevos: Postgres, pg-boss y el push de Expo ya están.
+- Más peticiones públicas significa más trabajo de moderación. Antes de abrirlo hay que decidir quién modera y en qué horario, y medir el tiempo de moderación en la beta.
+
+### Decisiones que necesito del fundador
+
+1. Aprobar este cambio para aplicarlo en Notion (SDD-02, 05, 07 y 08).
+2. ¿Entra para el 10-feb o justo después? Mi recomendación: para el 10-feb, solo US-31 a US-34; los grupos privados después.
+3. Duraciones: un día, novena y un mes. ¿Alguna más (por ejemplo, una semana)?
+4. ¿Quién modera las peticiones y en qué horario?
+5. ¿La web pública cuenta esta función en la sección V («Nadie reza solo») en lugar de las seis tarjetas de ejemplo?
+
+---
+
 ## Cambio propuesto el 23-nov-2026: beta web (PWA) con la vela gratis
 
 Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones abiertas, resueltas con la recomendación:
