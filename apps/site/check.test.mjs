@@ -63,3 +63,16 @@ test("las pantallas de la app tienen texto alternativo", () => {
   assert.equal(phones.length, 3);
   for (const m of phones) assert.ok(m[1].length > 10);
 });
+
+test("aviso legal y privacidad existen, en español, con titular y contacto", () => {
+  for (const page of ["aviso-legal", "privacidad"]) {
+    const src = readFileSync(pub(page + "/index.html"), "utf8");
+    assert.match(src, /<html lang="es">/);
+    assert.equal((src.match(/<h1[\s>]/g) || []).length, 1);
+    assert.match(src, /Juan Ramón Gutiérrez Blanco/);
+    assert.match(src, /hola@misagradocorazon\.com/);
+    assert.doesNotMatch(src, /\[NIF\]|\[DOMICILIO\]/);
+    assert.match(html, new RegExp(`href="/${page}/"`));
+  }
+  assert.doesNotMatch(html, /\[ENLACE A LA POLÍTICA DE PRIVACIDAD\]/);
+});

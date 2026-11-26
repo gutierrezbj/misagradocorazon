@@ -57,10 +57,11 @@ pnpm --filter @msc/site test
 
 - **Pie:** enlace a Instagram (@misagradocorazon.app), también en el `sameAs` de schema.org.
 
-Pendiente: enlaces legales y contacto en el pie.
+- **Páginas legales:** `/aviso-legal/` y `/privacidad/`, con el fundador como titular mientras no exista la sociedad, y `hola@misagradocorazon.com` como contacto. Enlazadas desde el pie y desde la casilla del formulario.
+
+Pendiente: crear el buzón `hola@misagradocorazon.com` y, al conectar la lista de espera, poner el proveedor en la política de privacidad (marcado en la página).
 
 ## Pendiente (`docs/web-publica.md`, apartado 6)
 
 - **El formulario es maqueta:** valida el correo y la casilla, pero no guarda nada.
-- **Enlace a la política de privacidad:** el texto de la casilla lleva el marcador `[ENLACE A LA POLÍTICA DE PRIVACIDAD]`.
 - **Versión EN.**
