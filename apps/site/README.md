@@ -55,7 +55,9 @@ pnpm --filter @msc/site test
 - **Velas en móvil:** carrusel horizontal que se desliza con el dedo, con la pista «Desliza para ver las tres velas».
 - **Portada en pantallas táctiles:** «toca la pantalla» en lugar de «pasa la mano».
 
-Pendiente: pie con enlaces legales, contacto y redes.
+- **Pie:** enlace a Instagram (@misagradocorazon.app), también en el `sameAs` de schema.org.
+
+Pendiente: enlaces legales y contacto en el pie.
 
 ## Pendiente (`docs/web-publica.md`, apartado 6)
 

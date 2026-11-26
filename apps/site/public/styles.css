@@ -1059,6 +1059,20 @@ input {
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
+.foot__ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  margin-block: -12px;
+  color: #2a1a0e;
+  font-weight: 600;
+  text-decoration: none;
+}
+.foot__ig:hover span {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
 
 /* ---------- Pantallas de la app ---------- */
 .head {
