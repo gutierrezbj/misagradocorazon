@@ -148,7 +148,7 @@ rsync -rt --delete --rsync-path=rev-rsync apps/site/dist/ root@<KVM1>:/srv/rev/m
 
 1. Comprobar que el bloque está libre (sin salida):
    `ssh root@<KVM4> 'ss -tlnH | grep -E ":[3-6]27[0-9] "; grep -rhoE "127.0.0.1:[3-6]27[0-9]" /etc/nginx/sites-enabled/'`
-2. Código en `/opt/apps/msc-web` y `docker compose -f apps/site/deploy/compose.yml up -d --build`. El compose ya lleva `container_name: msc-web`, `restart: unless-stopped`, el puerto `127.0.0.1:3270:80` y las etiquetas `jrgb.*`.
+2. Código en `/opt/apps/msc-web` y `docker compose -p msc-web -f apps/site/deploy/compose.yml up -d --build`. El compose ya lleva `container_name: msc-web`, `restart: unless-stopped`, el puerto `127.0.0.1:3270:80` y las etiquetas `jrgb.*`.
 3. DNS en hPanel (cuenta personal): A `@` y `www` → KVM 4, TTL 300.
 4. vhost del host: `apps/site/deploy/nginx-host.conf` → `nginx -t && systemctl reload nginx`.
 5. `certbot --nginx -d misagradocorazon.com -d www.misagradocorazon.com` (elegir redirigir).

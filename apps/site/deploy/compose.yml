@@ -1,5 +1,6 @@
 # Producción en el KVM 4: /opt/apps/msc-web (docs/web-publica.md, apartado 8).
 # Bloque 270 reservado: la web escucha solo en 127.0.0.1:3270; el nginx del host pone dominio y TLS.
+name: msc-web
 services:
   web:
     build:
