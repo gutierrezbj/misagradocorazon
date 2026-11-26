@@ -19,9 +19,9 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 Estado: **aprobada por el fundador el 26-nov-2026. Entra para el lanzamiento del 10-feb-2027** (US-31 a US-34; los grupos privados, después). Idea y nombre del fundador, del mismo día.
 
-**Pendiente:**
-- pasarlo a Notion (SDD-02, 05, 07 y 08);
-- decisiones 3 a 5 del final de este bloque: duraciones, quién modera y la sección V de la web.
+**Aplicado en Notion el 26-nov-2026:** SDD-02 (pilar 1 y grupos privados fuera del MVP), SDD-05 (Épica 17, US-31 a US-34), SDD-07 y SDD-08.
+
+**Pendiente:** decisiones 3 y 4 del final de este bloque: duraciones y quién modera. La 5 (sección V de la web) quedó resuelta: la web ya cuenta «Rezamos contigo».
 
 **Qué es:** quien publica una intención en el muro puede pedir que recen con ella. Otros fieles se unen, con su nombre o en anónimo, y quien pidió ve cuántos rezan con él y desde cuántos países. Ejemplo: Celeste pide oración por su padre durante una novena; se unen 120 personas de 9 países y ella recibe avisos según crece el número.
 
