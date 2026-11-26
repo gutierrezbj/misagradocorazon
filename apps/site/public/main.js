@@ -225,14 +225,30 @@
     var btn = $("[data-velas]");
     var grid = $("[data-velas-grid]");
     if (!btn || !grid) return;
-    // Precarga la foto encendida para que el cambio sea inmediato.
-    new Image().src = "/img/corazon_velas_encendido.webp";
+    var touched = false;
+    function set(on) {
+      btn.setAttribute("aria-pressed", String(on));
+      btn.textContent = on ? "Apagar las velas" : "Encender las velas";
+      grid.classList.toggle("is-lit", on);
+    }
     btn.addEventListener("click", function () {
-      var onNow = btn.getAttribute("aria-pressed") !== "true";
-      btn.setAttribute("aria-pressed", String(onNow));
-      btn.textContent = onNow ? "Velas encendidas" : "Encender las velas";
-      grid.classList.toggle("is-lit", onNow);
+      touched = true;
+      set(btn.getAttribute("aria-pressed") !== "true");
     });
+    // Al llegar a la sección se encienden solas, una tras otra, si nadie ha tocado el botón.
+    if ("IntersectionObserver" in window) {
+      var io = new IntersectionObserver(
+        function (es) {
+          if (!es[0].isIntersecting) return;
+          io.disconnect();
+          setTimeout(function () {
+            if (!touched) set(true);
+          }, 900);
+        },
+        { threshold: 0.4 },
+      );
+      io.observe(grid);
+    }
   }
 
   /* ---------- II · Tu día: la aguja gira al momento elegido ---------- */

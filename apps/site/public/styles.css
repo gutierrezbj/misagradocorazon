@@ -502,23 +502,58 @@ input {
   flex-direction: column;
   gap: 16px;
 }
+/* Cada vela tiene su pareja apagada/encendida alineada al píxel. La encendida se revela
+   desde la llama (--fx, --fy) con una máscara radial que crece; las tres, una tras otra. */
+@property --lit {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
 .vela__img {
+  position: relative;
   aspect-ratio: 4 / 5;
   border-radius: 4px;
-  background: #0f0b08 url("/img/corazon_velas_apagado.webp") no-repeat;
-  background-size: 420% auto;
+  overflow: hidden;
+  background: #0f0b08;
 }
-.velas.is-lit .vela__img {
-  background-image: url("/img/corazon_velas_encendido.webp");
+.vela__img img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.vela__on {
+  --lit: 0%;
+  opacity: 0;
+  -webkit-mask-image: radial-gradient(circle at var(--fx) var(--fy), #000 var(--lit), transparent calc(var(--lit) + 35%));
+  mask-image: radial-gradient(circle at var(--fx) var(--fy), #000 var(--lit), transparent calc(var(--lit) + 35%));
+  transition:
+    --lit 1.8s var(--ease-reveal),
+    opacity 0.4s ease;
+}
+.velas.is-lit .vela__on {
+  --lit: 150%;
+  opacity: 1;
+}
+.velas.is-lit .vela:nth-child(2) .vela__on {
+  transition-delay: 0.6s;
+}
+.velas.is-lit .vela:nth-child(3) .vela__on {
+  transition-delay: 1.2s;
 }
 .vela__img--1 {
-  background-position: 8% 92%;
+  --fx: 41%;
+  --fy: 48%;
 }
 .vela__img--2 {
-  background-position: 50% 92%;
+  --fx: 37%;
+  --fy: 26%;
 }
 .vela__img--3 {
-  background-position: 88% 92%;
+  --fx: 49%;
+  --fy: 10%;
 }
 .vela__row {
   display: flex;
@@ -885,7 +920,7 @@ input {
     max-width: 360px;
   }
   .vela__img {
-    aspect-ratio: 4 / 3;
+    max-width: 420px;
   }
 }
 @media (max-width: 520px) {
@@ -918,6 +953,10 @@ input {
   }
   .dia__hand {
     transition: none;
+  }
+  .vela__on {
+    --lit: 150%;
+    transition: opacity 1s ease;
   }
   .btn,
   .card {
