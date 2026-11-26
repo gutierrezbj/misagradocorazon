@@ -17,7 +17,11 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ## Cambio propuesto el 26-nov-2026: «Rezamos contigo»
 
-Estado: **pendiente de aprobación del fundador.** Idea del fundador del 26-nov-2026; nombre elegido por él ese mismo día.
+Estado: **aprobada por el fundador el 26-nov-2026. Entra para el lanzamiento del 10-feb-2027** (US-31 a US-34; los grupos privados, después). Idea y nombre del fundador, del mismo día.
+
+**Pendiente:**
+- pasarlo a Notion (SDD-02, 05, 07 y 08);
+- decisiones 3 a 5 del final de este bloque: duraciones, quién modera y la sección V de la web.
 
 **Qué es:** quien publica una intención en el muro puede pedir que recen con ella. Otros fieles se unen, con su nombre o en anónimo, y quien pidió ve cuántos rezan con él y desde cuántos países. Ejemplo: Celeste pide oración por su padre durante una novena; se unen 120 personas de 9 países y ella recibe avisos según crece el número.
 
@@ -105,8 +109,8 @@ Estado: **pendiente de aprobación del fundador.** Idea del fundador del 26-nov-
 
 ### Decisiones que necesito del fundador
 
-1. Aprobar este cambio para aplicarlo en Notion (SDD-02, 05, 07 y 08).
-2. ¿Entra para el 10-feb o justo después? Mi recomendación: para el 10-feb, solo US-31 a US-34; los grupos privados después.
+1. ~~Aprobar este cambio para aplicarlo en Notion.~~ Aprobado el 26-nov-2026.
+2. ~~¿Entra para el 10-feb o justo después?~~ Entra para el 10-feb: US-31 a US-34. Los grupos privados, después.
 3. Duraciones: un día, novena y un mes. ¿Alguna más (por ejemplo, una semana)?
 4. ¿Quién modera las peticiones y en qué horario?
 5. ¿La web pública cuenta esta función en la sección V («Nadie reza solo») en lugar de las seis tarjetas de ejemplo?
