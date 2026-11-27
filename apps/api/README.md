@@ -79,7 +79,7 @@ Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coin
 | PATCH | `/api/me` | ✔ | Actualizar perfil, preferencias de notificación y consentimiento de analítica |
 | DELETE | `/api/me` | ✔ | Borrar la cuenta; exige `{ "confirm": true }` (`docs/borrado-cuenta.md`) |
 | POST | `/api/me/belief-consent` | ✔ | Da el consentimiento de datos de creencias (RGPD art. 9.2.a): guarda fecha y versión del texto |
-| DELETE | `/api/me/belief-consent` | ✔ | Lo retira (`{ confirm: true }`): borra santo patrón, intenciones, «Rezo por ti» e historial de oración; las velas quedan sin texto. Vuelve al onboarding |
+| DELETE | `/api/me/belief-consent` | ✔ | Lo retira (`{ confirm: true }`): borra santo patrón, velas (salvo las que tengan movimientos en el libro, que quedan sin texto), intenciones, «Rezo por ti», historial de oración, mensajes del chat y asistencia a misa. Vuelve al onboarding |
 | POST | `/api/me/apple-authorization` | ✔ | Código de Sign in with Apple, para revocar al borrar la cuenta (`docs/borrado-cuenta.md`) |
 | PUT | `/api/me/push-tokens` | ✔ | Registrar el dispositivo para push (`docs/push.md`) |
 | DELETE | `/api/me/push-tokens` | ✔ | Dar de baja el dispositivo al cerrar sesión |
