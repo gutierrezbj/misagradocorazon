@@ -32,6 +32,7 @@ beforeEach(() => {
 test("guarda el santo patrón elegido, los horarios, el idioma y la zona horaria", async () => {
   await renderScreen(<Onboarding />);
   await fireEvent.press(await screen.findByTestId("saint-saint_judas"));
+  await fireEvent(screen.getByTestId("belief-consent"), "valueChange", true);
   await fireEvent.press(screen.getByTestId("finish-onboarding-button"));
 
   await waitFor(() => expect(mockSetUser).toHaveBeenCalledWith(UPDATED));
@@ -46,6 +47,8 @@ test("guarda el santo patrón elegido, los horarios, el idioma y la zona horaria
       timezone: "America/Los_Angeles",
       // El consentimiento de analítica empieza desactivado (ADR-011).
       analyticsConsent: false,
+      // Consentimiento explícito de datos de fe (RGPD art. 9.2.a).
+      beliefConsent: true,
     },
   });
 });
@@ -53,6 +56,7 @@ test("guarda el santo patrón elegido, los horarios, el idioma y la zona horaria
 test("sin santo patrón no se guarda nada", async () => {
   await renderScreen(<Onboarding />);
   await screen.findByTestId("saint-saint_judas");
+  await fireEvent(screen.getByTestId("belief-consent"), "valueChange", true);
   await fireEvent.press(screen.getByTestId("finish-onboarding-button"));
   expect(mockApi.mock.calls.some(([path]) => path === "/me/onboarding")).toBe(false);
   expect(mockSetUser).not.toHaveBeenCalled();
@@ -61,9 +65,20 @@ test("sin santo patrón no se guarda nada", async () => {
 test("activar la analítica se guarda como consentimiento explícito", async () => {
   await renderScreen(<Onboarding />);
   await fireEvent.press(await screen.findByTestId("saint-saint_guadalupe"));
+  await fireEvent(screen.getByTestId("belief-consent"), "valueChange", true);
   await fireEvent(screen.getByTestId("analytics-consent"), "valueChange", true);
   await fireEvent.press(screen.getByTestId("finish-onboarding-button"));
   await waitFor(() => expect(mockSetUser).toHaveBeenCalled());
   const put = mockApi.mock.calls.find(([path]) => path === "/me/onboarding");
   expect(put?.[1]?.body).toMatchObject({ patronSaintId: "saint_guadalupe", analyticsConsent: true });
+});
+
+test("sin el consentimiento de datos de fe no se guarda nada, aunque haya santo", async () => {
+  await renderScreen(<Onboarding />);
+  // Empieza sin marcar.
+  expect(screen.getByTestId("belief-consent").props.value).toBe(false);
+  await fireEvent.press(await screen.findByTestId("saint-saint_judas"));
+  await fireEvent.press(screen.getByTestId("finish-onboarding-button"));
+  expect(mockApi.mock.calls.some(([path]) => path === "/me/onboarding")).toBe(false);
+  expect(mockSetUser).not.toHaveBeenCalled();
 });

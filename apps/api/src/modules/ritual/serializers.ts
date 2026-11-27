@@ -63,6 +63,8 @@ export function profileDto(u: User, streak: number) {
     notifyCommunity: u.notifyCommunity,
     notifyCandleExpiry: u.notifyCandleExpiry,
     analyticsConsent: u.analyticsConsent,
+    beliefConsent: u.beliefConsentAt !== null,
+    beliefConsentVersion: u.beliefConsentVersion,
     streak,
   };
 }

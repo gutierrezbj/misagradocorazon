@@ -2,7 +2,10 @@
 // - los ficheros con hash del build (/_expo/static/...) se sirven desde caché;
 // - la página se pide siempre a la red y solo se usa la copia si no hay conexión;
 // - nada de la API: va a otro dominio y nunca se guarda (datos personales, GDPR art. 9).
-const CACHE = "msc-web-v1";
+// v2: v1 podía guardar como "/" el aviso de privacidad o los términos; al activar se borra.
+const CACHE = "msc-web-v2";
+// Páginas estáticas (aviso de privacidad y términos): no son la app y no se guardan como "/".
+const STATIC_PAGES = ["/privacidad/", "/terminos/", "/fonts/"];
 const SHELL = ["/", "/manifest.webmanifest", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
@@ -27,6 +30,8 @@ self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
   if (req.method !== "GET" || url.origin !== self.location.origin) return;
+
+  if (STATIC_PAGES.some((p) => url.pathname.startsWith(p) || url.pathname === p.slice(0, -1))) return;
 
   if (req.mode === "navigate") {
     event.respondWith(

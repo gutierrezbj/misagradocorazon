@@ -56,6 +56,19 @@ jobs:
         run: docker build -f apps/mobile/Dockerfile.web --build-arg EXPO_PUBLIC_BACKEND_URL=https://api.misagradocorazon.com -t msc-web .
       - name: Imagen de las copias de seguridad
         run: docker build -t msc-backup deploy/staging/backup
+      - name: La beta web sirve el aviso de privacidad y los términos, no la app
+        run: |
+          docker run -d --name web -p 8080:8080 -e API_ORIGIN=https://api.misagradocorazon.com -e API_WS_ORIGIN=wss://api.misagradocorazon.com msc-web
+          for i in $(seq 1 20); do curl -fsS -o /dev/null localhost:8080/ && break; sleep 1; done
+          curl -fsS localhost:8080/privacidad/ | grep -q "Aviso de privacidad"
+          curl -fsS localhost:8080/privacidad/ | grep -q "Privacy notice"
+          curl -fsS localhost:8080/terminos/ | grep -q "Términos de la beta"
+          curl -fsS localhost:8080/terminos/ | grep -q "Beta terms"
+          curl -fsSL localhost:8080/privacidad | grep -q "Aviso de privacidad"
+          echo "Una ruta inventada devuelve la app, no el aviso"
+          if curl -fsS localhost:8080/ruta-inventada | grep -q "Aviso de privacidad"; then exit 1; fi
+          curl -fsS localhost:8080/ruta-inventada | grep -q '<div id="root">'
+          docker rm -f web
       - name: La API arranca y aplica migraciones
         run: |
           docker network create msc

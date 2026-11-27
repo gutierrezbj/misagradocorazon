@@ -15,6 +15,7 @@ import { useFeatures } from "@/src/features";
 import { SocialButtons } from "@/src/components/SocialButtons";
 import type { SocialProvider } from "@/src/social";
 import { errorKey } from "@/src/errors";
+import { LegalLinks } from "@/src/legal";
 
 export default function LoginScreen() {
   const styles = useStyles();
@@ -138,6 +139,13 @@ export default function LoginScreen() {
             </Pressable>
           )}
 
+          {mode === "register" && (
+            <View style={{ marginTop: spacing.sm }}>
+              <Text style={styles.legalIntro}>{t("legalIntro")}</Text>
+              <LegalLinks />
+            </View>
+          )}
+
           <View style={{ height: spacing.sm }} />
           <AppButton testID="submit-auth-button" label={mode === "login" ? t("signIn") : t("signUp")} onPress={submit} loading={busy} />
 
@@ -192,4 +200,5 @@ const useStyles = makeStyles((c) => ({
   toggle: { marginTop: spacing.lg, alignItems: "center" },
   forgot: { alignSelf: "flex-end", minHeight: 44, justifyContent: "center", marginTop: -spacing.sm },
   toggleText: { fontFamily: fonts.bodyMedium, color: c.brand, fontSize: 15 },
+  legalIntro: { fontFamily: fonts.body, fontSize: 14, color: c.onSurfaceSecondary, textAlign: "center" },
 }));

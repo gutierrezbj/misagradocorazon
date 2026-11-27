@@ -258,7 +258,7 @@ const dict = {
   voteHistory: { es: "Historial de votos", en: "Vote history" },
   notifications: { es: "Notificaciones", en: "Notifications" },
   privacy: { es: "Política de privacidad", en: "Privacy policy" },
-  terms: { es: "Términos de uso", en: "Terms of use" },
+  terms: { es: "Términos de la beta", en: "Beta terms" },
   support: { es: "Soporte", en: "Support" },
   // sin conexión
   offline: {
@@ -281,6 +281,45 @@ const dict = {
     en: "Share usage statistics: which screens are opened and which features are used. Never your intentions, messages, name or email. You can change this in Settings.",
   },
   privacySection: { es: "Privacidad", en: "Privacy" },
+  // consentimiento explícito para los datos de creencias (RGPD art. 9.2.a). Si cambia el texto,
+  // se sube BELIEF_CONSENT_VERSION en packages/shared/src/domain.ts.
+  beliefConsentTitle: { es: "Tus datos de fe", en: "Your faith data" },
+  beliefConsentText: {
+    es: "Para acompañarte, la app guarda datos que muestran tu fe: tu santo patrón, las velas que enciendes, tus intenciones, por quién rezas y las oraciones que completas. La ley los protege de forma especial (art. 9 del RGPD). Solo los usamos para que la app funcione: nunca para publicidad y nunca los vendemos.",
+    en: "To accompany you, the app stores data that shows your faith: your patron saint, the candles you light, your intentions, who you pray for and the prayers you complete. The law gives this data special protection (GDPR art. 9). We only use it to make the app work: never for advertising, and we never sell it.",
+  },
+  beliefConsentCheck: {
+    es: "Doy mi consentimiento explícito para que Mi Sagrado Corazón trate estos datos.",
+    en: "I give my explicit consent for Mi Sagrado Corazón to process this data.",
+  },
+  beliefConsentWithdrawNote: {
+    es: "Puedes retirarlo cuando quieras en Ajustes. Entonces se borran esos datos.",
+    en: "You can withdraw it at any time in Settings. That data is then deleted.",
+  },
+  beliefConsentRequired: {
+    es: "Para usar la app necesitamos tu consentimiento para los datos de fe.",
+    en: "To use the app we need your consent for your faith data.",
+  },
+  beliefConsentGiven: { es: "Consentimiento dado", en: "Consent given" },
+  withdrawConsent: { es: "Retirar el consentimiento de datos de fe", en: "Withdraw consent for faith data" },
+  withdrawConsentLead: {
+    es: "Si lo retiras, la app deja de guardar datos de tu fe y borra los que tiene.",
+    en: "If you withdraw it, the app stops storing data about your faith and deletes what it has.",
+  },
+  withdrawConsentGone: { es: "Se borra", en: "Deleted" },
+  withdrawConsentGoneList: {
+    es: "Tu santo patrón y tus santos secundarios, tus intenciones privadas y las que publicaste en el muro, los «Rezo por ti» que diste y tu historial de oración.",
+    en: 'Your patron and secondary saints, your private intentions and the ones you posted on the wall, the "I pray for you" you gave and your prayer history.',
+  },
+  withdrawConsentKept: { es: "Se conserva", en: "Kept" },
+  withdrawConsentKeptList: {
+    es: "Tu cuenta, para que puedas volver cuando quieras, y las velas que encendiste, sin el texto de la intención. Para usar el altar tendrás que dar de nuevo el consentimiento.",
+    en: "Your account, so you can come back whenever you like, and the candles you lit, without the intention text. To use the altar you will need to give your consent again.",
+  },
+  withdrawConsentConfirmWord: { es: "RETIRAR", en: "WITHDRAW" },
+  withdrawConsentButton: { es: "Retirar y borrar mis datos de fe", en: "Withdraw and delete my faith data" },
+  withdrawConsentDone: { es: "Consentimiento retirado. Hemos borrado tus datos de fe.", en: "Consent withdrawn. We have deleted your faith data." },
+  legalIntro: { es: "Antes de crear tu cuenta, lee:", en: "Before creating your account, read:" },
   // borrado de cuenta (SDD-02, transversal)
   account: { es: "Cuenta", en: "Account" },
   deleteAccount: { es: "Borrar mi cuenta", en: "Delete my account" },
