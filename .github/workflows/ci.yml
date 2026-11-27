@@ -43,7 +43,7 @@ jobs:
       - name: Build del panel
         run: pnpm --filter @msc/admin build
 
-  # Las imágenes de Railway se construyen en cada PR: un Dockerfile roto no llega a main.
+  # Las imágenes se construyen en cada PR: un Dockerfile roto no llega a main.
   images:
     runs-on: ubuntu-latest
     steps:
@@ -68,3 +68,45 @@ jobs:
           for i in $(seq 1 30); do curl -fsS localhost:8001/api/health && exit 0; sleep 2; done
           docker logs api
           exit 1
+      # La imagen de copias corre contra la base del paso anterior. run.sh es un bucle sin fin, así
+      # que cada prueba entra con --entrypoint.
+      - name: Copias, limpieza y restauración
+        run: |
+          mkdir -p /tmp/bk
+          touch -d '10 days ago' /tmp/bk/ajeno.txt /tmp/bk/msc-2000-01-01T0000Z.dump.enc
+          PG="-e PGHOST=db -e PGUSER=postgres -e PGPASSWORD=postgres -e PGDATABASE=msc"
+          BK="docker run --rm --network msc $PG -e BACKUP_DEST=/backups -e BACKUP_PASSPHRASE=ci-clave-de-copias -e BACKUP_RETENTION_DAYS=7 -e RCLONE_CONFIG=/dev/null"
+          echo "Sin el montaje de /backups, la copia tiene que fallar"
+          if $BK --entrypoint backup.sh msc-backup; then echo "backup.sh no comprobó el montaje"; exit 1; fi
+          $BK -v /tmp/bk:/backups --entrypoint backup.sh msc-backup
+          ls -la /tmp/bk
+          f=$(ls /tmp/bk | grep -E '^msc-.*\.dump\.enc$' | grep -v '^msc-2000-')
+          test -n "$f"
+          test "$(stat -c %a "/tmp/bk/$f")" = 600
+          echo "La limpieza borra la copia vieja de MSC y respeta el fichero ajeno"
+          test ! -e /tmp/bk/msc-2000-01-01T0000Z.dump.enc
+          test -e /tmp/bk/ajeno.txt
+          $BK -v /tmp/bk:/backups --entrypoint createdb msc-backup msc_prueba
+          $BK -v /tmp/bk:/backups --entrypoint restore.sh msc-backup "$f" --db msc_prueba --yes
+          n=$($BK --entrypoint psql msc-backup -d msc_prueba -Atc 'select count(*) from saint')
+          test "$n" -gt 0
+          echo "Restaurar sobre la base viva tiene que fallar"
+          if $BK -v /tmp/bk:/backups --entrypoint restore.sh msc-backup "$f" --db msc --yes; then echo "restore.sh aceptó msc"; exit 1; fi
+          if $BK -v /tmp/bk:/backups --entrypoint restore.sh msc-backup "$f" --yes; then echo "restore.sh aceptó sin --db"; exit 1; fi
+      - name: Compose de la beta (KVM 1)
+        working-directory: deploy/staging
+        run: |
+          cp .env.example .env
+          sed -i -e 's|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=falso|' \
+            -e 's|^BETTER_AUTH_SECRET=.*|BETTER_AUTH_SECRET=falso-falso-falso-falso-falso-falso|' \
+            -e "s|^INTENTIONS_KEY=.*|INTENTIONS_KEY=$(head -c 32 /dev/zero | base64)|" \
+            -e 's|^BACKUP_PASSPHRASE=.*|BACKUP_PASSPHRASE=falso|' \
+            -e 's|^IMAGE_TAG=.*|IMAGE_TAG=0000000000000000000000000000000000000000|' .env
+          docker compose -p msc -f compose.yml config -q
+          ips=$(docker compose -p msc -f compose.yml config --format json | jq -r '[.services[].ports[]?.host_ip] | unique | join(",")')
+          echo "host_ip de los puertos: $ips"
+          test "$ips" = "127.0.0.1"
+          for v in PAYMENTS_MODE BACKUP_PASSPHRASE; do
+            grep -v "^$v=" .env > .env.sin
+            if docker compose -p msc -f compose.yml --env-file .env.sin config -q; then echo "config pasó sin $v"; exit 1; fi
+          done

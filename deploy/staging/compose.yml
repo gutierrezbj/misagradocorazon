@@ -1,10 +1,14 @@
-# Staging provisional en el VPS del fundador (aprobado 29-sep-2026) hasta que exista Railway.
-# Mismos Dockerfiles que Railway. Las imágenes las construye GitHub Actions en cada push a main
-# (.github/workflows/staging-images.yml) y el VPS solo las descarga: no se compila en el servidor.
-# Uso y primer despliegue: deploy/staging/README.md. Se ejecuta desde esta carpeta.
-# Puertos: offset +270 del Catálogo de Infraestructura JRGB (3270 panel, 4270 API, 5270 beta web,
-# 6270 PostgreSQL), siempre en 127.0.0.1. El worker no tiene HTTP.
-name: msc-staging
+# Beta de Mi Sagrado Corazón en el KVM 1 (decisión del fundador, 26-nov-2026). Railway queda como
+# plan futuro del SDD, no como destino actual. Las imágenes las construye GitHub Actions en cada
+# push a main (.github/workflows/staging-images.yml) y el KVM 1 solo las descarga: en el servidor
+# no se construye nada.
+# Uso: deploy/staging/README.md. En el servidor vive en /opt/apps/msc y se lanza siempre así:
+#   cd /opt/apps/msc && docker compose -p msc -f compose.yml …
+# Puertos (desplazamiento 270), siempre en 127.0.0.1: PostgreSQL 6270, API 4270, panel 3271 y
+# beta web 5270. El 3270 queda para la web pública. El worker y las copias no tienen HTTP.
+# Límites: el KVM 1 tiene 1 vCPU y unos 2,8 GB libres, compartidos con otros contenedores. Los
+# valores los aprobó el fundador y no están medidos: el consumo real se verá al desplegar.
+name: msc
 
 # Las opcionales (Google, R2, SMTP, Sentry...) llegan desde .env con env_file, solo si están
 # definidas: una variable vacía no pasa la validación de la API (apps/api/src/env.ts).
@@ -15,18 +19,31 @@ x-api-env: &api-env
   BETTER_AUTH_URL: https://${API_DOMAIN:?falta API_DOMAIN}
   TRUSTED_ORIGINS: https://${ADMIN_DOMAIN:?falta ADMIN_DOMAIN},https://${APP_DOMAIN:?falta APP_DOMAIN}
   INTENTIONS_KEY: ${INTENTIONS_KEY:?falta INTENTIONS_KEY}
+  # Obligatoria: sin ella la API usa "simulated" y apuntaría compras simuladas con fieles reales.
+  PAYMENTS_MODE: ${PAYMENTS_MODE:?falta PAYMENTS_MODE}
   SENTRY_ENVIRONMENT: staging
+
+# Etiquetas del proyecto: el mismo valor en todos los servicios.
+x-labels: &labels
+  jrgb.project: msc
+  jrgb.offset: "270"
+  jrgb.domain: ${APP_DOMAIN:?falta APP_DOMAIN}
 
 services:
   db:
     image: postgres:16
     container_name: msc-db
     restart: unless-stopped
+    labels: *labels
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.5
+    pids_limit: 200
     environment:
       POSTGRES_USER: msc
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: msc
-    # Solo en local, para pg_dump o un túnel SSH.
+    # Solo en local, para un túnel SSH.
     ports:
       - "127.0.0.1:6270:5432"
     volumes:
@@ -37,10 +54,15 @@ services:
       timeout: 5s
       retries: 20
 
-  # Equivale al preDeployCommand de Railway: si las migraciones fallan, la API no arranca.
+  # Si las migraciones fallan, la API no arranca.
   migrate:
-    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:-staging}
+    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:?falta IMAGE_TAG}
     container_name: msc-migrate
+    labels: *labels
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.5
+    pids_limit: 100
     env_file: .env
     command: ["prisma", "migrate", "deploy"]
     environment: *api-env
@@ -50,15 +72,20 @@ services:
     restart: "no"
 
   api:
-    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:-staging}
+    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:?falta IMAGE_TAG}
     container_name: msc-api
+    labels: *labels
+    mem_limit: 640m
+    memswap_limit: 640m
+    cpus: 0.5
+    pids_limit: 200
     env_file: .env
     restart: unless-stopped
     environment: *api-env
     depends_on:
       migrate:
         condition: service_completed_successfully
-    # Solo en local: se publica con el proxy HTTPS que ya tiene el VPS.
+    # Solo en local: lo publica con HTTPS el nginx del KVM 1.
     ports:
       - "127.0.0.1:4270:8001"
     healthcheck:
@@ -69,8 +96,13 @@ services:
       start_period: 30s
 
   worker:
-    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:-staging}
+    image: ghcr.io/gutierrezbj/misagradocorazon-api:${IMAGE_TAG:?falta IMAGE_TAG}
     container_name: msc-worker
+    labels: *labels
+    mem_limit: 512m
+    memswap_limit: 512m
+    cpus: 0.3
+    pids_limit: 200
     env_file: .env
     restart: unless-stopped
     command: ["tsx", "src/jobs/worker.ts"]
@@ -81,40 +113,55 @@ services:
 
   admin:
     # Lleva fijada la URL de la API de staging (VITE_API_URL se fija al construir).
-    image: ghcr.io/gutierrezbj/misagradocorazon-admin:${IMAGE_TAG:-staging}
+    image: ghcr.io/gutierrezbj/misagradocorazon-admin:${IMAGE_TAG:?falta IMAGE_TAG}
     container_name: msc-admin
+    labels: *labels
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.25
+    pids_limit: 50
     restart: unless-stopped
     ports:
-      - "127.0.0.1:3270:8080"
+      - "127.0.0.1:3271:8080"
 
   backup:
-    # Copia diaria cifrada de la base de datos fuera del VPS (R2), con 7 días de retención.
-    # Obligatoria antes de abrir la beta a fieles reales (docs/beta-web.md). Solo recibe lo que
-    # necesita: nada de los secretos de la API.
-    image: ghcr.io/gutierrezbj/misagradocorazon-backup:${IMAGE_TAG:-staging}
+    # Copia diaria cifrada de la base de datos en una sola carpeta con tres nombres:
+    # /opt/apps/msc/backups en el servidor, ./backups aquí y /backups dentro del contenedor.
+    # 7 días de retención; el Mac del fundador se las trae cada mañana. Solo recibe la conexión a
+    # la base de datos y la clave de cifrado.
+    image: ghcr.io/gutierrezbj/misagradocorazon-backup:${IMAGE_TAG:?falta IMAGE_TAG}
     container_name: msc-backup
+    labels: *labels
+    mem_limit: 256m
+    memswap_limit: 256m
+    cpus: 0.5
+    pids_limit: 50
     restart: unless-stopped
     environment:
       PGHOST: db
       PGUSER: msc
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: msc
-      BACKUP_DEST: ${BACKUP_DEST:-}
-      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:-}
-      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-7}
-      RCLONE_S3_PROVIDER: Cloudflare
-      RCLONE_S3_ENDPOINT: ${BACKUP_S3_ENDPOINT:-}
-      RCLONE_S3_ACCESS_KEY_ID: ${BACKUP_S3_ACCESS_KEY_ID:-}
-      RCLONE_S3_SECRET_ACCESS_KEY: ${BACKUP_S3_SECRET_ACCESS_KEY:-}
+      BACKUP_DEST: /backups
+      BACKUP_PASSPHRASE: ${BACKUP_PASSPHRASE:?falta BACKUP_PASSPHRASE}
+      BACKUP_RETENTION_DAYS: "7"
       RCLONE_CONFIG: /dev/null
+    volumes:
+      - ./backups:/backups
     depends_on:
       db:
         condition: service_healthy
 
-  web:
-    # Beta web instalable (SDD-05 US-27). Lleva fijada la URL de la API de staging (se fija al construir).
-    image: ghcr.io/gutierrezbj/misagradocorazon-web:${IMAGE_TAG:-staging}
-    container_name: msc-web
+  app:
+    # Beta web instalable (SDD-05 US-27). Lleva fijada la URL de la API de staging (se fija al
+    # construir). Antes era el servicio "web"; la imagen conserva su nombre.
+    image: ghcr.io/gutierrezbj/misagradocorazon-web:${IMAGE_TAG:?falta IMAGE_TAG}
+    container_name: msc-app
+    labels: *labels
+    mem_limit: 128m
+    memswap_limit: 128m
+    cpus: 0.25
+    pids_limit: 50
     restart: unless-stopped
     ports:
       - "127.0.0.1:5270:8080"

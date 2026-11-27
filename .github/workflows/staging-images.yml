@@ -1,7 +1,7 @@
 name: Imágenes de staging
 
-# Staging provisional en el VPS (deploy/staging): el servidor tiene 1 CPU y comparte máquina con
-# otros proyectos, así que no compila. Aquí se construyen las imágenes y se suben a GHCR.
+# Beta en el KVM 1 (deploy/staging): en el servidor no se construye nada, solo se descargan las
+# imágenes. Aquí se construyen y se suben a GHCR, etiquetadas con el SHA completo del commit.
 on:
   push:
     branches: [main]
