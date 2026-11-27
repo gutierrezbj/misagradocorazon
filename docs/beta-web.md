@@ -30,19 +30,21 @@ La misma app de `apps/mobile`, exportada para navegador (`expo export --platform
   - CSP sin scripts en línea; la API y su WebSocket (chat de misa) como únicos orígenes externos, además de PostHog, Sentry y YouTube.
   - Caché larga para los ficheros con hash; la página, el manifiesto y el service worker se revalidan siempre.
 - **Dónde se construye:** el CI la construye en cada PR, y en cada push a `main` se sube a GHCR como `misagradocorazon-web` (`.github/workflows/staging-images.yml`).
-- **Dónde corre:** en el VPS, servicio `web` en `127.0.0.1:5270`, con su vhost de nginx (`deploy/staging/README.md`).
+- **Dónde corre:** en el KVM 1, servicio `app` (contenedor `msc-app`) en `127.0.0.1:5270`, con su vhost de nginx (`deploy/staging/README.md`). La imagen sigue llamándose `misagradocorazon-web`.
+- **Aviso de privacidad y términos:** páginas estáticas de la propia imagen, `/privacidad/` y `/terminos/` (ES y EN), que se leen sin sesión. La app las enlaza en el registro, el onboarding y Ajustes.
 - **Configuración de la API:**
   - `APP_DOMAIN` entra en `TRUSTED_ORIGINS`;
   - `PAYMENTS_MODE=beta_free` (`deploy/staging/.env.example`).
 
 ## Antes de abrir la beta a fieles reales
 
-Con la beta abierta, el VPS deja de ser "staging": guarda cuentas e intenciones, que son datos de creencias religiosas (GDPR art. 9).
+Con la beta abierta, el KVM 1 deja de ser "staging": guarda cuentas e intenciones, que son datos de creencias religiosas (GDPR art. 9). Abre el 1-dic-2026, abierta a cualquiera (aprobado el 23-nov-2026). Condición dura: sin aviso de privacidad publicado y enlazado en la app, no se abre.
 
 1. **Base de datos limpia:** sin las velas y compras simuladas de las pruebas.
-2. **`INTENTIONS_KEY` nueva**, generada para la beta y guardada fuera del VPS, en el gestor de contraseñas del fundador. La anterior estuvo escrita en Notion.
-3. **Copias de seguridad diarias de PostgreSQL fuera del VPS:** el contenedor `msc-backup` ya está listo (cifradas, en R2, 7 días). Falta darlo de alta con la cuenta de Cloudflare del fundador y hacer una restauración de prueba (`deploy/staging/README.md`, "Copias de seguridad").
-4. **Aviso de privacidad publicado y enlazado en la app:** cuenta, intenciones cifradas y analítica con consentimiento.
+2. **`INTENTIONS_KEY` nueva**, generada para la beta y guardada fuera del servidor, en el gestor de contraseñas del fundador. La anterior estuvo escrita en Notion.
+3. **Copias de seguridad diarias de PostgreSQL:** el contenedor `msc-backup` las guarda cifradas en `/opt/apps/msc/backups` (7 días) y el Mac del fundador se las trae cada mañana (guarda 14 y avisa por Telegram). Antes de abrir, una restauración de prueba en una base aparte (`deploy/staging/README.md`, "Copias de seguridad").
+4. **Aviso de privacidad dentro de la app:** publicado en `/privacidad/` y enlazado en el registro, el onboarding y Ajustes, con el consentimiento explícito de datos de fe en el onboarding.
+   - Comprobación: en el SHA que se despliega, `git grep -nE '\[(RESPONSABLE|CONTACTO|PROVEEDOR DE ALOJAMIENTO|CONSERVACIÓN DE REGISTROS|EDAD MÍNIMA)\]' <SHA> -- apps/mobile/public` tiene que salir vacío.
 5. **DNS y HTTPS** de `app.misagradocorazon.com` (`deploy/staging/README.md`).
 6. **Recomendado:** SMTP (recuperar contraseña), R2 (imágenes y audio propios), PostHog y Sentry.
 
@@ -60,4 +62,4 @@ El icono, el favicon y la pantalla de arranque eran los del constructor (Emergen
   - sin bloqueos de la CSP;
   - las fotos de los santos no cargan en este entorno porque el proxy bloquea Wikimedia; no es de esta PR.
 - **iPhone simulado:** sale el aviso con los pasos de Safari y, al cerrarlo, no vuelve.
-- **Pendiente en dispositivos reales:** instalar en un iPhone y un Android y recorrer los tres pilares (SDD-07).
+- **Pendiente en dispositivos reales:** instalar en un iPhone y un Android y recorrer los tres pilares (SDD-07). Esa prueba crea cuentas y velas, así que va contra una pila local, nunca contra la base de la beta.
