@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
@@ -16,6 +15,7 @@ import { AppButton, Icon, useToast } from "@/src/components/ui";
 import type { Saint, User } from "@/src/types";
 import { errorKey } from "@/src/errors";
 import { LegalLinks } from "@/src/legal";
+import { SaintImage } from "@/src/components/SaintImage";
 const TIMES = ["06:00", "06:30", "07:00", "07:30", "08:00", "12:00", "18:00", "20:00", "21:00", "21:30", "22:00"];
 
 export default function Onboarding() {
@@ -130,7 +130,7 @@ export default function Onboarding() {
                 onLongPress={() => toggleSecondary(s.id)}
                 style={[styles.saintCard, isPatron && styles.saintCardActive]}
               >
-                <Image source={{ uri: s.imageUrl }} style={styles.saintImg} contentFit="cover" />
+                <SaintImage uri={s.imageUrl} name={s.name} style={styles.saintImg} />
                 {isPatron && (
                   <View style={styles.badge}>
                     <Icon name="star" size={14} color={colors.onBrandSecondary} />

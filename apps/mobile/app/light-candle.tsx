@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, Pressable, ScrollView, TextInput, Platform } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
@@ -21,6 +20,7 @@ import { ShareCandlePanel } from "@/src/ritual/ShareCandlePanel";
 import { track } from "@/src/analytics";
 import { errorKey } from "@/src/errors";
 import { useFeatures } from "@/src/features";
+import { SaintImage } from "@/src/components/SaintImage";
 
 // Precios de @msc/shared (céntimos): 0,99 / 1,99 / 2,99 USD, los tiers de las stores.
 const TYPES = [
@@ -137,7 +137,7 @@ export default function LightCandle() {
               onPress={() => setSaintId(s.id)}
               style={[styles.saintChip, saintId === s.id && styles.saintChipActive]}
             >
-              <Image source={{ uri: s.imageUrl }} style={styles.saintChipImg} contentFit="cover" />
+              <SaintImage uri={s.imageUrl} name={s.name} style={styles.saintChipImg} />
               <Text style={styles.saintChipName} numberOfLines={3}>
                 {s.name}
               </Text>

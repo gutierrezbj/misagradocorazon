@@ -11,7 +11,10 @@ import { containsBannedWord } from "../../lib/moderation.ts";
 import { massStatus } from "./service.ts";
 
 type Ack = (res: { ok: boolean; error?: string; status?: string }) => void;
-type SocketUser = { id: string; name: string };
+// beliefConsent: consentimiento de datos de fe (RGPD art. 9.2.a). Asistir a misa y escribir en su
+// chat revelan fe: sin él se puede ver la misa y leer el chat, pero no se guarda asistencia ni
+// se puede escribir (decisión del fundador, 27-nov-2026).
+type SocketUser = { id: string; name: string; beliefConsent: boolean };
 
 let io: Server | null = null;
 const lastMessageAt = new Map<string, number>();
@@ -36,7 +39,7 @@ async function userFromToken(token: unknown): Promise<SocketUser | null> {
   if (!session) return null;
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (!user || user.blocked) return null;
-  return { id: user.id, name: user.name };
+  return { id: user.id, name: user.name, beliefConsent: user.beliefConsentAt !== null };
 }
 
 export function attachChat(httpServer: HttpServer): Server {
@@ -59,7 +62,7 @@ export function attachChat(httpServer: HttpServer): Server {
       const mass = payload?.massId ? await prisma.mass.findUnique({ where: { id: payload.massId } }) : null;
       if (!mass) return ack?.({ ok: false, error: "mass_not_found" });
       await socket.join(roomOf(mass.id));
-      if (user) {
+      if (user?.beliefConsent) {
         const status = massStatus(mass);
         if (status === "live") {
           await recordAttendance(mass.id, user.id).catch(() => undefined);
@@ -78,6 +81,7 @@ export function attachChat(httpServer: HttpServer): Server {
 
     socket.on("chat:send", async (payload: { massId?: string; text?: string }, ack?: Ack) => {
       if (!user) return ack?.({ ok: false, error: "unauthenticated" });
+      if (!user.beliefConsent) return ack?.({ ok: false, error: "belief_consent_required" });
       const massId = payload?.massId ?? "";
       if (!socket.rooms.has(roomOf(massId))) return ack?.({ ok: false, error: "not_joined" });
       const parsed = chatMessageSchema.safeParse({ text: payload?.text });

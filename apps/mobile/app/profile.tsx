@@ -11,6 +11,7 @@ import type { MyCandle, MyVote, Saint } from "@/src/types";
 import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { Icon } from "@/src/components/ui";
+import { SaintImage } from "@/src/components/SaintImage";
 
 export default function Profile() {
   const styles = useStyles();
@@ -57,7 +58,7 @@ export default function Profile() {
 
         {patron && (
           <Pressable style={styles.patronCard} onPress={() => router.push(`/saint/${patron.id}`)}>
-            <Image source={{ uri: patron.imageUrl }} style={styles.patronImg} contentFit="cover" />
+            <SaintImage uri={patron.imageUrl} name={patron.name} style={styles.patronImg} />
             <View style={{ flex: 1 }}>
               <Text style={styles.patronLabel}>{t("myPatron")}</Text>
               <Text style={styles.patronName}>{patron.name}</Text>

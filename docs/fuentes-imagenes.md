@@ -1,5 +1,9 @@
 # Fuentes de las imágenes de santos
 
+> **Decisión del fundador (27-nov-2026), opción B:** el catálogo (`apps/api/prisma/seed-data/saints.json`) se siembra **sin imágenes** (`imageUrl` vacía) mientras no se verifiquen las licencias. La app muestra un marcador propio (`apps/mobile/src/components/SaintImage.tsx`) y no carga nada de Wikimedia ni de Pexels. Las imágenes se añaden después desde el panel, subidas a R2. Si alguna vuelve a cargarse desde un tercero, hay que nombrarlo en el aviso de privacidad (`apps/mobile/public/privacidad/`), porque le llega la IP del fiel.
+>
+> Lo que sigue es el registro de las URLs que traía la entrega, para revisar sus licencias.
+
 Estado a 2026-09-25, rama `conflict_250926_1728`, fichero `backend/seed.py` (diccionario `IMG`).
 
 - Las imágenes no están alojadas por nosotros: la app las carga directamente desde URLs de terceros.

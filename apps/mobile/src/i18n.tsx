@@ -285,8 +285,8 @@ const dict = {
   // se sube BELIEF_CONSENT_VERSION en packages/shared/src/domain.ts.
   beliefConsentTitle: { es: "Tus datos de fe", en: "Your faith data" },
   beliefConsentText: {
-    es: "Para acompañarte, la app guarda datos que muestran tu fe: tu santo patrón, las velas que enciendes, tus intenciones, por quién rezas y las oraciones que completas. La ley los protege de forma especial (art. 9 del RGPD). Solo los usamos para que la app funcione: nunca para publicidad y nunca los vendemos.",
-    en: "To accompany you, the app stores data that shows your faith: your patron saint, the candles you light, your intentions, who you pray for and the prayers you complete. The law gives this data special protection (GDPR art. 9). We only use it to make the app work: never for advertising, and we never sell it.",
+    es: "Para acompañarte, la app guarda datos que muestran tu fe: tu santo patrón, las velas que enciendes, tus intenciones, por quién rezas, las oraciones que completas, las misas a las que asistes y lo que escribes en su chat. La ley los protege de forma especial (art. 9 del RGPD). Solo los usamos para que la app funcione: nunca para publicidad y nunca los vendemos.",
+    en: "To accompany you, the app stores data that shows your faith: your patron saint, the candles you light, your intentions, who you pray for, the prayers you complete, the Masses you attend and what you write in their chat. The law gives this data special protection (GDPR art. 9). We only use it to make the app work: never for advertising, and we never sell it.",
   },
   beliefConsentCheck: {
     es: "Doy mi consentimiento explícito para que Mi Sagrado Corazón trate estos datos.",
@@ -308,13 +308,13 @@ const dict = {
   },
   withdrawConsentGone: { es: "Se borra", en: "Deleted" },
   withdrawConsentGoneList: {
-    es: "Tu santo patrón y tus santos secundarios, tus intenciones privadas y las que publicaste en el muro, los «Rezo por ti» que diste y tu historial de oración.",
-    en: 'Your patron and secondary saints, your private intentions and the ones you posted on the wall, the "I pray for you" you gave and your prayer history.',
+    es: "Tu santo patrón y tus santos secundarios, las velas que encendiste, tus intenciones privadas y las que publicaste en el muro, los «Rezo por ti» que diste, tu historial de oración, tu asistencia a misa y tus mensajes del chat.",
+    en: 'Your patron and secondary saints, the candles you lit, your private intentions and the ones you posted on the wall, the "I pray for you" you gave, your prayer history, your Mass attendance and your chat messages.',
   },
   withdrawConsentKept: { es: "Se conserva", en: "Kept" },
   withdrawConsentKeptList: {
-    es: "Tu cuenta, para que puedas volver cuando quieras, y las velas que encendiste, sin el texto de la intención. Para usar el altar tendrás que dar de nuevo el consentimiento.",
-    en: "Your account, so you can come back whenever you like, and the candles you lit, without the intention text. To use the altar you will need to give your consent again.",
+    es: "Tu cuenta, para que puedas volver cuando quieras. Para usar el altar tendrás que dar de nuevo el consentimiento.",
+    en: "Your account, so you can come back whenever you like. To use the altar you will need to give your consent again.",
   },
   withdrawConsentConfirmWord: { es: "RETIRAR", en: "WITHDRAW" },
   withdrawConsentButton: { es: "Retirar y borrar mis datos de fe", en: "Withdraw and delete my faith data" },

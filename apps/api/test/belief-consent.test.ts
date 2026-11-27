@@ -3,6 +3,7 @@ import { BELIEF_CONSENT_VERSION } from "@msc/shared";
 import { beforeEach, describe, expect, test } from "vitest";
 
 import { prisma } from "../src/db.ts";
+import { betaFreePayments, setPaymentProvider, simulatedPayments } from "../src/modules/payments/provider.ts";
 import { app, bearer, resetDb, signUp } from "./helpers.ts";
 
 beforeEach(resetDb);
@@ -87,7 +88,17 @@ describe("consentimiento de datos de creencias", () => {
     expect((await prisma.user.findUniqueOrThrow({ where: { id: u.userId } })).beliefConsentAt).toEqual(first);
   });
 
-  test("retirarlo borra los datos de creencias, deja la cuenta y vuelve al onboarding", async () => {
+  test("retirarlo borra los datos de creencias (velas, chat y asistencia incluidos), deja la cuenta y vuelve al onboarding", async () => {
+    // Como en la beta: velas gratis, sin movimientos en el libro.
+    setPaymentProvider(betaFreePayments);
+    try {
+      await withdrawScenario();
+    } finally {
+      setPaymentProvider(simulatedPayments);
+    }
+  });
+
+  async function withdrawScenario() {
     const other = await signUp();
     const othersIntention = await request(app)
       .post("/api/intentions")
@@ -106,6 +117,12 @@ describe("consentimiento de datos de creencias", () => {
     await request(app).post(`/api/intentions/${othersIntention.body.data.id}/pray`).set(h).expect(200);
     await request(app).post("/api/me/intentions").set(h).send({ text: "Por mi hermano" }).expect(201);
     await request(app).post("/api/prayers/complete").set(h).send({ kind: "morning" }).expect(200);
+    const mass = await prisma.mass.create({
+      data: { titleEs: "Misa", titleEn: "Mass", youtubeUrl: "https://www.youtube.com/watch?v=abcdefghijk", scheduledAt: new Date() },
+    });
+    await prisma.chatMessage.create({ data: { massId: mass.id, userId: u.userId, text: "Amén", status: "approved" } });
+    await prisma.chatMessage.create({ data: { massId: mass.id, userId: other.userId, text: "Gloria", status: "approved" } });
+    await prisma.massAttendance.create({ data: { massId: mass.id, userId: u.userId } });
 
     // Sin confirmación no se borra nada.
     await request(app).delete("/api/me/belief-consent").set(h).send({}).expect(400);
@@ -123,16 +140,18 @@ describe("consentimiento de datos de creencias", () => {
     expect(await prisma.intentionPrayer.count({ where: { userId: u.userId } })).toBe(0);
     expect(await prisma.privateIntention.count({ where: { userId: u.userId } })).toBe(0);
     expect(await prisma.prayerLog.count({ where: { userId: u.userId } })).toBe(0);
-    // La vela se queda, sin el texto de la intención (igual que al borrar la cuenta).
-    const candles = await request(app).get("/api/candles/me").set(h).expect(200);
-    expect(candles.body.data.map((c: { intention: string }) => c.intention)).toEqual([""]);
-    expect(await prisma.candle.count({ where: { userId: u.userId } })).toBe(1);
+    // Las velas se borran del todo (decisión del fundador, 27-nov-2026), y también el chat y la asistencia.
+    expect(await prisma.candle.count({ where: { userId: u.userId } })).toBe(0);
+    expect(await prisma.chatMessage.count({ where: { userId: u.userId } })).toBe(0);
+    expect(await prisma.massAttendance.count({ where: { userId: u.userId } })).toBe(0);
+    // La misa y los mensajes de otras personas siguen.
+    expect(await prisma.chatMessage.count({ where: { userId: other.userId } })).toBe(1);
     // La intención de otra persona sigue en el muro.
     expect(await prisma.intention.count({ where: { userId: other.userId } })).toBe(1);
 
     // Y ya no se puede guardar nada nuevo hasta darlo otra vez.
     await request(app).post("/api/candles").set(h).send({ saintId: "saint_guadalupe", intention: "Otra", type: "basic" }).expect(403);
-  });
+  }
 
   test("borrar la cuenta retira también este consentimiento", async () => {
     const u = await signUp();
@@ -140,5 +159,22 @@ describe("consentimiento de datos de creencias", () => {
     const user = await prisma.user.findUniqueOrThrow({ where: { id: u.userId } });
     expect(user.beliefConsentAt).toBeNull();
     expect(user.beliefConsentVersion).toBeNull();
+  });
+});
+
+describe("retirada con velas pagadas", () => {
+  beforeEach(resetDb);
+  test("una vela con movimientos en el libro se queda, sin el texto de la intención", async () => {
+    const u = await signUp();
+    const h = bearer(u.token);
+    // Modo de pagos simulado (el de los tests): la vela genera movimientos en el libro.
+    await request(app).post("/api/candles").set(h).send({ saintId: "saint_guadalupe", intention: "Por mi familia", type: "basic" }).expect(201);
+    const withLedger = await prisma.candle.count({ where: { userId: u.userId, ledger: { some: {} } } });
+    expect(withLedger).toBeGreaterThan(0);
+    await request(app).delete("/api/me/belief-consent").set(h).send({ confirm: true }).expect(200);
+    expect(await prisma.candle.count({ where: { userId: u.userId } })).toBe(withLedger);
+    for (const c of await prisma.candle.findMany({ where: { userId: u.userId } })) {
+      expect(c.intentionEncrypted).not.toContain("Por mi familia");
+    }
   });
 });

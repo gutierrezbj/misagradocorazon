@@ -92,7 +92,7 @@ Todo desde el Mac del fundador, con su sí.
 
    `X-Forwarded-For` lleva solo la IP que ve nginx: la API confía en un salto (`trust proxy` = 1) y pasa esa IP a Better Auth (`docs/seguridad.md`, «IP real del cliente»).
 6. **Catálogo de santos y primer superadmin:**
-   - `seed-catalog.ts` se ejecuta solo si el fundador da por buenas sus imágenes. Por `ssh -n` funciona, porque compose quita la TTY solo:
+   - `seed-catalog.ts` siembra los 7 santos **sin imagen** (opción B del fundador, 27-nov-2026): la app muestra un marcador propio hasta que se suban imágenes con licencia verificada desde el panel. Por `ssh -n` funciona, porque compose quita la TTY solo:
      ```bash
      ssh -n -o BatchMode=yes root@<KVM 1> 'cd /opt/apps/msc && docker compose -p msc -f compose.yml exec -T api tsx prisma/seed-catalog.ts'
      ```

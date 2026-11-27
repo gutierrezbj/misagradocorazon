@@ -25,8 +25,11 @@ export function beliefConsentStamp() {
 }
 
 // Retirar el consentimiento borra los datos de creencias y deja la cuenta. La persona vuelve al
-// onboarding y no puede usar el altar hasta darlo de nuevo. Las velas se conservan sin el texto de
-// la intención, igual que al borrar la cuenta. Todo en una transacción: o se borra entero o nada.
+// onboarding y no puede usar el altar hasta darlo de nuevo (decisión del fundador, 27-nov-2026):
+// - las velas se borran del todo, salvo las que tengan movimientos en el libro (ADR-015, de solo
+//   inserción): esas se quedan sin el texto de la intención. En la beta gratis no hay ninguna;
+// - también se borran sus mensajes del chat de misa y su asistencia a misa.
+// Todo en una transacción: o se borra entero o nada.
 export async function withdrawBeliefConsent(userId: string) {
   await prisma.$transaction(async (tx) => {
     const byUser = { where: { userId } };
@@ -34,6 +37,9 @@ export async function withdrawBeliefConsent(userId: string) {
     await tx.intentionPrayer.deleteMany(byUser);
     await tx.intention.deleteMany(byUser); // sus oraciones recibidas caen en cascada
     await tx.prayerLog.deleteMany(byUser);
+    await tx.chatMessage.deleteMany(byUser);
+    await tx.massAttendance.deleteMany(byUser);
+    await tx.candle.deleteMany({ where: { userId, ledger: { none: {} } } });
     const empty = encryptText("", env.INTENTIONS_KEY);
     await tx.candle.updateMany({ where: { userId }, data: { intentionEncrypted: empty } });
     await tx.user.update({
