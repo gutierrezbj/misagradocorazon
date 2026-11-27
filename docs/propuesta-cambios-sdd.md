@@ -124,7 +124,7 @@ Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones 
 - apertura el 1-dic, con la novena;
 - beta abierta a cualquiera.
 
-**Pendiente:** pasarlo a Notion (SDD-02, 04, 05, 07 y 08). La edición desde la sesión de código quedó bloqueada por permisos el 23-nov-2026.
+**Notion:** US-27 a US-30 pasadas a SDD-05 el 27-nov-2026 (Épica 18 y Épica 2). **Pendiente:** el resto del cambio en SDD-04 (ADR-016 y beta gratis en ADR-003), SDD-07 y SDD-08. La edición desde la sesión de código quedó bloqueada por permisos el 23-nov-2026.
 
 **Por qué:** MSC pasa a ser el producto principal (Plan v4.2 de Mi Academia). Publicar en las tiendas lleva semanas: cuentas, revisión de Apple y, en Google, una prueba cerrada de 14 días con al menos 12 testers. Cobrar exige una sociedad que aún no está. La app ya funciona en navegador. Una beta web instalable (PWA) llega a los fieles en días y deja que Meta Ads lleve directo a la app, sin ficha de tienda.
 
