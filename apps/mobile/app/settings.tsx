@@ -36,7 +36,10 @@ export default function Settings() {
   };
 
   const setPref = useCallback(
-    async (key: "notifyMorning" | "notifyNight" | "notifySaint" | "notifyCommunity" | "notifyCandleExpiry" | "analyticsConsent", value: boolean) => {
+    async (
+      key: "notifyMorning" | "notifyNight" | "notifySaint" | "notifyCommunity" | "notifyCandleExpiry" | "analyticsConsent" | "newsConsent",
+      value: boolean,
+    ) => {
       if (!user) return;
       setUser({ ...user, [key]: value });
       try {
@@ -124,6 +127,13 @@ export default function Settings() {
           hint={t("analyticsConsentHint")}
           value={!!user?.analyticsConsent}
           onChange={(v) => setPref("analyticsConsent", v)}
+        />
+        <Toggle
+          testID="news-consent"
+          label={t("newsConsent")}
+          hint={t("newsConsentHint")}
+          value={!!user?.newsConsent}
+          onChange={(v) => setPref("newsConsent", v)}
         />
         {user?.beliefConsent && (
           <Pressable testID="withdraw-consent" onPress={() => router.push("/withdraw-consent")} accessibilityRole="button" style={styles.row}>

@@ -21,9 +21,13 @@ async function assertSaintsExist(ids: string[]) {
   if (found !== new Set(ids).size) throw new HttpError(400, "invalid_saint", "Santo no válido");
 }
 
-// La fecha del consentimiento cambia solo cuando cambia el consentimiento.
+// La fecha de cada consentimiento cambia solo cuando cambia el consentimiento.
 function consentStamp(user: { analyticsConsent: boolean }, consent: boolean | undefined) {
   return consent === undefined || consent === user.analyticsConsent ? {} : { analyticsConsentAt: new Date() };
+}
+
+function newsConsentStamp(user: { newsConsent: boolean }, consent: boolean | undefined) {
+  return consent === undefined || consent === user.newsConsent ? {} : { newsConsentAt: new Date() };
 }
 
 function assertTimeZone(tz: string | undefined) {
@@ -67,7 +71,10 @@ usersRouter.patch("/me", requireUser, async (req, res) => {
   assertTimeZone(input.timezone);
   if (input.patronSaintId !== undefined || input.secondarySaintIds !== undefined) assertBeliefConsent(user);
   await assertSaintsExist([...(input.patronSaintId ? [input.patronSaintId] : []), ...(input.secondarySaintIds ?? [])]);
-  const updated = await prisma.user.update({ where: { id: user.id }, data: { ...input, ...consentStamp(user, input.analyticsConsent) } });
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { ...input, ...consentStamp(user, input.analyticsConsent), ...newsConsentStamp(user, input.newsConsent) },
+  });
   ok(res, profileDto(updated, await currentStreak(updated.id, updated.timezone)));
 });
 

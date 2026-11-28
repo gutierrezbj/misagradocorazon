@@ -76,7 +76,7 @@ Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coin
 | GET | `/api/features` | — | Qué opciones de acceso ofrece el servidor (hoy: `passwordReset`) |
 | GET | `/api/me` | ✔ | Perfil y racha |
 | PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria y consentimientos de analítica y de datos de creencias (`beliefConsent: true`, si no se dio antes) |
-| PATCH | `/api/me` | ✔ | Actualizar perfil, preferencias de notificación y consentimiento de analítica |
+| PATCH | `/api/me` | ✔ | Actualizar perfil, preferencias de notificación y consentimientos de analítica y de novedades |
 | DELETE | `/api/me` | ✔ | Borrar la cuenta; exige `{ "confirm": true }` (`docs/borrado-cuenta.md`) |
 | POST | `/api/me/belief-consent` | ✔ | Da el consentimiento de datos de creencias (RGPD art. 9.2.a): guarda fecha y versión del texto |
 | DELETE | `/api/me/belief-consent` | ✔ | Lo retira (`{ confirm: true }`): borra santo patrón, velas (salvo las que tengan movimientos en el libro, que quedan sin texto), intenciones, «Rezo por ti», historial de oración, mensajes del chat y asistencia a misa. Vuelve al onboarding |
@@ -158,6 +158,8 @@ Staff = moderador, editor y superadmin. El superadmin puede con todo. La matriz 
 | POST | `/api/admin/causes/:id/transfers` | superadmin | Transferencia a la causa ganadora; escribe en el libro |
 | GET | `/api/admin/users` | superadmin | Usuarios (`?search=`), sin las cuentas borradas |
 | PATCH | `/api/admin/users/:id` | superadmin | Cambiar rol o bloquear; nunca deja el sistema sin superadmin |
+| GET | `/api/admin/news-subscribers` | superadmin | Cuántos fieles aceptaron recibir novedades (US-35) |
+| POST | `/api/admin/news-subscribers/export` | superadmin | Lista para descargar (nombre, correo, idioma, fecha); queda en el registro de cambios |
 | GET | `/api/admin/audit` | superadmin | Registro de cambios (`?entity=`, `?actorId=`, `?cursor=`) |
 
 Cada acción de gestión queda en `admin_audit_log` con el autor, la acción y la entidad.

@@ -1,0 +1,17 @@
+# Web pública misagradocorazon.com en el KVM 1, junto a la beta (docs/web-publica.md, apartado 8).
+# La imagen la construye GitHub Actions en cada push a main (.github/workflows/staging-images.yml);
+# en el servidor no se construye nada. En el servidor vive en /opt/apps/msc-web y se lanza así:
+#   cd /opt/apps/msc-web && IMAGE_TAG=<sha de 40 caracteres> docker compose -p msc-web -f compose.yml up -d
+# Bloque 270: la web escucha solo en 127.0.0.1:3270; el nginx del servidor pone dominio y TLS.
+name: msc-web
+services:
+  web:
+    image: ghcr.io/gutierrezbj/misagradocorazon-site:${IMAGE_TAG:?falta IMAGE_TAG}
+    container_name: msc-web
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:3270:80'
+    labels:
+      jrgb.project: msc-web
+      jrgb.offset: '270'
+      jrgb.domain: misagradocorazon.com

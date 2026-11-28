@@ -280,6 +280,11 @@ const dict = {
     es: "Compartir estadísticas de uso: qué pantallas se abren y qué funciones se usan. Nunca tus intenciones, mensajes, nombre ni email. Puedes cambiarlo en Ajustes.",
     en: "Share usage statistics: which screens are opened and which features are used. Never your intentions, messages, name or email. You can change this in Settings.",
   },
+  newsConsent: { es: "Quiero recibir novedades y ayudar a mejorar la app", en: "I want to get news and help improve the app" },
+  newsConsentHint: {
+    es: "Te escribiremos de vez en cuando a tu correo con novedades y para pedirte tu opinión. Puedes darte de baja en Ajustes.",
+    en: "We'll email you now and then with news and to ask for your opinion. You can unsubscribe in Settings.",
+  },
   privacySection: { es: "Privacidad", en: "Privacy" },
   // consentimiento explícito para los datos de creencias (RGPD art. 9.2.a). Si cambia el texto,
   // se sube BELIEF_CONSENT_VERSION en packages/shared/src/domain.ts.

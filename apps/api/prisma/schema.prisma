@@ -126,6 +126,11 @@ model User {
   analyticsConsent   Boolean   @default(false)
   analyticsConsentAt DateTime?
 
+  // Novedades por correo y ayuda para mejorar la app (US-35): casilla del registro, sin marcar.
+  // Solo con consentimiento explícito; se guarda cuándo se dio o retiró. No es un dato de fe.
+  newsConsent   Boolean   @default(false)
+  newsConsentAt DateTime?
+
   // Consentimiento explícito para los datos de creencias (RGPD art. 9.2.a): santo patrón, velas,
   // intenciones, "Rezo por ti" e historial de oración. Sin él la API no guarda ninguno. Se guarda
   // cuándo se dio y con qué versión del texto; al retirarlo vuelven a null y se borran esos datos.

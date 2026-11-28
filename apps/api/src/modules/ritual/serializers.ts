@@ -63,6 +63,7 @@ export function profileDto(u: User, streak: number) {
     notifyCommunity: u.notifyCommunity,
     notifyCandleExpiry: u.notifyCandleExpiry,
     analyticsConsent: u.analyticsConsent,
+    newsConsent: u.newsConsent,
     beliefConsent: u.beliefConsentAt !== null,
     beliefConsentVersion: u.beliefConsentVersion,
     streak,

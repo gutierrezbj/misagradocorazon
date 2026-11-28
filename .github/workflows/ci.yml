@@ -69,6 +69,10 @@ jobs:
           if curl -fsS localhost:8080/ruta-inventada | grep -q "Aviso de privacidad"; then exit 1; fi
           curl -fsS localhost:8080/ruta-inventada | grep -q '<div id="root">'
           docker rm -f web
+      - name: Imagen de la web pública (misagradocorazon.com)
+        run: |
+          docker build -f apps/site/Dockerfile -t msc-site .
+          docker run --rm msc-site nginx -t
       - name: La API arranca y aplica migraciones
         run: |
           docker network create msc

@@ -2,7 +2,7 @@
 // al borrar la cuenta), nunca al login. Si ese envío falla, el login sigue adelante.
 import { beforeEach, expect, jest, test } from "@jest/globals";
 import { Pressable, Text } from "react-native";
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native";
 
 import { AuthProvider, useAuth } from "@/src/auth";
 
@@ -85,4 +85,19 @@ test("si Apple no da código, no se llama a la API", async () => {
   await fireEvent.press(screen.getByTestId("apple"));
   await screen.findByText("u1");
   expect(mockApi.mock.calls.map(([p]) => p)).not.toContain("/me/apple-authorization");
+});
+
+test("registrarse con la casilla de novedades marcada la guarda en el perfil (US-35)", async () => {
+  mockApi.mockImplementation(async () => user);
+  function RegisterProbe() {
+    const { register } = useAuth();
+    return <Pressable testID="register" onPress={() => void register("rosa@example.com", "Oracion2026!", "Rosa", { newsConsent: true })} />;
+  }
+  await render(
+    <AuthProvider>
+      <RegisterProbe />
+    </AuthProvider>,
+  );
+  await fireEvent.press(screen.getByTestId("register"));
+  await waitFor(() => expect(mockApi).toHaveBeenCalledWith("/me", { method: "PATCH", body: { newsConsent: true } }));
 });

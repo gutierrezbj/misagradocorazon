@@ -28,6 +28,8 @@ export type User = {
   notifyCommunity: boolean;
   notifyCandleExpiry: boolean;
   analyticsConsent: boolean;
+  // Novedades por correo y ayuda para mejorar la app (US-35).
+  newsConsent: boolean;
   // Consentimiento explícito para los datos de creencias (RGPD art. 9.2.a).
   beliefConsent: boolean;
   beliefConsentVersion: string | null;

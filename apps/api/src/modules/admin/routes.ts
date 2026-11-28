@@ -301,6 +301,27 @@ adminRouter.patch("/admin/users/:id", ...superadmin, async (req, res) => {
   ok(res, { id: updated.id, role: updated.role, blocked: updated.blocked });
 });
 
+// --- Novedades (US-35) --------------------------------------------------------
+// Fieles que aceptaron recibir novedades y ayudar a mejorar la app. El recuento se consulta sin más;
+// la lista lleva correos, así que solo la descarga el superadmin y queda en el registro de cambios.
+
+const newsWhere = { newsConsent: true, deletedAt: null, blocked: false };
+
+adminRouter.get("/admin/news-subscribers", ...superadmin, async (_req, res) => {
+  ok(res, { count: await prisma.user.count({ where: newsWhere }) });
+});
+
+adminRouter.post("/admin/news-subscribers/export", ...superadmin, async (req, res) => {
+  const actor = currentUser(req);
+  const items = await prisma.user.findMany({
+    where: newsWhere,
+    orderBy: { newsConsentAt: "asc" },
+    select: { name: true, email: true, language: true, newsConsentAt: true },
+  });
+  await audit(prisma, actor.id, "news.export", "user", "news-subscribers", { count: items.length });
+  ok(res, { count: items.length, items });
+});
+
 // --- Notificaciones (avisos del equipo) --------------------------------------
 // Se crean aquí y las envía el worker en el minuto siguiente. Llegan a quien acepta avisos de la comunidad.
 

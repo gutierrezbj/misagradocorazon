@@ -58,7 +58,15 @@ export const notificationPrefsSchema = z.object({
 });
 export type NotificationPrefs = z.infer<typeof notificationPrefsSchema>;
 
-export const profileUpdateSchema = z.object({ ...profileFields, ...notificationPrefsSchema.shape }).partial();
+export const profileUpdateSchema = z
+  .object({
+    ...profileFields,
+    ...notificationPrefsSchema.shape,
+    // Novedades por correo y ayuda para mejorar la app (US-35). Se da en el registro, con una casilla
+    // sin marcar, o en Ajustes; no forma parte del onboarding.
+    newsConsent: z.boolean(),
+  })
+  .partial();
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;
 
 export const prayerCompleteSchema = z.object({ kind: z.enum(["morning", "night"]) });

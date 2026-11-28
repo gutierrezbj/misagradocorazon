@@ -15,6 +15,140 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ---
 
+## Cambio del 28-nov-2026: la web abre en diciembre y el registro pide permiso para escribir
+
+Estado: **aprobado por el fundador el 28-nov-2026 y aplicado en Notion el mismo día** (SDD-02, SDD-05 épica 19, SDD-07, SDD-08 y la línea de lanzamiento de la página principal). Sale con la beta el 1-dic-2026.
+
+- **Por qué:**
+  - La web es el escaparate y tiene que salir antes que la app de las tiendas, o a la vez.
+  - Queremos ir reuniendo fieles que nos ayuden a probar la app y a mejorarla.
+- **SDD-02, alcance:**
+  - La web pública (misagradocorazon.com) abre el 1-dic con la beta.
+  - Su llamada a la acción es «Regístrate gratis y ayúdanos a probar la app», que lleva al registro de la app web (app.misagradocorazon.com).
+  - Se quita la lista de espera de la web: los correos se recogen en el registro de la app, no en la web.
+  - La app queda abierta: cualquiera puede registrarse y usarla.
+- **SDD-05, US-35 — Novedades y ayuda para mejorar la app:**
+  - Como fiel, al registrarme puedo marcar «Quiero recibir novedades y ayudar a mejorar la app».
+  - Criterios:
+    - la casilla sale **sin marcar**, y registrarse no depende de marcarla;
+    - se guarda la fecha en que se acepta;
+    - en Ajustes se puede retirar en cualquier momento;
+    - el aviso de privacidad explica esta finalidad, que la base es el consentimiento y cómo retirarlo;
+    - en el panel, el superadmin ve cuántos fieles la aceptaron y descarga la lista (nombre, correo, idioma, fecha) en CSV.
+  - Esta casilla no tiene que ver con los datos de fe: no se mezcla con el consentimiento del art. 9.
+- **KPI:** porcentaje de registros que aceptan novedades.
+- **SDD-07, testing:**
+  - test de que la casilla llega sin marcar;
+  - test de que el permiso se guarda con fecha y se puede retirar;
+  - test de que solo el superadmin ve y descarga la lista.
+- **SDD-08, despliegue:**
+  - La web se sirve desde el KVM 1, como la beta: imagen en GHCR, contenedor `msc-web` en `127.0.0.1:3270` y nginx del servidor con HTTPS.
+  - El buzón hola@misagradocorazon.com ya existe y es el contacto de la web.
+
+---
+
+## Cambio propuesto el 26-nov-2026: «Rezamos contigo»
+
+Estado: **aprobada por el fundador el 26-nov-2026. Entra para el lanzamiento del 10-feb-2027** (US-31 a US-34; los grupos privados, después). Idea y nombre del fundador, del mismo día.
+
+**Aplicado en Notion el 26-nov-2026:** SDD-02 (pilar 1 y grupos privados fuera del MVP), SDD-05 (Épica 17, US-31 a US-34), SDD-07 y SDD-08.
+
+**Pendiente:** decisiones 3 y 4 del final de este bloque: duraciones y quién modera. La 5 (sección V de la web) quedó resuelta: la web ya cuenta «Rezamos contigo».
+
+**Qué es:** quien publica una intención en el muro puede pedir que recen con ella. Otros fieles se unen, con su nombre o en anónimo, y quien pidió ve cuántos rezan con él y desde cuántos países. Ejemplo: Celeste pide oración por su padre durante una novena; se unen 120 personas de 9 países y ella recibe avisos según crece el número.
+
+**Por qué:**
+- **Producto:** convierte «Nadie reza solo» en algo que la app hace. Es el mismo pilar del ritual, no uno nuevo.
+- **Crecimiento:** quien pide comparte el enlace por WhatsApp con su familia y su parroquia. Es la vía de entrada más natural de fieles nuevos antes y después del 10-feb.
+- **Coste:** se apoya en lo que ya existe en `apps/api`:
+  - el muro de intenciones públicas, con moderación (`Intention`);
+  - el «Rezo por ti» (`IntentionPrayer`);
+  - el push de Expo;
+  - las tareas programadas de pg-boss.
+
+### SDD-02 — Alcance
+
+- **Entra en el MVP:** «Rezamos contigo» sobre el muro de intenciones:
+  - pedir que recen contigo;
+  - unirse con nombre o en anónimo;
+  - contador de personas y países;
+  - avisos a quien pidió;
+  - enlace para compartir.
+- **Después del lanzamiento (fase 2):** grupos privados de oración con enlace de invitación y una persona responsable. Ejemplo: el grupo de rezadoras de una parroquia o de una familia. Fuera del MVP.
+- **Se mantiene fuera hasta v3:** el muro de testimonios. Al cerrar una petición solo se puede dar las gracias con un botón, sin texto libre, para no abrir testimonios por la puerta de atrás.
+
+### SDD-05 — Backlog
+
+- **US-31 — Pedir que recen conmigo.** Como fiel, al publicar una intención en el muro activo «Rezamos contigo» y elijo:
+  - cuánto dura: un día, una novena (9 días) o un mes;
+  - cómo aparezco: «Celeste M.» (como hoy en el muro) o «Anónimo».
+  - **Criterios:**
+    - pasa por la misma moderación que el resto del muro;
+    - al escribir, un aviso pide no poner el nombre completo ni datos de salud identificables de otra persona («Por mi padre», no «Por Juan Pérez, con cáncer de pulmón»);
+    - puedo cerrar la petición antes de tiempo y borrarla cuando quiera.
+- **US-32 — Unirme a rezar.** Como fiel, en una petición activa pulso «Rezo contigo» y elijo si me uno con mi nombre o en anónimo.
+  - **Criterios:**
+    - una vez por persona y petición;
+    - si me uno en anónimo, no aparezco en ninguna lista, tampoco para quien pidió;
+    - si la petición es una novena, puedo activar un recordatorio diario hasta que termine (preferencia nueva, desactivada por defecto).
+- **US-33 — Saber quién reza conmigo.** Como quien pidió, veo cuántas personas rezan conmigo, desde cuántos países y, si quisieron, sus nombres.
+  - **Criterios:**
+    - recibo un push al llegar a 1, 10, 50, 100, 500 y 1.000 personas, y al terminar: «Ya rezan contigo 50 personas desde 7 países.»;
+    - el aviso no lleva el texto de la intención (regla de `docs/push.md`);
+    - preferencia nueva `notifyPrayingWithYou`, activada por defecto porque responde a algo que pidió el propio fiel.
+- **US-34 — Compartir la petición.** Como quien pidió, comparto un enlace a mi petición.
+  - **Criterios:**
+    - quien lo abre ve la intención y el contador, y puede unirse tras registrarse;
+    - la vista previa del enlace (WhatsApp) no muestra el texto de la intención, solo «Celeste te pide que reces con ella» o «Te piden que reces».
+- **Panel:**
+  - las peticiones aparecen en la cola de moderación con su contador;
+  - el moderador puede cerrarlas o retirarlas.
+- **KPIs** (regla del fundador: cada función con su medida):
+  - `prayer_request_created`, con su duración;
+  - `prayer_joined`, con anónimo o con nombre;
+  - `prayer_request_shared`;
+  - registros que llegan por un enlace compartido: la medida de crecimiento;
+  - en el panel: peticiones activas, media de personas por petición y tiempo de moderación.
+
+### Datos y privacidad (GDPR art. 9)
+
+- **Intenciones y uniones:** son datos de creencias religiosas. La intención pública ya lo es por decisión de su autor (como hoy); unirse a rezar también revela creencias, así que se trata igual.
+- **Países sin dato nuevo:** el país sale de la zona horaria que el fiel ya tiene en su perfil (`User.timezone`), sin preguntar nada ni mirar la IP.
+  - Se guarda solo el código de país en la unión y se muestra siempre agregado.
+  - La zona horaria tiene hoy un valor por defecto (`America/Mexico_City`). Hay que confirmar que la app guarda la real del teléfono; si no, los países salen mal.
+- **Datos de terceros:** el padre de Celeste no ha consentido. De ahí el aviso de US-31 y que la moderación retire nombres completos y diagnósticos.
+- **Borrado:** si quien pidió borra la petición o su cuenta, se borran la petición y todas las uniones. Si borra su cuenta quien se unió, se borra su unión y baja el contador.
+- **Aviso de privacidad:** tiene que explicar todo esto antes de abrir la función.
+
+### SDD-07 — Testing
+
+- **Anonimato:**
+  - una unión anónima no aparece en ninguna respuesta de la API, tampoco en la de quien pidió;
+  - el contador sí la cuenta.
+- **Moderación:**
+  - solo se puede unir a peticiones aprobadas y activas (el fallo que la auditoría encontró en el «Rezo por ti» de la entrega, `docs/auditoria-entrega.md`).
+- **Push:**
+  - cada hito sale una sola vez;
+  - ningún aviso lleva el texto de la intención.
+- **Borrado:**
+  - al borrar la petición o una cuenta desaparecen sus uniones.
+- **Prueba manual con dos cuentas en dos teléfonos:** pedir, unirse, recibir el aviso, compartir el enlace y unirse desde él.
+
+### SDD-08 — Despliegue
+
+- Sin servicios nuevos: Postgres, pg-boss y el push de Expo ya están.
+- Más peticiones públicas significa más trabajo de moderación. Antes de abrirlo hay que decidir quién modera y en qué horario, y medir el tiempo de moderación en la beta.
+
+### Decisiones que necesito del fundador
+
+1. ~~Aprobar este cambio para aplicarlo en Notion.~~ Aprobado el 26-nov-2026.
+2. ~~¿Entra para el 10-feb o justo después?~~ Entra para el 10-feb: US-31 a US-34. Los grupos privados, después.
+3. Duraciones: un día, novena y un mes. ¿Alguna más (por ejemplo, una semana)?
+4. ¿Quién modera las peticiones y en qué horario?
+5. ¿La web pública cuenta esta función en la sección V («Nadie reza solo») en lugar de las seis tarjetas de ejemplo?
+
+---
+
 ## Cambio propuesto el 23-nov-2026: beta web (PWA) con la vela gratis
 
 Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones abiertas, resueltas con la recomendación:
@@ -22,7 +156,7 @@ Estado: **aprobado por el fundador el 23-nov-2026** ("a toda vela"). Decisiones 
 - apertura el 1-dic, con la novena;
 - beta abierta a cualquiera.
 
-**Pendiente:** pasarlo a Notion (SDD-02, 04, 05, 07 y 08). La edición desde la sesión de código quedó bloqueada por permisos el 23-nov-2026.
+**Notion:** US-27 a US-30 pasadas a SDD-05 el 27-nov-2026 (Épica 18 y Épica 2). **Pendiente:** el resto del cambio en SDD-04 (ADR-016 y beta gratis en ADR-003), SDD-07 y SDD-08. La edición desde la sesión de código quedó bloqueada por permisos el 23-nov-2026.
 
 **Por qué:** MSC pasa a ser el producto principal (Plan v4.2 de Mi Academia). Publicar en las tiendas lleva semanas: cuentas, revisión de Apple y, en Google, una prueba cerrada de 14 días con al menos 12 testers. Cobrar exige una sociedad que aún no está. La app ya funciona en navegador. Una beta web instalable (PWA) llega a los fieles en días y deja que Meta Ads lleve directo a la app, sin ficha de tienda.
 
