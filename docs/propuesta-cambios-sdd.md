@@ -113,6 +113,71 @@ Aprobado por el fundador el 23-nov-2026. Sustituye la restricción de SDD-02 "au
 3. Fecha de apertura: el 1-dic (empieza la novena), o antes en privado con un grupo pequeño.
 4. ¿La beta web es abierta a cualquiera desde el primer día, o con invitación?
 
+### Propuesta del 28-nov-2026: la vela en pantalla (US-31)
+
+Idea del fundador del 28-nov-2026. **Pendiente de aprobar**: sin ese visto bueno no se escribe código.
+
+- **Qué es:** el fiel enciende su vela y la deja a pantalla completa mientras ora, por ejemplo en la mesita de noche. La llama se mueve y la cera baja según el tiempo que le queda de verdad a la vela.
+- **SDD-05, US-31, en la Épica 3, Velas:** "Como fiel, quiero dejar mi vela encendida en la pantalla mientras rezo, para tenerla delante como en un altar". Criterios de aceptación:
+  1. **Desde dónde se abre:**
+     - en "Mis velas" del altar, al tocar una vela encendida;
+     - y en la confirmación de la vela, con el botón "Dejarla en pantalla".
+  2. **La pantalla:**
+     - a pantalla completa, sin pestañas ni barras, sobre el negro cálido del altar;
+     - con la llama de siempre (`CandleFlame`) en grande y la cera a la altura que le toca según `litAt` y `expiresAt`;
+     - debajo, el santo y cuánto le queda ("Le quedan 2 días y 5 horas").
+  3. **La intención está oculta por defecto:** son datos de creencias (RGPD art. 9) y otra persona puede ver la pantalla. Un toque en "Ver intención" la muestra, y se vuelve a ocultar sola a los 10 s.
+  4. **La pantalla no se apaga mientras dura el temporizador.** El fiel lo elige al entrar:
+     - 30 min;
+     - 1 h (por defecto);
+     - toda la noche (8 h).
+
+     Al acabar, el teléfono vuelve a su comportamiento normal y se apaga cuando le toque. Hace falta así porque la vela dura de 1 a 7 días y la pantalla no puede quedarse encendida tanto tiempo.
+  5. **Controles:** un toque en cualquier sitio los muestra, y se ocultan solos a los 5 s:
+     - cerrar;
+     - ver la intención;
+     - la oración de la noche, con el reproductor de siempre (el audio sigue al cerrar la pantalla).
+  6. **De noche:**
+     - casi todo en negro y la llama con poco brillo;
+     - la llama se desplaza unos píxeles cada pocos minutos para no marcar la pantalla.
+
+     El brillo del teléfono no se toca en esta versión.
+  7. **Si la vela se consume con la pantalla abierta:**
+     - la llama se apaga despacio;
+     - aparece "Tu vela se ha consumido";
+     - debajo, "Encender otra vela", que lleva al flujo de siempre.
+
+     Ese texto no menciona causas, donaciones ni el 20 % (Apple 3.2.2.iv).
+  8. Con "reducir movimiento" activado en el teléfono, la llama queda quieta.
+  9. Textos por i18n (ES/EN). 16 px el texto de lectura y 14 px el resto como mínimo.
+- **SDD-03 y SDD-04, técnica:**
+  - **No toca la API ni la base de datos:** la vela ya trae `litAt`, `expiresAt` y su tipo.
+  - **En el teléfono:** `expo-keep-awake`, el módulo oficial de Expo SDK 57 y la única dependencia nueva.
+  - **En la web:** la API Screen Wake Lock del navegador.
+    - Funciona en Chrome y Android. En el iPhone necesita una versión reciente de iOS.
+    - Si el navegador no la tiene, la pantalla sale igual con un aviso: "Tu navegador puede apagar la pantalla; súbele el tiempo de bloqueo en Ajustes".
+- **KPIs:** dos eventos de producto en PostHog; las métricas de negocio no cambian.
+  - `candle_vigil_started`, con el tipo de vela, el temporizador elegido y la plataforma;
+  - `candle_vigil_ended`, con los minutos que estuvo abierta y por qué terminó: el fiel la cerró, se acabó el temporizador o la vela se consumió.
+
+  Sirve para medir qué parte de las velas encendidas se usan así y cuánto tiempo, y si quien la usa vuelve más al ritual (retención por cohortes).
+- **SDD-07, pruebas:**
+  - tests de la altura de la cera y del tiempo restante;
+  - que la pantalla se mantiene encendida y se libera al cerrar o al acabar el temporizador;
+  - que la intención está oculta al entrar;
+  - que la vela se apaga al consumirse;
+  - que la pantalla de vela consumida no nombra causas ni el 20 %;
+  - prueba en el navegador y en el teléfono.
+- **Encaje con el plan:** cabe antes del 1-dic. Si no, entra justo después sin bloquear la beta.
+
+### Decisiones que necesito del fundador (US-31)
+
+1. Aprobar US-31 tal cual, con:
+   - la intención oculta por defecto;
+   - el temporizador de 1 h por defecto, con 30 min y 8 h como alternativas;
+   - el nombre "Dejarla en pantalla" para el botón.
+2. Pasarla a Notion (SDD-05 y SDD-07) junto con lo que está pendiente.
+
 ---
 
 ## SDD-01 — Definición del problema
