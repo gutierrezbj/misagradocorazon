@@ -17,7 +17,7 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ## Cambio del 28-nov-2026: la web abre en diciembre y el registro pide permiso para escribir
 
-Estado: **aprobado por el fundador el 28-nov-2026.** Sale con la beta el 1-dic-2026. Pendiente de pasar a Notion (SDD-02, 05, 07 y 08) cuando el fundador dé el visto bueno.
+Estado: **aprobado por el fundador el 28-nov-2026 y aplicado en Notion el mismo día** (SDD-02, SDD-05 épica 19, SDD-07, SDD-08 y la línea de lanzamiento de la página principal). Sale con la beta el 1-dic-2026.
 
 - **Por qué:**
   - La web es el escaparate y tiene que salir antes que la app de las tiendas, o a la vez.
