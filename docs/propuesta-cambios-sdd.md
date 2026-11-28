@@ -115,7 +115,7 @@ Aprobado por el fundador el 23-nov-2026. Sustituye la restricción de SDD-02 "au
 
 ### Propuesta del 28-nov-2026: la vela en pantalla (US-31)
 
-Idea del fundador del 28-nov-2026. **Pendiente de aprobar**: sin ese visto bueno no se escribe código.
+Idea del fundador del 28-nov-2026. **Aprobada por el fundador el 28-nov-2026, sin el botón "Encender otra vela"** en la pantalla de vela consumida. Pendiente de pasar a Notion.
 
 - **Qué es:** el fiel enciende su vela y la deja a pantalla completa mientras ora, por ejemplo en la mesita de noche. La llama se mueve y la cera baja según el tiempo que le queda de verdad a la vela.
 - **SDD-05, US-31, en la Épica 3, Velas:** "Como fiel, quiero dejar mi vela encendida en la pantalla mientras rezo, para tenerla delante como en un altar". Criterios de aceptación:
@@ -144,8 +144,8 @@ Idea del fundador del 28-nov-2026. **Pendiente de aprobar**: sin ese visto bueno
      El brillo del teléfono no se toca en esta versión.
   7. **Si la vela se consume con la pantalla abierta:**
      - la llama se apaga despacio;
-     - aparece "Tu vela se ha consumido";
-     - debajo, "Encender otra vela", que lleva al flujo de siempre.
+     - aparece "Tu vela se ha consumido. Gracias por acompañarla en oración";
+     - no se ofrece encender otra vela desde ahí (decisión del fundador del 28-nov-2026).
 
      Ese texto no menciona causas, donaciones ni el 20 % (Apple 3.2.2.iv).
   8. Con "reducir movimiento" activado en el teléfono, la llama queda quieta.
@@ -170,13 +170,14 @@ Idea del fundador del 28-nov-2026. **Pendiente de aprobar**: sin ese visto bueno
   - prueba en el navegador y en el teléfono.
 - **Encaje con el plan:** cabe antes del 1-dic. Si no, entra justo después sin bloquear la beta.
 
-### Decisiones que necesito del fundador (US-31)
+### Decisiones del fundador (US-31, 28-nov-2026)
 
-1. Aprobar US-31 tal cual, con:
+1. Aprobada con:
    - la intención oculta por defecto;
    - el temporizador de 1 h por defecto, con 30 min y 8 h como alternativas;
-   - el nombre "Dejarla en pantalla" para el botón.
-2. Pasarla a Notion (SDD-05 y SDD-07) junto con lo que está pendiente.
+   - el botón "Dejarla en pantalla".
+2. Sin "Encender otra vela" en la pantalla de vela consumida.
+3. Pendiente: pasarla a Notion (SDD-05 y SDD-07) junto con lo demás.
 
 ---
 

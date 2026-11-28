@@ -151,7 +151,14 @@ export default function Altar() {
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: spacing.sm, paddingRight: spacing.md }}>
               {candles.map((c) => (
-                <View key={c.id} style={styles.miniCandle}>
+                <Pressable
+                  key={c.id}
+                  testID={`my-candle-${c.id}`}
+                  accessibilityRole="button"
+                  accessibilityHint={t("vigilOpen")}
+                  onPress={() => router.push(`/vigil/${c.id}`)}
+                  style={styles.miniCandle}
+                >
                   <CandleFlame size={54} lit variant={c.type} mourning={c.category === "difuntos"} />
                   <Text style={styles.miniSaint} numberOfLines={3}>
                     {c.saint.name}
@@ -159,7 +166,7 @@ export default function Altar() {
                   <Text style={styles.miniIntention} numberOfLines={2}>
                     {c.intention}
                   </Text>
-                </View>
+                </Pressable>
               ))}
             </ScrollView>
           )}
