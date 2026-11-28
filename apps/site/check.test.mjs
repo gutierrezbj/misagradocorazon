@@ -76,3 +76,16 @@ test("aviso legal y privacidad existen, en español, con titular y contacto", ()
   }
   assert.doesNotMatch(html, /\[ENLACE A LA POLÍTICA DE PRIVACIDAD\]/);
 });
+
+test("la llamada a la acción lleva al registro de la app y ya no hay lista de espera", () => {
+  const ctas = [...html.matchAll(/<a class="btn[^"]*" href="([^"]+)">([^<]+)<\/a>/g)];
+  assert.equal(ctas.length, 3, "portada, barra y cierre");
+  for (const [, href, label] of ctas) {
+    assert.equal(href, "https://app.misagradocorazon.com/registro");
+    assert.match(label, /^Regístrate gratis/);
+  }
+  assert.doesNotMatch(html + js, /<form|data-form|lista de espera/i);
+  for (const page of ["aviso-legal", "privacidad"]) {
+    assert.doesNotMatch(readFileSync(pub(page + "/index.html"), "utf8"), /lista de espera|\[PROVEEDOR/i);
+  }
+});

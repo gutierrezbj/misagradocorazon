@@ -7,7 +7,7 @@ El código está en `apps/site` (`apps/site/README.md`).
 ## 1. Qué es y para qué
 
 - Web pública en **misagradocorazon.com**. No es la app: la beta de la app vive en `app.misagradocorazon.com`.
-- **Objetivo:** captar la lista de espera para el lanzamiento del **Miércoles de Ceniza, 10-feb-2027**. Arranque fuerte en enero.
+- **Objetivo:** desde el 1-dic-2026, llevar a la gente a registrarse gratis en la beta de la app y ayudarnos a probarla, camino del lanzamiento en las tiendas del **Miércoles de Ceniza, 10-feb-2027** (cambio del fundador del 28-nov-2026).
 - **Es el único sitio donde se puede contar el 20 % y las causas.** Apple 3.2.2.iv prohíbe mencionarlo en el flujo de compra de la app.
 - Página única, larga, bilingüe ES/EN: fase 1 en ES; EN antes del lanzamiento.
 
@@ -98,13 +98,13 @@ Acento de luz: #FFC56B. El rayo y los puntos encendidos van de #FFD27A a #FFB347
 - **Nunca** publicar intenciones reales sin consentimiento expreso: son datos de creencias (RGPD art. 9).
 
 **VI · Cierre.** «Empezamos el camino juntos».
-- Formulario: correo, casilla de consentimiento obligatoria y botón «Quiero estar el 10 de febrero».
+- Desde el 28-nov-2026: sin formulario. Texto «La app ya está abierta…» y botón «Regístrate gratis y ayúdanos a probar la app», que lleva a `app.misagradocorazon.com/registro`. Los correos se recogen en el registro de la app, con la casilla de novedades (US-35, `docs/propuesta-cambios-sdd.md`).
 - A la derecha, la acuarela del corazón.
 - Pie: «Mi Sagrado Corazón · En español y en inglés · San Miguel Arcángel, defiéndenos en la batalla».
 
 ## 6. Lo que falta por decidir o conectar
 
-1. **Lista de espera:** elegir dónde se guardan los correos (propuesta: tabla propia en la API de MSC o un servicio de email marketing con doble opt-in). Hoy el formulario es maqueta.
+1. ~~**Lista de espera.**~~ Resuelto el 28-nov-2026: no hay lista de espera. La web lleva al registro de la app y allí se pide permiso para escribir (US-35).
 2. **Política de privacidad y aviso legal:** responsable (la sociedad de EEUU aún no existe: decidir quién figura), finalidad y baja. Enlazarlos desde la casilla y el pie.
 3. **Precios:** el cobro real depende de constituir la sociedad. Si el 10-feb las velas siguen gratis (modo beta), cambiar el texto de la sección I y el de la portada.
 4. **Revisión iconográfica** de las tres imágenes por alguien de confianza (atributos del Sagrado Corazón).
@@ -128,32 +128,34 @@ Falta probar en Safari de iPhone y en Firefox.
 
 ## 8. Despliegue
 
-Según el Cuaderno de Infraestructura JRGB (Notion), que tiene las IPs y los accesos. Todo se lanza desde el Mac del fundador, donde están las claves SSH. Las IPs no se escriben en el repo.
+Decisión del fundador del 28-nov-2026: la web sale el 1-dic con la beta, en el **KVM 1**, junto a ella (`deploy/staging/README.md`). Las IPs y los accesos están en el cuaderno de infraestructura, fuera del repo. Todo se lanza desde el Mac del fundador y con su sí.
 
-**Revisión:** KVM 1, `https://msc.rev.jrgblanco.com`, con clave y oculta a buscadores.
+- **Imagen:** la construye GitHub Actions en cada push a `main` (`.github/workflows/staging-images.yml`) y la sube a GHCR como `misagradocorazon-site`, con el SHA completo del commit como etiqueta. En el servidor no se construye nada.
+- **Contenedor:** `msc-web`, proyecto `msc-web`, carpeta `/opt/apps/msc-web`, puerto `127.0.0.1:3270` (bloque 270; la beta usa 3271, 4270, 5270 y 6270).
 
-```bash
-pnpm --filter @msc/site build
-```
+1. Comprobar que el 3270 está libre (sin salida):
+   ```bash
+   ssh root@<KVM 1> 'ss -tlnH | grep -E ":3270 "'
+   ```
+2. Imagen del SHA, igual que en la beta (si da «denied», se para y se pregunta al fundador):
+   ```bash
+   SHA=<sha de 40 caracteres>
+   docker pull ghcr.io/gutierrezbj/misagradocorazon-site:$SHA
+   ```
+3. Fichero del mismo SHA:
+   ```bash
+   git archive "$SHA" apps/site/deploy/compose.yml | tar -x
+   ssh root@<KVM 1> 'install -d /opt/apps/msc-web'
+   rsync apps/site/deploy/compose.yml root@<KVM 1>:/opt/apps/msc-web/
+   ```
+4. Arranque:
+   ```bash
+   ssh root@<KVM 1> 'cd /opt/apps/msc-web && IMAGE_TAG='"$SHA"' docker compose -p msc-web -f compose.yml up -d && curl -fsS -o /dev/null 127.0.0.1:3270/'
+   ```
+5. DNS en hPanel: A `@` y `www` → KVM 1, TTL 300.
+6. vhost del servidor: `apps/site/deploy/nginx-host.conf` → `nginx -t && systemctl reload nginx`.
+7. `certbot --nginx -d misagradocorazon.com -d www.misagradocorazon.com` (elegir redirigir).
+8. Comprobar la vista previa en WhatsApp con el dominio real y que «Regístrate gratis» abre `app.misagradocorazon.com/registro`.
+9. Alta en vigilancia y línea en el historial del cuaderno.
 
-```bash
-ssh root@<KVM1> rev-nueva msc
-```
-
-```bash
-rsync -rt --delete --rsync-path=rev-rsync apps/site/dist/ root@<KVM1>:/srv/rev/msc/
-```
-
-**Producción (enero):** KVM 4, desplazamiento **270 reservado**: la web queda en `127.0.0.1:3270`. Mismo patrón que `jrgb-web`: contenedor nginx alpine con la web estática.
-
-1. Comprobar que el bloque está libre (sin salida):
-   `ssh root@<KVM4> 'ss -tlnH | grep -E ":[3-6]27[0-9] "; grep -rhoE "127.0.0.1:[3-6]27[0-9]" /etc/nginx/sites-enabled/'`
-2. Código en `/opt/apps/msc-web` y `docker compose -p msc-web -f apps/site/deploy/compose.yml up -d --build`. El compose ya lleva `container_name: msc-web`, `restart: unless-stopped`, el puerto `127.0.0.1:3270:80` y las etiquetas `jrgb.*`.
-3. DNS en hPanel (cuenta personal): A `@` y `www` → KVM 4, TTL 300.
-4. vhost del host: `apps/site/deploy/nginx-host.conf` → `nginx -t && systemctl reload nginx`.
-5. `certbot --nginx -d misagradocorazon.com -d www.misagradocorazon.com` (elegir redirigir).
-6. Alta en vigilancia (healthcheck y SA99) y línea en el historial del cuaderno.
-
-> **Aviso:** la beta de la app vive hoy en el Servidor 2 (`/opt/apps/misagradocorazon`), que caduca el 12-feb-2027, dos días después del lanzamiento. Hay que moverla al KVM 4 antes, con la receta «Mover un proyecto de un servidor a otro».
->
-> **Choque de nombres:** la beta de la app ya usa un contenedor llamado `msc-web` (`docs/beta-web.md`). Si las dos acaban en el KVM 4, una tiene que cambiar de nombre.
+Para actualizar: pasos 2 a 4 con el SHA nuevo.

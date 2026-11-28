@@ -413,11 +413,15 @@
     var strong = document.createElement("strong");
     strong.textContent = String(days);
     el.appendChild(strong);
-    el.appendChild(document.createTextNode(days === 1 ? " día para empezar." : " días para empezar."));
+    el.appendChild(
+      document.createTextNode(
+        days === 1 ? " día para el lanzamiento en las tiendas, el 10 de febrero." : " días para el lanzamiento en las tiendas, el 10 de febrero.",
+      ),
+    );
     el.hidden = false;
   }
 
-  /* ---------- Barra fija: tras la portada, y se retira al llegar al formulario ---------- */
+  /* ---------- Barra fija: tras la portada, y se retira al llegar al cierre ---------- */
   function bar() {
     var el = $("[data-bar]");
     var hero = $(".hero");
@@ -441,32 +445,6 @@
     ).observe(lista);
   }
 
-  /* ---------- VI · Lista de espera (maqueta: aún sin destino para los correos) ---------- */
-  function form() {
-    var f = $("[data-form]");
-    var status = $("[data-form-status]");
-    if (!f || !status) return;
-    f.addEventListener("submit", function (e) {
-      e.preventDefault();
-      var mail = f.elements.namedItem("email");
-      var consent = f.elements.namedItem("consent");
-      status.classList.remove("is-error");
-      if (!mail.value || !mail.checkValidity()) {
-        status.classList.add("is-error");
-        status.textContent = "Escribe un correo válido.";
-        mail.focus();
-        return;
-      }
-      if (!consent.checked) {
-        status.classList.add("is-error");
-        status.textContent = "Marca la casilla para que podamos avisarte.";
-        consent.focus();
-        return;
-      }
-      status.textContent = "Maqueta: el formulario aún no está conectado a ninguna lista.";
-    });
-  }
-
   function init() {
     splitTitle();
     hero();
@@ -478,7 +456,6 @@
     rezamos();
     countdown();
     bar();
-    form();
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

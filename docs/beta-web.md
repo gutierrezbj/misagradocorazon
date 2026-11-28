@@ -57,7 +57,7 @@ El icono, el favicon y la pantalla de arranque eran los del constructor (Emergen
 - **Chromium:**
   - la página es instalable, sin errores de instalabilidad ni de manifiesto;
   - el service worker queda activo y guarda la página, el manifiesto, los iconos y las fuentes.
-- **Contenedor `msc-web` contra la API local en modo beta:**
+- **Contenedor local de la beta web (en el servidor, `msc-app`) contra la API local en modo beta:**
   - entrar, onboarding, vela gratis ("Gratis durante la beta", sin precios), transparencia de la beta y misa;
   - sin bloqueos de la CSP;
   - las fotos de los santos no cargan en este entorno porque el proxy bloquea Wikimedia; no es de esta PR.

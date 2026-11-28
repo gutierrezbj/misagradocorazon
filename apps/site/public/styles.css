@@ -967,59 +967,25 @@ input {
   gap: 48px;
   align-items: center;
 }
-.form {
+.join {
   margin-top: 40px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  align-items: flex-start;
+  gap: 20px;
   max-width: 620px;
 }
-.form__label {
-  font-size: 14px;
-  font-weight: 600;
-}
-.form__row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-.form__input {
-  flex: 1 1 260px;
-  min-width: 0;
-  min-height: 56px;
-  padding: 0 20px;
-  border-radius: 999px;
-  border: 1px solid #2a1a0e;
-  background: #fff;
-  color: #2a1a0e;
-  font-size: 16px;
-}
-.form__input::placeholder {
-  color: #7a6450;
-}
-.form__check {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-  font-size: 14px;
-  line-height: 1.5;
+.join__text {
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.6;
   color: #3a2716;
 }
-.form__check input {
-  flex: 0 0 auto;
-  margin-top: 2px;
-  width: 20px;
-  height: 20px;
-  accent-color: #2a1a0e;
-}
-.form__status {
+.join__note {
   margin: 0;
-  min-height: 21px;
   font-size: 14px;
+  line-height: 1.5;
   color: #6b4a2e;
-}
-.form__status.is-error {
-  color: #8a1f12;
 }
 .cierre__heart {
   width: 100%;
@@ -1070,11 +1036,6 @@ input {
   align-items: center;
   min-height: 44px;
   color: #2a1a0e;
-  text-underline-offset: 3px;
-}
-.form__check a {
-  color: #2a1a0e;
-  font-weight: 600;
   text-underline-offset: 3px;
 }
 
@@ -1416,7 +1377,7 @@ body.legal {
   .hero__num {
     font-size: 80px;
   }
-  .form__row .btn {
+  .join .btn {
     width: 100%;
   }
   .bar__brand {
