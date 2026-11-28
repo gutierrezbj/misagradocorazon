@@ -63,6 +63,7 @@ export async function deleteAccount(userId: string) {
         notifyCommunity: false,
         notifyCandleExpiry: false,
         analyticsConsent: false,
+        newsConsent: false,
         beliefConsentAt: null,
         beliefConsentVersion: null,
       },

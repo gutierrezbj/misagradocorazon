@@ -13,7 +13,8 @@ export type { User } from "@/src/types";
 type AuthCtx = {
   user: User | null;
   loading: boolean;
-  register: (email: string, password: string, name: string) => Promise<void>;
+  /** newsConsent: casilla «Quiero recibir novedades…» del registro (US-35), sin marcar por defecto. */
+  register: (email: string, password: string, name: string, opts?: { newsConsent?: boolean }) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   /** false si la persona cancela en la pantalla de Google o Apple. */
   loginWithProvider: (provider: SocialProvider) => Promise<boolean>;
@@ -47,8 +48,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [refresh]);
 
   const register = useCallback(
-    async (email: string, password: string, name: string) => {
+    async (email: string, password: string, name: string, opts: { newsConsent?: boolean } = {}) => {
       await authRequest("/auth/sign-up/email", { email, password, name });
+      // La cuenta ya existe: si esto falla, se puede aceptar después en Ajustes.
+      if (opts.newsConsent) await api("/me", { method: "PATCH", body: { newsConsent: true } }).catch(() => undefined);
       await refresh();
     },
     [refresh],

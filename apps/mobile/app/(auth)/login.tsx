@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput, Pressable, Switch } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 import { fonts, makeStyles, radius, spacing, useTheme } from "@/src/theme";
 import { useAuth } from "@/src/auth";
@@ -17,7 +17,8 @@ import type { SocialProvider } from "@/src/social";
 import { errorKey } from "@/src/errors";
 import { LegalLinks } from "@/src/legal";
 
-export default function LoginScreen() {
+// /login?registro=1 y /registro abren directamente el alta (enlace de la web pública).
+export default function LoginScreen({ initialMode }: { initialMode?: "login" | "register" }) {
   const styles = useStyles();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -25,13 +26,16 @@ export default function LoginScreen() {
   const toast = useToast();
   const { login, register, loginWithProvider } = useAuth();
   const router = useRouter();
+  const { registro } = useLocalSearchParams<{ registro?: string }>();
   // Recuperar contraseña (US-24) solo si el servidor tiene email configurado.
   const features = useFeatures();
 
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">(initialMode ?? (registro ? "register" : "login"));
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // Novedades por correo (US-35): sin marcar, y registrarse no depende de ella.
+  const [news, setNews] = useState(false);
   const [busy, setBusy] = useState(false);
   const [socialBusy, setSocialBusy] = useState<SocialProvider | null>(null);
 
@@ -43,7 +47,7 @@ export default function LoginScreen() {
     setBusy(true);
     try {
       if (mode === "login") await login(email.trim(), password);
-      else await register(email.trim(), password, name.trim());
+      else await register(email.trim(), password, name.trim(), { newsConsent: news });
     } catch (e) {
       // Better Auth responde en inglés: se traducen los casos conocidos.
       // Credenciales incorrectas → authError; sin red o demasiados intentos → su propio mensaje.
@@ -140,6 +144,24 @@ export default function LoginScreen() {
           )}
 
           {mode === "register" && (
+            <View style={styles.news}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.newsTitle}>{t("newsConsent")}</Text>
+                <Text style={styles.newsText}>{t("newsConsentHint")}</Text>
+              </View>
+              <Switch
+                testID="news-consent"
+                value={news}
+                onValueChange={setNews}
+                trackColor={{ true: colors.brandPrimary, false: colors.border }}
+                thumbColor={colors.surface}
+                {...({ activeThumbColor: colors.surface } as object)}
+                accessibilityLabel={t("newsConsent")}
+              />
+            </View>
+          )}
+
+          {mode === "register" && (
             <View style={{ marginTop: spacing.sm }}>
               <Text style={styles.legalIntro}>{t("legalIntro")}</Text>
               <LegalLinks />
@@ -200,5 +222,8 @@ const useStyles = makeStyles((c) => ({
   toggle: { marginTop: spacing.lg, alignItems: "center" },
   forgot: { alignSelf: "flex-end", minHeight: 44, justifyContent: "center", marginTop: -spacing.sm },
   toggleText: { fontFamily: fonts.bodyMedium, color: c.brand, fontSize: 15 },
+  news: { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.sm },
+  newsTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
+  newsText: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: c.muted, marginTop: 2 },
   legalIntro: { fontFamily: fonts.body, fontSize: 14, color: c.onSurfaceSecondary, textAlign: "center" },
 }));

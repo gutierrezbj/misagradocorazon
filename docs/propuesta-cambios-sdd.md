@@ -15,6 +15,38 @@ Cada bloque dice qué cambia, por qué y qué se mantiene. Cuando lo apruebes, l
 
 ---
 
+## Cambio del 28-nov-2026: la web abre en diciembre y el registro pide permiso para escribir
+
+Estado: **aprobado por el fundador el 28-nov-2026.** Sale con la beta el 1-dic-2026. Pendiente de pasar a Notion (SDD-02, 05, 07 y 08) cuando el fundador dé el visto bueno.
+
+- **Por qué:**
+  - La web es el escaparate y tiene que salir antes que la app de las tiendas, o a la vez.
+  - Queremos ir reuniendo fieles que nos ayuden a probar la app y a mejorarla.
+- **SDD-02, alcance:**
+  - La web pública (misagradocorazon.com) abre el 1-dic con la beta.
+  - Su llamada a la acción es «Regístrate gratis y ayúdanos a probar la app», que lleva al registro de la app web (app.misagradocorazon.com).
+  - Se quita la lista de espera de la web: los correos se recogen en el registro de la app, no en la web.
+  - La app queda abierta: cualquiera puede registrarse y usarla.
+- **SDD-05, US-35 — Novedades y ayuda para mejorar la app:**
+  - Como fiel, al registrarme puedo marcar «Quiero recibir novedades y ayudar a mejorar la app».
+  - Criterios:
+    - la casilla sale **sin marcar**, y registrarse no depende de marcarla;
+    - se guarda la fecha en que se acepta;
+    - en Ajustes se puede retirar en cualquier momento;
+    - el aviso de privacidad explica esta finalidad, que la base es el consentimiento y cómo retirarlo;
+    - en el panel, el superadmin ve cuántos fieles la aceptaron y descarga la lista (nombre, correo, idioma, fecha) en CSV.
+  - Esta casilla no tiene que ver con los datos de fe: no se mezcla con el consentimiento del art. 9.
+- **KPI:** porcentaje de registros que aceptan novedades.
+- **SDD-07, testing:**
+  - test de que la casilla llega sin marcar;
+  - test de que el permiso se guarda con fecha y se puede retirar;
+  - test de que solo el superadmin ve y descarga la lista.
+- **SDD-08, despliegue:**
+  - La web se sirve desde el KVM 1, como la beta: imagen en GHCR, contenedor `msc-web` en `127.0.0.1:3270` y nginx del servidor con HTTPS.
+  - El buzón hola@misagradocorazon.com ya existe y es el contacto de la web.
+
+---
+
 ## Cambio propuesto el 26-nov-2026: «Rezamos contigo»
 
 Estado: **aprobada por el fundador el 26-nov-2026. Entra para el lanzamiento del 10-feb-2027** (US-31 a US-34; los grupos privados, después). Idea y nombre del fundador, del mismo día.

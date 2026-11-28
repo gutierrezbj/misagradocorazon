@@ -6,6 +6,7 @@ import { api } from "../api.ts";
 import { useAuth } from "../auth.tsx";
 import { useI18n, type I18nKey } from "../i18n.tsx";
 import type { AdminUser } from "../types.ts";
+import { NewsSubscribers } from "./NewsSubscribers.tsx";
 
 export function Users() {
   const { t, lang } = useI18n();
@@ -38,6 +39,7 @@ export function Users() {
           style={{ minWidth: 280, border: "1px solid var(--border)", borderRadius: 6, padding: "9px 11px" }}
         />
       </div>
+      <NewsSubscribers />
       <section className="card">
         {isLoading && <p className="muted">{t("loading")}</p>}
         {patch.isError && <p className="error">{t("genericError")}</p>}
