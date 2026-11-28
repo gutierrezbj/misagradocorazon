@@ -41,6 +41,9 @@ export const onboardingSchema = z.object({
   language: localeSchema.default("es"),
   timezone: profileFields.timezone.optional(),
   analyticsConsent: profileFields.analyticsConsent.optional(),
+  // Consentimiento explícito para los datos de creencias (RGPD art. 9.2.a). Solo vale true: sin él,
+  // y si no se dio antes, la API no guarda el santo patrón.
+  beliefConsent: z.literal(true).optional(),
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 
@@ -312,3 +315,6 @@ export const accountDeleteSchema = z.object({ confirm: z.literal(true) });
 
 // Código de autorización de Sign in with Apple, para poder revocar al borrar la cuenta.
 export const appleAuthorizationSchema = z.object({ code: z.string().min(1).max(2000) });
+
+// Retirada del consentimiento de datos de creencias: borra esos datos, así que exige confirmación.
+export const beliefConsentWithdrawSchema = z.object({ confirm: z.literal(true) });

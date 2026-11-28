@@ -126,6 +126,12 @@ model User {
   analyticsConsent   Boolean   @default(false)
   analyticsConsentAt DateTime?
 
+  // Consentimiento explícito para los datos de creencias (RGPD art. 9.2.a): santo patrón, velas,
+  // intenciones, "Rezo por ti" e historial de oración. Sin él la API no guarda ninguno. Se guarda
+  // cuándo se dio y con qué versión del texto; al retirarlo vuelven a null y se borran esos datos.
+  beliefConsentAt      DateTime?
+  beliefConsentVersion String?
+
   patronSaint       Saint?             @relation("PatronSaint", fields: [patronSaintId], references: [id])
   sessions          Session[]
   accounts          Account[]

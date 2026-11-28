@@ -20,7 +20,7 @@ Detalle de cada una en `docs/dependencias.md`.
 | Apple Developer | App Store, Sign in with Apple, clave para revocar tokens al borrar la cuenta, push en iOS | `docs/login-social.md` |
 | Google Play y Google Cloud | Play Store y login con Google | `docs/login-social.md` |
 | Firebase | Push en Android | `docs/push.md` |
-| Railway | API, worker, panel y base de datos en producción; activar backups antes del lanzamiento | `docs/despliegue.md`, `docs/monitorizacion.md` |
+| Railway | Plan futuro del SDD para API, worker, panel y base de datos. Hoy la beta corre en el KVM 1 (`deploy/staging/README.md`) | `docs/despliegue.md`, `docs/monitorizacion.md` |
 | Cloudflare R2 | Subir imágenes y audio desde el panel | `docs/contenido.md` |
 | PostHog | Analítica de producto | `docs/kpis.md` |
 | Proveedor de email (SMTP) | Recuperar la contraseña (US-24): sin él, la opción no aparece en la app | `docs/recuperar-contrasena.md` |
@@ -53,8 +53,8 @@ Necesita el primer build de EAS. Es el checklist manual de SDD-07 (`docs/testing
 Antes de abrirla a fieles reales: `docs/beta-web.md`, "Antes de abrir la beta".
 - base de datos limpia;
 - `INTENTIONS_KEY` nueva;
-- copias de seguridad fuera del VPS;
-- aviso de privacidad;
+- copias de seguridad: el contenedor `msc-backup` las guarda cifradas en el KVM 1 y el Mac del fundador se las trae cada mañana;
+- aviso de privacidad y términos publicados en la beta web (`/privacidad/`, `/terminos/`), enlazados en la app y sin huecos;
 - DNS de `app.misagradocorazon.com`.
 
 **Logo definitivo:** el icono actual es provisional; sustituye al del constructor.

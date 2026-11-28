@@ -68,7 +68,7 @@ pnpm test
 ## Builds y despliegue
 
 - **App (iOS y Android):** builds con EAS y publicación en las tiendas (`docs/despliegue.md`, sección "App móvil").
-- **API, worker y panel:** Railway, con imágenes Docker (`docs/despliegue.md`).
+- **API, worker y panel:** Railway como plan (`docs/despliegue.md`). Hoy la beta corre en el KVM 1 con las mismas imágenes Docker (`deploy/staging/README.md`).
 
 ## Documentación
 
@@ -78,7 +78,7 @@ Entrega (`docs/requisitos-entrega.md`):
 - `docs/modelo-datos.md`: tablas, reglas y migraciones
 - `docs/dependencias.md`: dependencias y servicios de terceros
 - `docs/pendiente.md`: qué está simulado y qué queda pendiente
-- `docs/despliegue.md`: Railway (API, worker, panel), EAS y variables de entorno
+- `docs/despliegue.md`: Railway como plan (API, worker, panel), EAS y variables de entorno. Hoy la beta corre en el KVM 1 (`deploy/staging/README.md`)
 
 Funcionalidad y decisiones:
 

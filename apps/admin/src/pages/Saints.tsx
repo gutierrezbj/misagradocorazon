@@ -244,9 +244,7 @@ export function Saints() {
             <tbody>
               {data.map((s) => (
                 <tr key={s.id} style={s.deletedAt ? { opacity: 0.55 } : undefined}>
-                  <td>
-                    <img className="thumb" src={s.imageUrl} alt="" />
-                  </td>
+                  <td>{s.imageUrl ? <img className="thumb" src={s.imageUrl} alt="" /> : <span className="thumb" aria-hidden="true" />}</td>
                   <td>
                     <strong>{s.name}</strong>
                     <div className="muted">

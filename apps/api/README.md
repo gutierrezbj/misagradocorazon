@@ -75,9 +75,11 @@ Una fila por método y ruta. `test/docs.test.ts` comprueba que estas tablas coin
 | POST | `/api/auth/email-otp/reset-password` | — | Cambiar la contraseña con el código; cierra las sesiones abiertas (US-24) |
 | GET | `/api/features` | — | Qué opciones de acceso ofrece el servidor (hoy: `passwordReset`) |
 | GET | `/api/me` | ✔ | Perfil y racha |
-| PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria y consentimiento de analítica |
+| PUT | `/api/me/onboarding` | ✔ | Santo patrón, secundarios, horarios, idioma, zona horaria y consentimientos de analítica y de datos de creencias (`beliefConsent: true`, si no se dio antes) |
 | PATCH | `/api/me` | ✔ | Actualizar perfil, preferencias de notificación y consentimiento de analítica |
 | DELETE | `/api/me` | ✔ | Borrar la cuenta; exige `{ "confirm": true }` (`docs/borrado-cuenta.md`) |
+| POST | `/api/me/belief-consent` | ✔ | Da el consentimiento de datos de creencias (RGPD art. 9.2.a): guarda fecha y versión del texto |
+| DELETE | `/api/me/belief-consent` | ✔ | Lo retira (`{ confirm: true }`): borra santo patrón, velas (salvo las que tengan movimientos en el libro, que quedan sin texto), intenciones, «Rezo por ti», historial de oración, mensajes del chat y asistencia a misa. Vuelve al onboarding |
 | POST | `/api/me/apple-authorization` | ✔ | Código de Sign in with Apple, para revocar al borrar la cuenta (`docs/borrado-cuenta.md`) |
 | PUT | `/api/me/push-tokens` | ✔ | Registrar el dispositivo para push (`docs/push.md`) |
 | DELETE | `/api/me/push-tokens` | ✔ | Dar de baja el dispositivo al cerrar sesión |

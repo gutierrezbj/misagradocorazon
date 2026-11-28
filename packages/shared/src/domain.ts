@@ -121,3 +121,7 @@ export function liturgicalSeason(date: string): LiturgicalSeason {
   if (t >= easter && t <= easter + 49 * DAY_MS) return "easter";
   return "ordinary";
 }
+
+// Versión del texto del consentimiento de datos de creencias (RGPD art. 9.2.a). Se guarda con cada
+// consentimiento. Si cambia el texto de la app (beliefConsentText en i18n), se sube la versión.
+export const BELIEF_CONSENT_VERSION = "2026-11-27";

@@ -4,6 +4,7 @@ import { CANDLE_TYPES, impactCents, lightCandleSchema, type CandleType } from "@
 import { prisma } from "../../db.ts";
 import { env } from "../../env.ts";
 import { decryptText, encryptText } from "../../lib/crypto.ts";
+import { assertBeliefConsent } from "../../lib/belief-consent.ts";
 import { monthOf } from "../../lib/dates.ts";
 import { notFound, ok } from "../../http.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
@@ -15,6 +16,7 @@ const HOUR_MS = 3_600_000;
 
 candlesRouter.post("/candles", requireUser, async (req, res) => {
   const user = currentUser(req);
+  assertBeliefConsent(user);
   const input = lightCandleSchema.parse(req.body);
   const type = input.type as CandleType;
   const tier = CANDLE_TYPES[type];

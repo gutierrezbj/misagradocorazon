@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { prisma } from "../../db.ts";
 import { env } from "../../env.ts";
+import { assertBeliefConsent } from "../../lib/belief-consent.ts";
 import { decryptText, encryptText } from "../../lib/crypto.ts";
 import { publicName } from "../../lib/display-name.ts";
 import { assertRateLimit } from "../../lib/rate-limit.ts";
@@ -52,6 +53,7 @@ wallRouter.get("/intentions", optionalUser, async (req, res) => {
 
 wallRouter.post("/intentions", requireUser, async (req, res) => {
   const user = currentUser(req);
+  assertBeliefConsent(user);
   assertRateLimit(`intention:${user.id}`, 30_000);
   const input = intentionSchema.parse(req.body);
   const flagged = await containsBannedWord(input.text);
@@ -65,6 +67,7 @@ wallRouter.post("/intentions", requireUser, async (req, res) => {
 // "Rezo por ti": una vez por persona y solo sobre intenciones publicadas.
 wallRouter.post("/intentions/:id/pray", requireUser, async (req, res) => {
   const user = currentUser(req);
+  assertBeliefConsent(user);
   const intention = await prisma.intention.findFirst({ where: { id: pathParam(req, "id"), status: "approved" } });
   if (!intention) throw notFound("Intención");
   await prisma.intentionPrayer.upsert({
@@ -92,6 +95,7 @@ wallRouter.get("/me/intentions", requireUser, async (req, res) => {
 
 wallRouter.post("/me/intentions", requireUser, async (req, res) => {
   const user = currentUser(req);
+  assertBeliefConsent(user);
   const { text } = privateIntentionSchema.parse(req.body);
   const created = await prisma.privateIntention.create({
     data: { userId: user.id, textEncrypted: encryptText(text, env.INTENTIONS_KEY) },

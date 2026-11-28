@@ -17,7 +17,7 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 
 | Tabla | Para qué | Campos clave |
 |---|---|---|
-| `user` | Cuenta y perfil devocional | `email` único; `role` (`user`, `moderator`, `editor`, `superadmin`); `blocked`; `deletedAt` (cuenta borrada); santo patrón y secundarios; idioma, zona horaria y horas de oración; preferencias de push; `analyticsConsent` y su fecha |
+| `user` | Cuenta y perfil devocional | `email` único; `role` (`user`, `moderator`, `editor`, `superadmin`); `blocked`; `deletedAt` (cuenta borrada); santo patrón y secundarios; idioma, zona horaria y horas de oración; preferencias de push; `analyticsConsent` y su fecha; `beliefConsentAt` y `beliefConsentVersion` (consentimiento de datos de creencias, RGPD art. 9.2.a) |
 | `session` | Sesiones activas (token Bearer) | `token` único, `expiresAt`, `userId` |
 | `account` | Formas de entrar: contraseña, Google, Apple | `providerId`, `accountId` (el `sub` del proveedor), `password` (hash). En Apple, `refreshToken` para revocar al borrar la cuenta |
 | `verification` | Códigos temporales de Better Auth | `identifier`, `value`, `expiresAt` |
@@ -98,3 +98,4 @@ Los nombres de estas tablas y de sus campos los fija Better Auth.
 | `20260928101941_cause_budget_items` | Destino del dinero y presupuesto desglosado de las causas; las causas existentes pasan a tener una partida única |
 | `20260928223908_saint_iconography` | Iconografía del santo en ES/EN (US-26), vacía por defecto |
 | `20261124123515_audio_voice` | Quién pone la voz de cada audio, ES/EN (US-30): `ai` o el nombre de la persona. En santos, meditación, oraciones del día y oraciones por tiempo |
+| `20261127185402_belief_consent` | Consentimiento explícito para los datos de creencias (RGPD art. 9.2.a) en `user`: `beliefConsentAt` y `beliefConsentVersion`. Sin él la API no guarda santo, velas, intenciones, «Rezo por ti» ni oraciones |
