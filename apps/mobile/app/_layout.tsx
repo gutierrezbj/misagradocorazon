@@ -77,6 +77,7 @@ function Gate() {
   return (
     <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.surface } }}>
       <Stack.Screen name="light-candle" options={{ presentation: "modal" }} />
+      <Stack.Screen name="vigil/[id]" options={{ presentation: "fullScreenModal", animation: "fade" }} />
     </Stack>
   );
 }

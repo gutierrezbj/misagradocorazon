@@ -4,7 +4,16 @@ import Svg, { Path, Rect, Ellipse, G, Defs, RadialGradient, LinearGradient, Stop
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withTiming, withSequence, Easing, interpolate } from "react-native-reanimated";
 
 export type CandleVariant = "pillar" | "basic" | "solemn" | "permanent";
-type Props = { size?: number; lit?: boolean; variant?: CandleVariant; mourning?: boolean };
+type Props = {
+  size?: number;
+  lit?: boolean;
+  variant?: CandleVariant;
+  mourning?: boolean;
+  /** Cera que queda, de 0 a 1 (US-31, la vela en pantalla). Por defecto, entera. */
+  level?: number;
+  /** Sin animación ("reducir movimiento"). */
+  still?: boolean;
+};
 
 // Teardrop flame path pointing up, inside a `w` x `h` box.
 function flamePath(w: number, h: number): string {
@@ -13,13 +22,13 @@ function flamePath(w: number, h: number): string {
           C ${cx - w * 0.52} ${h * 0.99}, ${cx - w * 0.6} ${h * 0.34}, ${cx} 0 Z`;
 }
 
-export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourning = false }: Props) {
+export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourning = false, level = 1, still = false }: Props) {
   const flicker = useSharedValue(0);
   const sway = useSharedValue(0);
   const glow = useSharedValue(0);
 
   useEffect(() => {
-    if (!lit) return;
+    if (!lit || still) return;
     flicker.value = withRepeat(
       withSequence(
         withTiming(1, { duration: 420, easing: Easing.inOut(Easing.quad) }),
@@ -32,7 +41,7 @@ export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourni
     );
     sway.value = withRepeat(withTiming(1, { duration: 1600, easing: Easing.inOut(Easing.sin) }), -1, true);
     glow.value = withRepeat(withTiming(1, { duration: 900, easing: Easing.inOut(Easing.quad) }), -1, true);
-  }, [lit, flicker, sway, glow]);
+  }, [lit, still, flicker, sway, glow]);
 
   // Ids de degradado únicos por vela: en web todos los SVG comparten documento y, con ids fijos,
   // varias velas en pantalla (muro, altar) se pintaban con los degradados de la primera.
@@ -55,11 +64,14 @@ export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourni
   } as const;
   const vc = isGlass ? cfg[variant as "basic" | "solemn" | "permanent"] : { w: 0.58, h: 0.92 };
   const bodyW = size * vc.w;
-  const bodyH = size * vc.h;
+  const wax = Math.min(1, Math.max(0, level));
+  // El cirio se acorta al consumirse; en el vaso, la cera (y la llama) bajan por dentro.
+  const bodyH = size * vc.h * (isGlass ? 1 : 0.25 + 0.75 * wax);
   const bodyTop = wrapH - bodyH;
+  const waxDrop = isGlass ? (1 - wax) * bodyH * 0.62 : 0;
 
   // Flame sits at rim (glass) or on wick (pillar)
-  const flameTop = bodyTop - flameH + (isGlass ? size * 0.06 : size * 0.03);
+  const flameTop = bodyTop - flameH + (isGlass ? size * 0.06 : size * 0.03) + waxDrop;
   const glowTop = flameTop + flameH * 0.4 - glowD / 2;
 
   const flameStyle = useAnimatedStyle(() => ({
@@ -102,7 +114,7 @@ export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourni
       {/* Vessel */}
       <View style={[styles.abs, { top: bodyTop, width: bodyW, height: bodyH + 4 }]}>
         {isGlass ? (
-          <GlassVotive uid={uid} w={bodyW} h={bodyH} variant={variant as "basic" | "solemn" | "permanent"} lit={lit} mourning={mourning} />
+          <GlassVotive uid={uid} w={bodyW} h={bodyH} variant={variant as "basic" | "solemn" | "permanent"} lit={lit} mourning={mourning} waxDrop={waxDrop} />
         ) : (
           <WaxPillar uid={uid} w={bodyW} h={bodyH} />
         )}
@@ -113,7 +125,15 @@ export function CandleFlame({ size = 160, lit = true, variant = "pillar", mourni
 
       {/* Flame */}
       {lit && (
-        <Animated.View style={[styles.abs, styles.flameOrigin, { top: flameTop, width: flameW, height: flameH }, flameStyle]}>
+        <Animated.View
+          style={[
+            styles.abs,
+            styles.flameOrigin,
+            // Dentro del vaso la llama se ve a través del cristal: algo más tenue.
+            { top: flameTop, width: flameW, height: flameH, opacity: waxDrop > 0 ? 0.8 : 1 },
+            flameStyle,
+          ]}
+        >
           <Svg width={flameW} height={flameH}>
             <Defs>
               <RadialGradient id={`flame${uid}`} cx="50%" cy="74%" r="62%">
@@ -176,6 +196,7 @@ function GlassVotive({
   variant,
   lit,
   mourning,
+  waxDrop = 0,
 }: {
   uid: string;
   w: number;
@@ -183,8 +204,10 @@ function GlassVotive({
   variant: "basic" | "solemn" | "permanent";
   lit: boolean;
   mourning?: boolean;
+  waxDrop?: number;
 }) {
   const rimY = 10;
+  const waxY = rimY + waxDrop;
   const gold = "#C5A059";
   const goldDeep = "#9A7B3C";
   const hasBands = variant === "solemn" || variant === "permanent";
@@ -224,7 +247,7 @@ function GlassVotive({
             <Stop offset="100%" stopColor="#3F0000" />
           </LinearGradient>
         )}
-        <RadialGradient id={`inner${uid}`} cx="50%" cy="22%" r="60%">
+        <RadialGradient id={`inner${uid}`} cx="50%" cy={`${Math.round(22 + (waxDrop / h) * 100)}%`} r="60%">
           <Stop offset="0%" stopColor="#FFE39A" stopOpacity={lit ? 0.95 : 0.15} />
           <Stop offset="45%" stopColor="#FF8A3D" stopOpacity={lit ? 0.5 : 0.1} />
           <Stop offset="100%" stopColor={mourning ? "#B58E44" : "#8B0000"} stopOpacity={0} />
@@ -273,8 +296,8 @@ function GlassVotive({
         stroke={hasBands ? gold : mourning ? goldDeep : "#B71C1C"}
         strokeWidth={hasBands ? 2.5 : 1.5}
       />
-      <Ellipse cx={w / 2} cy={rimY} rx={w / 2 - 6} ry={rimY - 4} fill={`url(#waxpool${uid})`} />
-      <Rect x={w / 2 - 1.2} y={rimY - 8} width={2.4} height={9} rx={1} fill="#3B2415" />
+      <Ellipse cx={w / 2} cy={waxY} rx={w / 2 - 6} ry={rimY - 4} fill={`url(#waxpool${uid})`} />
+      <Rect x={w / 2 - 1.2} y={waxY - 8} width={2.4} height={9} rx={1} fill="#3B2415" />
     </Svg>
   );
 }

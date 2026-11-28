@@ -57,7 +57,10 @@ export default function LightCandle() {
 
   const lightMut = useMutation({
     mutationFn: () =>
-      api<{ saint: { name: string } }>("/candles", { method: "POST", body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" } }),
+      api<{ id: string; saint: { name: string } }>("/candles", {
+        method: "POST",
+        body: { saintId, intention, type, category: forDeceased ? "difuntos" : "general" },
+      }),
     onSuccess: () => {
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       queryClient.invalidateQueries({ queryKey: ["candles"] });
@@ -106,6 +109,17 @@ export default function LightCandle() {
         <Pressable testID="share-candle-button" onPress={() => setSharing(true)} style={styles.doneBtn}>
           <Text style={styles.doneBtnText}>{t("shareCandle")}</Text>
         </Pressable>
+        {!!lightMut.data?.id && (
+          <Pressable
+            testID="candle-vigil-button"
+            accessibilityRole="button"
+            onPress={() => router.replace(`/vigil/${lightMut.data.id}`)}
+            style={styles.vigilBtn}
+          >
+            <Icon name="moon" size={18} color={colors.gold} />
+            <Text style={styles.vigilBtnText}>{t("vigilOpen")}</Text>
+          </Pressable>
+        )}
         <Pressable testID="candle-done-button" onPress={() => router.back()} style={styles.doneSecondary}>
           <Text style={styles.doneSecondaryText}>{t("continue")}</Text>
         </Pressable>
@@ -271,6 +285,18 @@ const useStyles = makeStyles((c) => ({
     height: 52,
     justifyContent: "center",
   },
+  vigilBtn: {
+    marginTop: spacing.md,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    borderWidth: 1,
+    borderColor: c.gold,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.xl,
+    height: 52,
+  },
+  vigilBtnText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.gold },
   doneSecondary: { marginTop: spacing.md, paddingVertical: spacing.sm, paddingHorizontal: spacing.lg },
   doneSecondaryText: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onAltarMuted },
   doneBtnText: { fontFamily: fonts.bodyBold, fontSize: 17, color: c.onBrandSecondary },

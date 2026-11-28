@@ -5,7 +5,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 const read = (p) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
-const PURCHASE_FLOW = ["app/light-candle.tsx", "src/ritual/ShareCandlePanel.tsx", "src/ritual/ShareCard.tsx"];
+// La vela en pantalla (US-31) también: incluida la de "Tu vela se ha consumido".
+const PURCHASE_FLOW = ["app/light-candle.tsx", "src/ritual/ShareCandlePanel.tsx", "src/ritual/ShareCard.tsx", "app/vigil/[id].tsx"];
 const FORBIDDEN = /caus|20\s?%|20 por ciento|percent|porcentaje|don(a|ó|o)ci|donat|donar|charit|benéfic|benefic|impact|fundaci|foundation|obras/i;
 
 const stripComments = (src) => src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");

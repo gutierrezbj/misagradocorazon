@@ -23,6 +23,10 @@ export type AnalyticsEvents = {
   // free: vela encendida gratis durante la beta (US-28).
   candle_lit: { type: CandleType; forDeceased: boolean; free: boolean };
   candle_shared: { withIntention: boolean };
+  // La vela en pantalla (US-31): cuánto tiempo y por qué terminó (el fiel la cerró, se acabó el
+  // temporizador o la vela se consumió).
+  candle_vigil_started: { type: CandleType; timer: 30 | 60 | 480 };
+  candle_vigil_ended: { minutes: number; reason: "user" | "timer" | "expired" };
   intention_posted: { category: IntentionCategory; moderated: boolean };
   intention_prayed: Record<string, never>;
   vote_cast: Record<string, never>;

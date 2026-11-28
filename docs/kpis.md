@@ -86,6 +86,8 @@ Solo con consentimiento explícito. Al final del onboarding la opción aparece *
   | `candle_flow_started` | ninguna |
   | `candle_lit` | tipo de vela, por difuntos o no, gratis en la beta o no (US-28) |
   | `candle_shared` | con o sin intención |
+  | `candle_vigil_started` | vela en pantalla (US-31): tipo de vela y temporizador elegido (30, 60 o 480 min) |
+  | `candle_vigil_ended` | minutos que estuvo abierta y por qué terminó: el fiel la cerró, se acabó el temporizador o la vela se consumió |
   | `intention_posted` | categoría, retenida por moderación o no |
   | `intention_prayed` | ninguna |
   | `vote_cast` | ninguna |
