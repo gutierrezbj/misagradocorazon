@@ -1,7 +1,8 @@
 import { Router } from "express";
-import { accountDeleteSchema, appleAuthorizationSchema, onboardingSchema, profileUpdateSchema } from "@msc/shared";
+import { accountDeleteSchema, appleAuthorizationSchema, beliefConsentWithdrawSchema, onboardingSchema, profileUpdateSchema } from "@msc/shared";
 
 import { prisma } from "../../db.ts";
+import { assertBeliefConsent, beliefConsentStamp, hasBeliefConsent, withdrawBeliefConsent } from "../../lib/belief-consent.ts";
 import { isValidTimeZone } from "../../lib/dates.ts";
 import { HttpError, ok } from "../../http.ts";
 import { mailConfigured } from "../../lib/mail.ts";
@@ -41,13 +42,17 @@ usersRouter.get("/me", requireUser, async (req, res) => {
 
 usersRouter.put("/me/onboarding", requireUser, async (req, res) => {
   const user = currentUser(req);
-  const input = onboardingSchema.parse(req.body);
+  const { beliefConsent, ...input } = onboardingSchema.parse(req.body);
   assertTimeZone(input.timezone);
+  // El santo patrón es un dato de creencias: sin consentimiento (nuevo o anterior) no se guarda.
+  const beliefStamp = beliefConsent && !hasBeliefConsent(user) ? beliefConsentStamp() : {};
+  if (!beliefConsent) assertBeliefConsent(user);
   await assertSaintsExist([input.patronSaintId, ...input.secondarySaintIds]);
   const updated = await prisma.user.update({
     where: { id: user.id },
     data: {
       ...input,
+      ...beliefStamp,
       ...consentStamp(user, input.analyticsConsent),
       secondarySaintIds: [...new Set(input.secondarySaintIds)],
       onboarded: true,
@@ -60,8 +65,25 @@ usersRouter.patch("/me", requireUser, async (req, res) => {
   const user = currentUser(req);
   const input = profileUpdateSchema.parse(req.body);
   assertTimeZone(input.timezone);
+  if (input.patronSaintId !== undefined || input.secondarySaintIds !== undefined) assertBeliefConsent(user);
   await assertSaintsExist([...(input.patronSaintId ? [input.patronSaintId] : []), ...(input.secondarySaintIds ?? [])]);
   const updated = await prisma.user.update({ where: { id: user.id }, data: { ...input, ...consentStamp(user, input.analyticsConsent) } });
+  ok(res, profileDto(updated, await currentStreak(updated.id, updated.timezone)));
+});
+
+// Consentimiento explícito para los datos de creencias (RGPD art. 9.2.a), fuera del onboarding.
+usersRouter.post("/me/belief-consent", requireUser, async (req, res) => {
+  const user = currentUser(req);
+  const updated = hasBeliefConsent(user) ? user : await prisma.user.update({ where: { id: user.id }, data: beliefConsentStamp() });
+  ok(res, profileDto(updated, await currentStreak(updated.id, updated.timezone)));
+});
+
+// Retirarlo borra los datos de creencias (lib/belief-consent.ts). Exige { confirm: true }.
+usersRouter.delete("/me/belief-consent", requireUser, async (req, res) => {
+  const user = currentUser(req);
+  beliefConsentWithdrawSchema.parse(req.body);
+  await withdrawBeliefConsent(user.id);
+  const updated = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
   ok(res, profileDto(updated, await currentStreak(updated.id, updated.timezone)));
 });
 

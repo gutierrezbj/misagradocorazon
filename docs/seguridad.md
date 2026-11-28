@@ -21,14 +21,14 @@ Revisión antes de publicar (26-sep-2026). Resume qué protege a la API y qué h
 
 ## IP real del cliente
 
-La API está detrás del proxy de Railway, y Express resuelve la IP con `trust proxy = 1`, es decir, confiando en un solo salto de proxy. Esa IP se pasa a Better Auth en una cabecera propia, que sobrescribe cualquier valor que mande el cliente.
+Hoy la API está detrás del nginx del KVM 1 (con Railway sería su proxy), y Express resuelve la IP con `trust proxy = 1`, es decir, confiando en un solo salto de proxy. nginx manda en `X-Forwarded-For` un solo valor, la IP que ve (`deploy/staging/nginx.conf`). Esa IP se pasa a Better Auth en una cabecera propia, que sobrescribe cualquier valor que mande el cliente.
 
 Antes, Better Auth leía `X-Forwarded-For`. Si un cliente añadía su propia dirección, llegaban varias y Better Auth no se fiaba de ninguna. Entonces todos esos intentos de login compartían un único contador, y cualquiera podía bloquear el login a los demás.
 
-**Comprobar en el primer despliegue:** después de iniciar sesión desde un móvil, la columna `ipAddress` de la tabla `session` debe mostrar la IP pública real de ese móvil.
+**Comprobar en el primer despliegue:** el fundador entra en el panel con su superadmin desde su móvil y se lee solo el `ipAddress` de esa sesión en la tabla `session`. Tiene que ser la IP pública real de ese móvil. En la beta no se crea una cuenta para probar.
 
-- Si aparece la IP de Railway, hay más de un salto de proxy y hay que subir `trust proxy`.
-- Si aparece vacía, Railway no está enviando `X-Forwarded-For`.
+- Si aparece la IP del servidor, hay más de un salto de proxy y hay que revisar `trust proxy`.
+- Si aparece vacía, el proxy no está enviando `X-Forwarded-For`.
 
 ## Resto de medidas
 

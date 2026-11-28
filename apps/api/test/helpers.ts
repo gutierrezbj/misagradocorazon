@@ -3,6 +3,7 @@ import request from "supertest";
 
 import { createApp } from "../src/app.ts";
 import { prisma } from "../src/db.ts";
+import { beliefConsentStamp } from "../src/lib/belief-consent.ts";
 import { resetRateLimits } from "../src/lib/rate-limit.ts";
 import { resetChatRateLimits } from "../src/modules/misa/chat.ts";
 
@@ -30,7 +31,9 @@ export async function resetDb() {
 }
 
 let counter = 0;
-export async function signUp(extra: Record<string, unknown> = {}) {
+// Por defecto el fiel de prueba ya dio el consentimiento de datos de creencias (RGPD art. 9.2.a),
+// como tras el onboarding. Con { beliefConsent: false } queda sin darlo.
+export async function signUp(extra: Record<string, unknown> = {}, opts: { beliefConsent?: boolean } = {}) {
   counter += 1;
   const email = `fiel${counter}_${Date.now()}@example.com`;
   const res = await request(app)
@@ -39,7 +42,9 @@ export async function signUp(extra: Record<string, unknown> = {}) {
   if (res.status !== 200) throw new Error(`sign-up ${res.status}: ${JSON.stringify(res.body)}`);
   const token = res.headers["set-auth-token"];
   if (!token) throw new Error("sin set-auth-token");
-  return { email, token: String(token), userId: String(res.body.user.id) };
+  const userId = String(res.body.user.id);
+  if (opts.beliefConsent !== false) await prisma.user.update({ where: { id: userId }, data: beliefConsentStamp() });
+  return { email, token: String(token), userId };
 }
 
 export const bearer = (token: string) => ({ Authorization: `Bearer ${token}` });

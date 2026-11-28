@@ -179,6 +179,17 @@ describe("chat de misa en tiempo real", () => {
     expect(await emit(notJoined, "chat:send", { massId: mass.id, text: "Hola" })).toMatchObject({ ok: false, error: "not_joined" });
   });
 
+  test("sin consentimiento de datos de fe se lee, pero no se escribe ni se guarda la asistencia", async () => {
+    const editor = await signUpAs("editor");
+    const mass = await createMass(editor.token, -10);
+    const user = await signUp({}, { beliefConsent: false });
+    const sender = await client(user.token);
+    expect(await emit(sender, "chat:join", { massId: mass.id })).toEqual({ ok: true });
+    expect(await emit(sender, "chat:send", { massId: mass.id, text: "Amén" })).toMatchObject({ ok: false, error: "belief_consent_required" });
+    expect(await prisma.chatMessage.count({ where: { userId: user.userId } })).toBe(0);
+    expect(await prisma.massAttendance.count({ where: { userId: user.userId } })).toBe(0);
+  });
+
   test("mensaje con palabra filtrada no se difunde y va a la cola", async () => {
     const editor = await signUpAs("editor");
     const mass = await createMass(editor.token, -10);

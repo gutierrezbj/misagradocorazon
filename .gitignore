@@ -76,3 +76,6 @@ credentials.json
 *.key
 .credentials
 !.env.example
+
+# Copias de la beta si se prueba el compose en local (deploy/staging/README.md)
+deploy/staging/backups/

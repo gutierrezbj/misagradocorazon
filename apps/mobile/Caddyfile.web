@@ -27,6 +27,8 @@
 	@manifest path /manifest.webmanifest
 	header @manifest Content-Type "application/manifest+json"
 
-	try_files {path} /index.html
+	# Aviso de privacidad y términos (public/privacidad, public/terminos): páginas estáticas que se
+	# leen sin sesión. {path}/index.html las sirve también sin la barra final.
+	try_files {path} {path}/index.html /index.html
 	file_server
 }

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { View, Text, Pressable, ScrollView, Switch } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
 import { useQuery } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
 
@@ -15,6 +14,8 @@ import { AppButton, Icon, useToast } from "@/src/components/ui";
 
 import type { Saint, User } from "@/src/types";
 import { errorKey } from "@/src/errors";
+import { LegalLinks } from "@/src/legal";
+import { SaintImage } from "@/src/components/SaintImage";
 const TIMES = ["06:00", "06:30", "07:00", "07:30", "08:00", "12:00", "18:00", "20:00", "21:00", "21:30", "22:00"];
 
 export default function Onboarding() {
@@ -38,6 +39,9 @@ export default function Onboarding() {
   const [busy, setBusy] = useState(false);
   // Consentimiento explícito para la analítica de uso: apagado hasta que la persona lo active.
   const [analytics, setAnalytics] = useState(false);
+  // Consentimiento explícito para los datos de fe (RGPD art. 9.2.a): sin marcar de antemano. Lo
+  // comprueba también la API.
+  const [belief, setBelief] = useState(false);
 
   const toggleSecondary = (id: string) => {
     if (id === patron) return;
@@ -45,6 +49,10 @@ export default function Onboarding() {
   };
 
   const finish = async () => {
+    if (!belief) {
+      toast(t("beliefConsentRequired"), "error");
+      return;
+    }
     if (!patron) {
       toast(t("chooseSaint"), "error");
       return;
@@ -62,6 +70,7 @@ export default function Onboarding() {
           language: lang,
           timezone: deviceTimeZone(),
           analyticsConsent: analytics,
+          beliefConsent: true,
         },
       });
       await applyAnalyticsConsent(updated).catch(() => undefined);
@@ -83,6 +92,27 @@ export default function Onboarding() {
         contentContainerStyle={{ paddingTop: insets.top + spacing.lg, paddingBottom: insets.bottom + spacing.xl }}
         showsVerticalScrollIndicator={false}
       >
+        <View style={[styles.section, { marginTop: 0, marginBottom: spacing.lg }]}>
+          <View style={styles.beliefBox}>
+            <Text style={styles.sectionTitle}>{t("beliefConsentTitle")}</Text>
+            <Text style={styles.consentText}>{t("beliefConsentText")}</Text>
+            <View style={styles.consent}>
+              <Text style={[styles.consentTitle, { flex: 1 }]}>{t("beliefConsentCheck")}</Text>
+              <Switch
+                testID="belief-consent"
+                value={belief}
+                onValueChange={setBelief}
+                trackColor={{ true: colors.brandPrimary, false: colors.border }}
+                thumbColor={colors.surface}
+                {...({ activeThumbColor: colors.surface } as object)}
+                accessibilityLabel={t("beliefConsentCheck")}
+              />
+            </View>
+            <Text style={styles.consentText}>{t("beliefConsentWithdrawNote")}</Text>
+            <LegalLinks />
+          </View>
+        </View>
+
         <View style={styles.header}>
           <Text style={styles.title}>{t("chooseSaint")}</Text>
           <Text style={styles.sub}>{t("chooseSaintSub")}</Text>
@@ -100,7 +130,7 @@ export default function Onboarding() {
                 onLongPress={() => toggleSecondary(s.id)}
                 style={[styles.saintCard, isPatron && styles.saintCardActive]}
               >
-                <Image source={{ uri: s.imageUrl }} style={styles.saintImg} contentFit="cover" />
+                <SaintImage uri={s.imageUrl} name={s.name} style={styles.saintImg} />
                 {isPatron && (
                   <View style={styles.badge}>
                     <Icon name="star" size={14} color={colors.onBrandSecondary} />
@@ -221,6 +251,7 @@ const useStyles = makeStyles((c) => ({
   consent: { flexDirection: "row", alignItems: "center", gap: spacing.md, backgroundColor: c.surfaceSecondary, borderRadius: radius.md, padding: spacing.md },
   consentTitle: { fontFamily: fonts.bodySemibold, fontSize: 16, color: c.onSurface },
   consentText: { fontFamily: fonts.body, fontSize: 16, lineHeight: 22, color: c.muted, marginTop: 2 },
+  beliefBox: { gap: spacing.sm, borderWidth: 1, borderColor: c.border, borderRadius: radius.md, padding: spacing.md },
   timeLabel: { fontFamily: fonts.bodyMedium, fontSize: 14, color: c.onSurfaceSecondary, marginTop: spacing.sm },
   timeChip: {
     height: 40,

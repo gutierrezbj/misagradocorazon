@@ -3,6 +3,7 @@ import { liturgicalSeason, prayerCompleteSchema } from "@msc/shared";
 import { z } from "zod";
 
 import { prisma } from "../../db.ts";
+import { assertBeliefConsent } from "../../lib/belief-consent.ts";
 import { isValidTimeZone, localDate } from "../../lib/dates.ts";
 import { HttpError, notFound, ok, pathParam } from "../../http.ts";
 import { currentUser, requireUser } from "../../middleware/require-user.ts";
@@ -44,6 +45,7 @@ ritualRouter.get("/daily", async (req, res) => {
 
 ritualRouter.post("/prayers/complete", requireUser, async (req, res) => {
   const user = currentUser(req);
+  assertBeliefConsent(user);
   const { kind } = prayerCompleteSchema.parse(req.body);
   const today = localDate(new Date(), user.timezone);
   await prisma.prayerLog.upsert({

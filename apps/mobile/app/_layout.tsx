@@ -27,7 +27,7 @@ function Gate() {
   const segments = useSegments();
   const router = useRouter();
   const { colors } = useTheme();
-  const ready = !loading && !!user?.onboarded;
+  const ready = !loading && !!user?.onboarded && !!user?.beliefConsent;
 
   // Al tocar una notificación se abre su pantalla; al abrir la app se refresca el token
   // sin volver a pedir permiso (el permiso se pide al terminar el onboarding o en Ajustes).
@@ -53,7 +53,8 @@ function Gate() {
       if (!inAuth) router.replace("/(auth)/login");
       return;
     }
-    if (!user.onboarded) {
+    // Sin el consentimiento de datos de fe (RGPD art. 9.2.a) no se usa el altar: se pide en el onboarding.
+    if (!user.onboarded || !user.beliefConsent) {
       if (!inOnboarding) router.replace("/onboarding");
       return;
     }

@@ -63,6 +63,8 @@ export async function deleteAccount(userId: string) {
         notifyCommunity: false,
         notifyCandleExpiry: false,
         analyticsConsent: false,
+        beliefConsentAt: null,
+        beliefConsentVersion: null,
       },
     });
     // Sin datos personales: solo que ocurrió y cuándo.

@@ -1,6 +1,5 @@
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +11,7 @@ import type { Saint } from "@/src/types";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon } from "@/src/components/ui";
 import { AudioPlayer } from "@/src/ritual/AudioPlayer";
+import { SaintImage } from "@/src/components/SaintImage";
 
 export default function SaintDetail() {
   const styles = useStyles();
@@ -31,7 +31,7 @@ export default function SaintDetail() {
       ) : (
         <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xl }} showsVerticalScrollIndicator={false}>
           <View style={styles.hero}>
-            <Image source={{ uri: saint.imageUrl }} style={styles.heroImg} contentFit="cover" />
+            <SaintImage uri={saint.imageUrl} name={saint.name} style={styles.heroImg} />
             <LinearGradient colors={["rgba(28,15,14,0.5)", "transparent", "rgba(28,15,14,0.95)"]} style={styles.heroScrim} />
             <Pressable
               testID="back-button"
@@ -59,7 +59,7 @@ export default function SaintDetail() {
                 <AudioPlayer
                   url={saint.audioUrl[lang]!}
                   title={saint.name}
-                  artworkUrl={saint.imageUrl}
+                  artworkUrl={saint.imageUrl || undefined}
                   route={`/saint/${saint.id}`}
                   analyticsContent="saint"
                   voice={saint.audioVoice?.[lang]}

@@ -148,7 +148,8 @@ describe("santo del día", () => {
         nightPrayerEn: "…",
       },
     });
-    const saint = await prisma.saint.findUniqueOrThrow({ where: { id: "saint_guadalupe" } });
+    // El catálogo inicial va sin imágenes (opción B): aquí se le pone una, como haría el panel.
+    const saint = await prisma.saint.update({ where: { id: "saint_guadalupe" }, data: { imageUrl: "https://media.example.com/guadalupe.jpg" } });
     await runReminders(at("2026-10-05T13:00:00Z"));
     const msg = fake.sent.find((m) => m.to === u.pushToken);
     expect(msg).toMatchObject({
@@ -157,6 +158,29 @@ describe("santo del día", () => {
       data: { url: "/saint/saint_guadalupe?autoplay=1" },
       richContent: { image: saint.imageUrl },
     });
+  });
+
+  it("sin imagen del santo, el aviso sale sin imagen", async () => {
+    const u = await faithful();
+    await prisma.dailyContent.create({
+      data: {
+        date: "2026-10-05",
+        saintOfDayId: "saint_guadalupe",
+        gospelRef: "Lc 1",
+        gospelEs: "…",
+        gospelEn: "…",
+        meditationEs: "…",
+        meditationEn: "…",
+        morningPrayerEs: "…",
+        morningPrayerEn: "…",
+        nightPrayerEs: "…",
+        nightPrayerEn: "…",
+      },
+    });
+    await runReminders(at("2026-10-05T13:00:00Z"));
+    const msg = fake.sent.find((m) => m.to === u.pushToken);
+    expect(msg).toMatchObject({ title: "Santo del día" });
+    expect(msg).not.toHaveProperty("richContent");
   });
 
   it("sin contenido del día no se envía nada", async () => {

@@ -11,6 +11,7 @@ import { useAuth } from "@/src/auth";
 import { useI18n } from "@/src/i18n";
 import { AppButton, Icon, useToast } from "@/src/components/ui";
 import { openSystemSettings, pushPermission, registerForPush, type PushPermission } from "@/src/push";
+import { openLegal } from "@/src/legal";
 
 export default function Settings() {
   const styles = useStyles();
@@ -124,11 +125,22 @@ export default function Settings() {
           value={!!user?.analyticsConsent}
           onChange={(v) => setPref("analyticsConsent", v)}
         />
+        {user?.beliefConsent && (
+          <Pressable testID="withdraw-consent" onPress={() => router.push("/withdraw-consent")} accessibilityRole="button" style={styles.row}>
+            <View style={{ flex: 1, paddingRight: spacing.sm }}>
+              <Text style={styles.rowLabel}>{t("beliefConsentTitle")}</Text>
+              <Text style={styles.rowHint}>
+                {t("beliefConsentGiven")} · {t("withdrawConsent")}
+              </Text>
+            </View>
+            <Icon name="chevron-right" size={18} color={colors.muted} />
+          </Pressable>
+        )}
 
         <Text style={styles.sectionTitle}>{t("information")}</Text>
-        <Row label={t("privacy")} chevron />
-        <Row label={t("terms")} chevron />
-        <Row label={t("support")} value="soporte@misagradocorazon.com" />
+        <Row testID="privacy-link" label={t("privacy")} chevron onPress={() => openLegal("privacidad")} />
+        <Row testID="terms-link" label={t("terms")} chevron onPress={() => openLegal("terminos")} />
+        <Row label={t("support")} value="hola@misagradocorazon.com" />
 
         <Text style={styles.sectionTitle}>{t("account")}</Text>
         <Pressable testID="delete-account" onPress={() => router.push("/delete-account")} accessibilityRole="button" style={styles.row}>
@@ -163,15 +175,21 @@ function Toggle({ label, hint, value, onChange, testID }: { label: string; hint?
   );
 }
 
-function Row({ label, value, chevron }: { label: string; value?: string; chevron?: boolean }) {
+function Row({ label, value, chevron, onPress, testID }: { label: string; value?: string; chevron?: boolean; onPress?: () => void; testID?: string }) {
   const styles = useStyles();
   const { colors } = useTheme();
-  return (
-    <View style={styles.row}>
+  const content = (
+    <>
       <Text style={styles.rowLabel}>{label}</Text>
       {value && <Text style={styles.rowValue}>{value}</Text>}
       {chevron && <Icon name="chevron-right" size={18} color={colors.muted} />}
-    </View>
+    </>
+  );
+  if (!onPress) return <View style={styles.row}>{content}</View>;
+  return (
+    <Pressable testID={testID} onPress={onPress} accessibilityRole="link" style={styles.row}>
+      {content}
+    </Pressable>
   );
 }
 

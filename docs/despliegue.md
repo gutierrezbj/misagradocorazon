@@ -2,7 +2,7 @@
 
 Plan de SDD-08 (actualización del 26-sep-2026). **Todo a nombre del fundador** (o de la futura sociedad).
 
-> **Staging provisional (29-sep-2026):** hasta que exista la cuenta de Railway, staging corre en el VPS del fundador con las mismas imágenes. Ver `deploy/staging/README.md`.
+> **Hoy (decisión del fundador del 26-nov-2026):** Railway es el plan del SDD. La beta corre en el KVM 1 con las mismas imágenes, detrás de su nginx. Ver `deploy/staging/README.md`.
 
 ## Servicios
 
